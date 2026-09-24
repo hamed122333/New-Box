@@ -28,6 +28,8 @@ TARGET="$DESKTOP/$NAME"
 if [ -d "$TARGET/.git" ]; then
   echo "↻ Mise à jour de $TARGET"
   git -C "$TARGET" fetch origin "$BRANCH"
+  # package-lock.json est régénéré par npm : on l'aligne sur le dépôt avant de mettre à jour
+  git -C "$TARGET" checkout -- package-lock.json
   git -C "$TARGET" checkout "$BRANCH"
   git -C "$TARGET" pull --ff-only origin "$BRANCH"
 else

@@ -46,6 +46,8 @@ $Target  = Join-Path $Desktop $Name
 
 if (Test-Path (Join-Path $Target '.git')) {
   Invoke-Step "Mise a jour de $Target" { & $git -C $Target fetch origin $Branch }
+  # package-lock.json est regenere par npm : on l'aligne sur le depot avant de mettre a jour
+  Invoke-Step 'Nettoyage du fichier de verrouillage' { & $git -C $Target checkout -- package-lock.json }
   Invoke-Step 'Selection de la branche' { & $git -C $Target checkout $Branch }
   Invoke-Step 'Recuperation des changements' { & $git -C $Target pull --ff-only origin $Branch }
 } else {
