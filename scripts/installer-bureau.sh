@@ -2,6 +2,7 @@
 # ---------------------------------------------------------------------------
 # New Box — installe (ou met à jour) la version locale dans un dossier du Bureau
 # Usage (macOS / Linux) :  bash installer-bureau.sh
+#   autre dossier : NEWBOX_DIR=~/work/NewBox-3D bash installer-bureau.sh
 # ---------------------------------------------------------------------------
 set -euo pipefail
 
@@ -23,7 +24,7 @@ if [ -z "$DESKTOP" ] || [ ! -d "$DESKTOP" ]; then
   elif [ -d "$HOME/Bureau" ]; then DESKTOP="$HOME/Bureau"
   else DESKTOP="$HOME/Desktop"; mkdir -p "$DESKTOP"; fi
 fi
-TARGET="$DESKTOP/$NAME"
+TARGET="${NEWBOX_DIR:-$DESKTOP/$NAME}"   # NEWBOX_DIR=/chemin/NewBox-3D pour un autre dossier
 
 if [ -d "$TARGET/.git" ]; then
   echo "↻ Mise à jour de $TARGET"
@@ -33,6 +34,11 @@ if [ -d "$TARGET/.git" ]; then
   git -C "$TARGET" checkout "$BRANCH"
   git -C "$TARGET" pull --ff-only origin "$BRANCH"
 else
+  if [ -d "$TARGET" ] && [ -n "$(ls -A "$TARGET")" ]; then
+    echo "❌ Le dossier $TARGET existe déjà et n'est pas vide : choisissez un autre dossier (NEWBOX_DIR)." >&2
+    exit 1
+  fi
+  mkdir -p "$(dirname "$TARGET")"
   echo "⬇ Clonage dans $TARGET"
   git clone --branch "$BRANCH" "$REPO" "$TARGET"
 fi

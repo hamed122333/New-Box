@@ -4,7 +4,8 @@ import { defineConfig } from 'vite';
 // (ex. https://newbox.com.tn/experience/) sans reconfiguration.
 export default defineConfig({
   base: './',
-  server: { host: true, port: 5173 },
+  // localhost uniquement (pas d'alerte du pare-feu Windows) ; `npm run dev:lan` pour tester sur mobile
+  server: { port: 5173 },
   build: {
     target: 'es2020',
     chunkSizeWarningLimit: 900,

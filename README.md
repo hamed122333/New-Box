@@ -48,6 +48,15 @@ irm https://raw.githubusercontent.com/hamed122333/New-Box/claude/charming-maxwel
 
 Ensuite, pour relancer le site : double-clic sur **`demarrer.bat`** dans le dossier `NewBox-3D` du Bureau.
 
+**Dans un autre dossier** (ex. `C:\Users\hamed\work`) : définir `NEWBOX_DIR` avant la même commande :
+
+```powershell
+$env:NEWBOX_DIR = 'C:\Users\hamed\work\NewBox-3D'; irm https://raw.githubusercontent.com/hamed122333/New-Box/claude/charming-maxwell-jjq9yf/scripts/installer-bureau.ps1 | iex
+```
+
+Le script prépare aussi l'environnement : si Git ou Node.js manquent (ou si Node est trop ancien),
+il propose de les installer avec `winget`. Tester sur téléphone (même Wi-Fi) : `npm.cmd run dev:lan`.
+
 Équivalent manuel (sous PowerShell, utiliser `npm.cmd` : `npm` seul est bloqué quand l'exécution
 des scripts est désactivée, ce qui est le réglage par défaut de Windows) :
 
