@@ -1,0 +1,394 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>New Box — Emballage en carton ondulé sur mesure · Expérience 3D</title>
+    <meta
+      name="description"
+      content="New Box, fabricant tunisien de carton ondulé à Kairouan : caisses américaines, plaques, découpes imprimées. Explorez la matière en 3D et configurez votre caisse."
+    />
+    <meta name="theme-color" content="#f3eee6" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  </head>
+  <body>
+    <div class="loader" data-loader aria-hidden="true">
+      <svg class="loader__mark" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linejoin="round">
+        <path d="M24 5 40 14v20L24 43 8 34V14Z" />
+        <path d="M8 14l16 9 16-9M24 23v20" />
+        <path class="loader__tape" d="M16 9.5l16 9" />
+      </svg>
+      <p>Préparation de la matière…</p>
+    </div>
+
+    <div id="bg" aria-hidden="true"></div>
+    <canvas id="webgl" aria-hidden="true"></canvas>
+    <div class="veil" aria-hidden="true"></div>
+
+    <div class="labels" data-labels aria-hidden="true">
+      <div class="label" data-anchor="outer" data-order="0">
+        <span class="label__dot"></span><span class="label__line"></span>
+        <span class="label__text"><strong>Couverture extérieure</strong><em data-paper="outer"></em></span>
+      </div>
+      <div class="label" data-anchor="flute" data-order="1">
+        <span class="label__dot"></span><span class="label__line"></span>
+        <span class="label__text"><strong>Cannelure (onde)</strong><em data-paper="fluting"></em></span>
+      </div>
+      <div class="label label--left" data-anchor="inner" data-order="2">
+        <span class="label__dot"></span><span class="label__line"></span>
+        <span class="label__text"><strong>Couverture intérieure</strong><em data-paper="inner"></em></span>
+      </div>
+      <div class="label label--left label--low" data-anchor="glue" data-order="3">
+        <span class="label__dot"></span><span class="label__line"></span>
+        <span class="label__text"><strong>Colle d’amidon</strong><em>Assemblage 100 % recyclable</em></span>
+      </div>
+    </div>
+
+    <header class="site-header">
+      <a class="brand" href="#hero" aria-label="New Box — accueil">
+        <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round" aria-hidden="true">
+          <path d="M24 5 40 14v20L24 43 8 34V14Z" />
+          <path d="M8 14l16 9 16-9M24 23v20" />
+        </svg>
+        <span>NEW BOX</span>
+      </a>
+      <nav class="site-nav" aria-label="Navigation principale">
+        <a href="#anatomie">Matière</a>
+        <a href="#cannelures">Cannelures</a>
+        <a href="#fabrication">Fabrication</a>
+        <a href="#secteurs">Secteurs</a>
+        <a href="#configurateur">Configurateur 3D</a>
+      </nav>
+      <a class="btn btn--small" href="#contact">Demander un devis</a>
+    </header>
+
+    <nav class="rail" aria-label="Chapitres du récit">
+      <a class="rail__item" data-target="hero" href="#hero"><span>Accueil</span></a>
+      <a class="rail__item" data-target="ouverture" href="#ouverture"><span>Sur mesure</span></a>
+      <a class="rail__item" data-target="plongee" href="#plongee"><span>Matière</span></a>
+      <a class="rail__item" data-target="anatomie" href="#anatomie"><span>Anatomie</span></a>
+      <a class="rail__item" data-target="cannelures" href="#cannelures"><span>Cannelures</span></a>
+      <a class="rail__item" data-target="qualite" href="#qualite"><span>Qualité</span></a>
+      <a class="rail__item" data-target="fabrication" href="#fabrication"><span>Fabrication</span></a>
+      <a class="rail__item" data-target="palette" href="#palette"><span>Logistique</span></a>
+      <a class="rail__item" data-target="engagement" href="#engagement"><span>Engagement</span></a>
+    </nav>
+
+    <main>
+      <!-- ============ RÉCIT 3D (scrollytelling) ============ -->
+      <div id="story">
+        <section class="chapter chapter--hero" id="hero" data-units="1">
+          <div class="chapter__content">
+            <p class="eyebrow">Fabricant de carton ondulé · Kairouan, Tunisie</p>
+            <h1>L’emballage qui protège ce qui compte.</h1>
+            <p class="lead">
+              Plaques, caisses américaines, découpes imprimées et calages sur mesure, conçus et fabriqués par New Box.
+            </p>
+            <div class="actions">
+              <a class="btn" href="#configurateur">Configurer ma caisse</a>
+              <a class="btn btn--ghost" href="#ouverture">Explorer la matière</a>
+            </div>
+            <p class="scroll-hint"><span aria-hidden="true"></span>Faites défiler</p>
+          </div>
+        </section>
+
+        <section class="chapter" id="ouverture" data-units="1.2">
+          <div class="chapter__content">
+            <p class="eyebrow"><span class="num">01</span>Sur mesure</p>
+            <h2>Une caisse pensée pour votre produit.</h2>
+            <p>
+              Dimensions, cannelure, grammage, impression jusqu’à 4 couleurs : chaque caisse américaine (FEFCO 0201) est
+              dimensionnée selon le poids, le stockage et le mode d’expédition de ce qu’elle transporte.
+            </p>
+            <ul class="chips">
+              <li>Caisses américaines</li>
+              <li>Plaques</li>
+              <li>Découpes imprimées</li>
+              <li>Croisillons</li>
+              <li>Calages</li>
+            </ul>
+          </div>
+        </section>
+
+        <section class="chapter" id="plongee" data-units="1">
+          <div class="chapter__content">
+            <p class="eyebrow"><span class="num">02</span>Au cœur de la matière</p>
+            <h2>Regardons de plus près.</h2>
+            <p>
+              Sur la tranche d’une caisse se cache une architecture : des papiers plans et une onde qui travaillent
+              ensemble comme une poutre. Léger, rigide, recyclable.
+            </p>
+          </div>
+        </section>
+
+        <section class="chapter" id="anatomie" data-units="1.5">
+          <div class="chapter__content">
+            <p class="eyebrow"><span class="num">03</span>Anatomie</p>
+            <h2>Trois papiers, une structure.</h2>
+            <p>
+              La couverture extérieure porte l’impression et résiste à l’éclatement. L’onde (la cannelure) apporte
+              rigidité et amortissement. La couverture intérieure stabilise l’ensemble, assemblé à la colle d’amidon.
+            </p>
+            <dl class="glossary">
+              <div><dt>Grammage</dt><dd>Masse du papier par m² (g/m²)</dd></div>
+              <div><dt>Kraftliner</dt><dd>Papier de fibres vierges, très résistant</dd></div>
+              <div><dt>Testliner</dt><dd>Papier de fibres recyclées</dd></div>
+            </dl>
+          </div>
+        </section>
+
+        <section class="chapter" id="cannelures" data-units="2.4">
+          <div class="chapter__content">
+            <p class="eyebrow"><span class="num">04</span>Cannelures</p>
+            <h2>Choisir la bonne onde.</h2>
+            <div class="flute-tabs" aria-hidden="true">
+              <span data-flute-tab="E">E</span><span data-flute-tab="B">B</span><span data-flute-tab="C">C</span><span data-flute-tab="BC">BC</span>
+            </div>
+            <article class="flute-card" data-flute-card aria-live="polite">
+              <header>
+                <h3 data-f="name">Cannelure C</h3>
+                <p data-f="family">Simple cannelure</p>
+              </header>
+              <div class="flute-card__bar" aria-hidden="true"><span></span></div>
+              <dl>
+                <div><dt>Épaisseur</dt><dd data-f="thickness">4,0 mm</dd></div>
+                <div><dt>Pas d’onde</dt><dd data-f="pitch">7,6 mm</dd></div>
+                <div><dt>Hauteur d’onde</dt><dd data-f="height">3,6 mm</dd></div>
+                <div><dt>Coef. d’ondulation</dt><dd data-f="takeup">1,43</dd></div>
+                <div><dt>Grammage total*</dt><dd data-f="grammage">≈ 497 g/m²</dd></div>
+                <div><dt>ECT estimé*</dt><dd data-f="ect">≈ 6,9 kN/m</dd></div>
+              </dl>
+              <p class="flute-card__usage" data-f="usage"></p>
+              <small>* Qualité standard : Kraftliner 175 g/m² · Fluting 127 g/m² · Testliner 140 g/m²</small>
+            </article>
+          </div>
+        </section>
+
+        <section class="chapter" id="qualite" data-units="1.5">
+          <div class="chapter__content">
+            <p class="eyebrow"><span class="num">05</span>Qualité</p>
+            <h2>La résistance se mesure.</h2>
+            <p>
+              Compression sur chant (ECT), gerbage (BCT), éclatement, absorption d’eau (Cobb) : chaque référence est
+              définie par des valeurs mesurables.
+            </p>
+            <div class="counters">
+              <div class="counter"><span class="counter__value"><b data-counter="ect">0</b><i>kN/m</i></span><span class="counter__label">ECT · compression sur chant</span></div>
+              <div class="counter"><span class="counter__value"><b data-counter="bct">0</b><i>kgf</i></span><span class="counter__label">BCT · caisse 400 × 300 × 300</span></div>
+              <div class="counter"><span class="counter__value"><b data-counter="burst">0</b><i>kPa</i></span><span class="counter__label">Résistance à l’éclatement</span></div>
+              <div class="counter"><span class="counter__value"><b data-counter="cobb">0</b><i>g/m²</i></span><span class="counter__label">Cobb 60 s · absorption d’eau</span></div>
+            </div>
+            <small class="note">Double cannelure BC, qualité standard. Valeurs indicatives calculées (formule de McKee).</small>
+          </div>
+        </section>
+
+        <section class="chapter" id="fabrication" data-units="1.8">
+          <div class="chapter__content">
+            <p class="eyebrow"><span class="num">06</span>Fabrication</p>
+            <h2>De la bobine à la caisse.</h2>
+            <ol class="steps">
+              <li data-step><b>Onduleuse</b><span>Les bobines de papier deviennent des plaques simple ou double cannelure.</span></li>
+              <li data-step><b>Impression flexo</b><span>Jusqu’à 4 couleurs, directement sur la plaque.</span></li>
+              <li data-step><b>Découpe Bobst</b><span>Articles imprimés et découpés à la forme, avec précision.</span></li>
+              <li data-step><b>Pliage &amp; collage</b><span>La patte de collage ferme le fourreau : la caisse est prête à monter.</span></li>
+            </ol>
+          </div>
+        </section>
+
+        <section class="chapter" id="palette" data-units="1.5">
+          <div class="chapter__content">
+            <p class="eyebrow"><span class="num">07</span>Logistique</p>
+            <h2>Prêt à gerber, prêt à partir.</h2>
+            <p>
+              Plan de palettisation, hauteur de gerbage, conditions de stockage : la bonne résistance au bon endroit,
+              sans sur-emballage.
+            </p>
+          </div>
+        </section>
+
+        <section class="chapter" id="engagement" data-units="2">
+          <div class="chapter__content">
+            <p class="eyebrow"><span class="num">08</span>Engagement</p>
+            <h2>Un matériau qui revient toujours.</h2>
+            <p>
+              Le carton ondulé est mono-matériau et 100 % recyclable. Dans notre usine, les chutes sont compactées en
+              balles et renvoyées vers le recyclage.
+            </p>
+          </div>
+        </section>
+      </div>
+
+      <!-- ============ SECTEURS ============ -->
+      <section class="section section--sectors" id="secteurs">
+        <header class="section__head">
+          <p class="eyebrow">Secteurs</p>
+          <h2>Un emballage pour chaque filière.</h2>
+          <p>Chaque marché a ses contraintes : humidité, gerbage, transport, image de marque. Nous adaptons la cannelure, le papier et l’impression.</p>
+        </header>
+        <div class="sector-grid">
+          <article class="sector">
+            <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 4c5 3 8 8 8 13a8 8 0 0 1-16 0c0-5 3-10 8-13Z" /><path d="M16 12v14" /></svg>
+            <h3>Agroalimentaire &amp; export</h3>
+            <p>Dattes, agrumes, huile d’olive, conserves : caisses résistantes à l’humidité et au froid.</p>
+          </article>
+          <article class="sector">
+            <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M4 22h24l-3 6H7Z" /><path d="M9 22c0-5 3-9 7-9s7 4 7 9" /><path d="M16 13V5m0 0 4 3m-4-3-4 3" /></svg>
+            <h3>Agriculture</h3>
+            <p>Plateaux fruits et légumes, caisses de récolte gerbables et ventilées.</p>
+          </article>
+          <article class="sector">
+            <svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="5" /><path d="M16 3v5m0 16v5M3 16h5m16 0h5M6.8 6.8l3.5 3.5m11.4 11.4 3.5 3.5m0-18.4-3.5 3.5M10.3 21.7l-3.5 3.5" /></svg>
+            <h3>Industrie</h3>
+            <p>Pièces techniques et électroménager : double cannelure, calages et croisillons.</p>
+          </article>
+          <article class="sector">
+            <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M4 10 16 4l12 6v12l-12 6-12-6Z" /><path d="m4 10 12 6 12-6M16 16v12" /></svg>
+            <h3>E-commerce &amp; distribution</h3>
+            <p>Caisses d’expédition légères, impression de marque, ouverture facile.</p>
+          </article>
+          <article class="sector">
+            <svg viewBox="0 0 32 32" aria-hidden="true"><rect x="11" y="4" width="10" height="6" rx="1" /><path d="M9 10h14v17a1 1 0 0 1-1 1H10a1 1 0 0 1-1-1Z" /><path d="M13 17h6" /></svg>
+            <h3>Cosmétique &amp; hygiène</h3>
+            <p>Micro-cannelure E, impression haute définition, présentoirs.</p>
+          </article>
+          <article class="sector">
+            <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M11 4 4 9l3 5 3-2v16h12V12l3 2 3-5-7-5c-1 2-3 3-5 3s-4-1-5-3Z" /></svg>
+            <h3>Textile &amp; chaussure</h3>
+            <p>Cartons d’expédition export aux formats normés, marquage colis.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="section section--figures" aria-label="New Box en chiffres">
+        <div class="figure"><b>2020</b><span>Création de l’usine à Kairouan</span></div>
+        <div class="figure"><b>4</b><span>couleurs en impression flexographique</span></div>
+        <div class="figure"><b>2</b><span>structures : simple &amp; double cannelure</span></div>
+        <div class="figure"><b>100 %</b><span>recyclable, chutes compactées et recyclées</span></div>
+      </section>
+
+      <!-- ============ CONFIGURATEUR 3D ============ -->
+      <section class="config" id="configurateur">
+        <div class="config__viewer" data-viewer>
+          <p class="config__summary" data-out="summary"></p>
+          <p class="config__hint">Glissez pour faire tourner la caisse</p>
+          <p class="config__nogl">La vue 3D nécessite WebGL. Les estimations restent disponibles.</p>
+        </div>
+
+        <form class="config__panel" onsubmit="return false">
+          <header>
+            <p class="eyebrow">Configurateur 3D</p>
+            <h2>Dessinez votre caisse.</h2>
+            <p>Réglez les dimensions, la cannelure et l’impression : la caisse et ses performances se mettent à jour en direct.</p>
+          </header>
+
+          <fieldset>
+            <legend>Dimensions intérieures <small>(mm)</small></legend>
+            <div class="dim">
+              <label for="dim-L">Longueur</label>
+              <input id="dim-L-range" type="range" name="L" step="5" aria-label="Longueur (curseur)" />
+              <input id="dim-L" type="number" name="L" step="1" inputmode="numeric" />
+            </div>
+            <div class="dim">
+              <label for="dim-W">Largeur</label>
+              <input id="dim-W-range" type="range" name="W" step="5" aria-label="Largeur (curseur)" />
+              <input id="dim-W" type="number" name="W" step="1" inputmode="numeric" />
+            </div>
+            <div class="dim">
+              <label for="dim-H">Hauteur</label>
+              <input id="dim-H-range" type="range" name="H" step="5" aria-label="Hauteur (curseur)" />
+              <input id="dim-H" type="number" name="H" step="1" inputmode="numeric" />
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>Cannelure</legend>
+            <div class="seg" data-options="flute" role="group" aria-label="Type de cannelure"></div>
+          </fieldset>
+
+          <fieldset>
+            <legend><label for="grade">Qualité papier</label></legend>
+            <select id="grade" name="grade"></select>
+          </fieldset>
+
+          <fieldset>
+            <legend>Impression</legend>
+            <div class="upload">
+              <label class="btn btn--ghost btn--small" for="logo">Importer un logo</label>
+              <input id="logo" type="file" name="logo" accept="image/png,image/jpeg,image/svg+xml,image/webp" class="visually-hidden" />
+              <span class="upload__name" data-logo-name>Aucun fichier</span>
+              <button type="button" class="link" data-action="remove-logo">Retirer</button>
+            </div>
+            <div class="inks" role="radiogroup" aria-label="Couleur d’encre">
+              <label><input type="radio" name="ink" value="noir" checked /><span style="--c: #231a14">Noir</span></label>
+              <label><input type="radio" name="ink" value="bleu" /><span style="--c: #1d3a6b">Bleu</span></label>
+              <label><input type="radio" name="ink" value="rouge" /><span style="--c: #a3261c">Rouge</span></label>
+              <label><input type="radio" name="ink" value="vert" /><span style="--c: #1f5a3a">Vert</span></label>
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>Vue</legend>
+            <label class="slider"><span>Ouverture des rabats</span><input type="range" name="lid" min="0" max="1" step="0.01" value="0" /></label>
+            <label class="slider"><span>Mise à plat (flan / plan de découpe)</span><input type="range" name="flat" min="0" max="1" step="0.01" value="0" /></label>
+            <label class="toggle"><input type="checkbox" name="autorotate" /><span>Rotation automatique</span></label>
+          </fieldset>
+
+          <section class="results" aria-live="polite">
+            <h3>Performances estimées</h3>
+            <div class="gauge" data-gauge aria-hidden="true"><span></span></div>
+            <dl>
+              <div><dt>BCT (gerbage)</dt><dd data-out="bct"></dd></div>
+              <div><dt>ECT</dt><dd data-out="ect"></dd></div>
+              <div><dt>Éclatement</dt><dd data-out="burst"></dd></div>
+              <div><dt>Grammage</dt><dd data-out="grammage"></dd></div>
+              <div><dt>Poids de la caisse</dt><dd data-out="weight"></dd></div>
+            </dl>
+          </section>
+
+          <fieldset>
+            <legend>Gerbage</legend>
+            <label class="slider"><span>Poids du contenu : <b data-out="content">10 kg</b></span><input type="range" name="content" min="0.5" max="40" step="0.5" value="10" /></label>
+            <label class="select"><span>Conditions de stockage</span><select name="condition"></select></label>
+            <p class="stack-result">
+              Charge admissible : <b data-out="maxload"></b><br />
+              Hauteur de gerbage : <b data-out="stack"></b> <small data-out="stack-note"></small>
+            </p>
+          </fieldset>
+
+          <div class="config__actions">
+            <button type="button" class="btn" data-action="quote">Demander un devis</button>
+            <button type="button" class="btn btn--ghost" data-action="capture">Capture PNG</button>
+            <button type="button" class="link" data-action="reset">Réinitialiser</button>
+          </div>
+          <p class="note">Estimations indicatives (formule de McKee, indices papier moyens). Les valeurs contractuelles sont établies par New Box.</p>
+        </form>
+      </section>
+
+      <!-- ============ CONTACT ============ -->
+      <footer class="contact" id="contact">
+        <div class="contact__cta">
+          <p class="eyebrow">Contact</p>
+          <h2>Parlons de votre prochain emballage.</h2>
+          <a class="btn btn--light" href="mailto:info@newbox.com.tn">info@newbox.com.tn</a>
+        </div>
+        <div class="contact__info">
+          <div>
+            <h3>Usine</h3>
+            <p>Z.I Sbikha 2 — B.P 92<br />Kairouan, Tunisie</p>
+          </div>
+          <div>
+            <h3>Produits</h3>
+            <p>Plaques · Caisses américaines · Découpes imprimées · Croisillons · Calages sur mesure</p>
+          </div>
+          <div>
+            <h3>Web</h3>
+            <p><a href="https://newbox.com.tn/" rel="noopener">newbox.com.tn</a></p>
+          </div>
+        </div>
+        <p class="contact__legal">© 2026 New Box · Prototype d’expérience 3D</p>
+      </footer>
+    </main>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
