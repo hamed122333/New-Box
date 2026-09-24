@@ -411,7 +411,7 @@ html[data-mode='config'] .rail {
 .chapter__content {
   position: fixed;
   left: var(--gutter);
-  top: 50%;
+  top: calc(50% + var(--header-h) / 2);
   width: min(460px, 38vw);
   color: var(--text);
   opacity: 0;
@@ -444,6 +444,11 @@ html[data-mode='config'] .rail {
     transform 0.9s var(--ease) 0.1s,
     visibility 0s,
     color 0.4s;
+}
+
+/* Pendant le fondu entre les deux mondes, le texte « clair » s'efface avec le voile */
+html:not([data-world='macro']) .chapter.is-active .chapter__content {
+  filter: opacity(calc(1 - var(--fade)));
 }
 
 .chapter--hero .chapter__content {
@@ -1471,6 +1476,52 @@ html:not(.js) .chapter__content::before,
 }
 
 /* ---------- responsive ---------- */
+
+/* Écrans d'ordinateur peu hauts (portables 720–820 px) : on compacte les chapitres */
+@media (min-width: 821px) and (max-height: 820px) {
+  .chapter h1 {
+    font-size: clamp(36px, 4.8vw, 68px);
+  }
+  .chapter h2 {
+    font-size: clamp(28px, 3vw, 44px);
+    margin-bottom: 12px;
+  }
+  .eyebrow {
+    margin-bottom: 12px;
+  }
+  .flute-card {
+    padding: 16px 18px;
+  }
+  .flute-card__bar {
+    margin: 10px 0;
+  }
+  .flute-card dl {
+    gap: 8px 16px;
+  }
+  .flute-card dd {
+    font-size: 17px;
+  }
+  .flute-card small {
+    display: none;
+  }
+  .counters {
+    margin-top: 16px;
+    gap: 10px;
+  }
+  .counter {
+    padding: 12px 14px;
+  }
+  .glossary,
+  .steps {
+    margin-top: 16px;
+  }
+  .steps li {
+    padding: 10px 0 10px 50px;
+  }
+  .steps li::before {
+    top: 10px;
+  }
+}
 
 @media (max-width: 1080px) {
   .site-nav {
