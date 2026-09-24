@@ -48,7 +48,7 @@ export class CorrugatedBox {
     this.root = new THREE.Group();
     this.group.add(this.root);
     this.params = { lid: 0, flat: 0, tape: 1 };
-    this.spec = { L: 400, W: 300, H: 300, flute: 'C', grade: 'standard', ink: 'noir', logo: null };
+    this.spec = { L: 400, W: 300, H: 300, flute: 'C', grade: 'standard', ink: 'bleu', logo: null, brandLogo: null };
     this._disposables = [];
     this.bump = bumpTile(this.aniso);
     this._tmp = new THREE.Vector3();
@@ -62,7 +62,7 @@ export class CorrugatedBox {
     this.comp = boardComposition(s.flute, s.grade);
     const needTex =
       !this.mats ||
-      ['L', 'W', 'H', 'flute', 'grade', 'ink', 'logo'].some((k) => prev[k] !== s[k]) ||
+      ['L', 'W', 'H', 'flute', 'grade', 'ink', 'logo', 'brandLogo'].some((k) => prev[k] !== s[k]) ||
       partial.force;
     if (needTex) this._buildMaterials();
     this._buildGeometry();
@@ -80,10 +80,11 @@ export class CorrugatedBox {
     const palette = GRADES[s.grade].color === 'white' ? 'white' : 'kraft';
     const common = {
       palette,
-      ink: INKS[s.ink] ?? INKS.noir,
+      ink: INKS[s.ink] ?? INKS.bleu,
       comp: this.comp,
       dims: { L: s.L, W: s.W, H: s.H },
       logo: s.logo,
+      brandLogo: s.brandLogo,
     };
     // Les faces imprimées ont des UV 0–1 : on répète le grain à l'échelle réelle.
     const bumpFor = (wMm, hMm) => {

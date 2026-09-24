@@ -8,16 +8,14 @@
       name="description"
       content="New Box, fabricant tunisien de carton ondulé à Kairouan : caisses américaines, plaques, découpes imprimées. Explorez la matière en 3D et configurez votre caisse."
     />
-    <meta name="theme-color" content="#f3eee6" />
-    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <meta name="theme-color" content="#14259B" />
+    <link rel="icon" href="/src/assets/brand/logo-new-box.png" type="image/png" />
+    <link rel="apple-touch-icon" href="/src/assets/brand/logo-new-box.png" />
   </head>
   <body>
     <div class="loader" data-loader aria-hidden="true">
-      <svg class="loader__mark" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linejoin="round">
-        <path d="M24 5 40 14v20L24 43 8 34V14Z" />
-        <path d="M8 14l16 9 16-9M24 23v20" />
-        <path class="loader__tape" d="M16 9.5l16 9" />
-      </svg>
+      <img class="loader__logo" src="/src/assets/brand/logo-new-box.png" alt="" width="604" height="634" />
+      <span class="loader__bar"><span></span></span>
       <p>Préparation de la matière…</p>
     </div>
 
@@ -45,12 +43,8 @@
     </div>
 
     <header class="site-header">
-      <a class="brand" href="#hero" aria-label="New Box — accueil">
-        <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round" aria-hidden="true">
-          <path d="M24 5 40 14v20L24 43 8 34V14Z" />
-          <path d="M8 14l16 9 16-9M24 23v20" />
-        </svg>
-        <span>NEW BOX</span>
+      <a class="brand" href="#hero">
+        <img class="brand__logo" src="/src/assets/brand/logo-new-box.png" alt="New Box Tunisia — accueil" width="604" height="634" />
       </a>
       <nav class="site-nav" aria-label="Navigation principale">
         <a href="#anatomie">Matière</a>
@@ -319,8 +313,8 @@
               <button type="button" class="link" data-action="remove-logo">Retirer</button>
             </div>
             <div class="inks" role="radiogroup" aria-label="Couleur d’encre">
-              <label><input type="radio" name="ink" value="noir" checked /><span style="--c: #231a14">Noir</span></label>
-              <label><input type="radio" name="ink" value="bleu" /><span style="--c: #1d3a6b">Bleu</span></label>
+              <label><input type="radio" name="ink" value="bleu" checked /><span style="--c: #14259b">Bleu New Box</span></label>
+              <label><input type="radio" name="ink" value="noir" /><span style="--c: #231a14">Noir</span></label>
               <label><input type="radio" name="ink" value="rouge" /><span style="--c: #a3261c">Rouge</span></label>
               <label><input type="radio" name="ink" value="vert" /><span style="--c: #1f5a3a">Vert</span></label>
             </div>
@@ -367,6 +361,7 @@
       <!-- ============ CONTACT ============ -->
       <footer class="contact" id="contact">
         <div class="contact__cta">
+          <img class="contact__logo" src="/src/assets/brand/logo-new-box.png" alt="New Box Tunisia" width="604" height="634" loading="lazy" />
           <p class="eyebrow">Contact</p>
           <h2>Parlons de votre prochain emballage.</h2>
           <a class="btn btn--light" href="mailto:info@newbox.com.tn">info@newbox.com.tn</a>

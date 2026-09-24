@@ -40,7 +40,15 @@ actuel, par exemple dans `newbox.com.tn/experience/`.
 Les scripts créent le dossier **`NewBox-3D`** sur le Bureau, récupèrent cette branche,
 installent les dépendances et ouvrent le site dans le navigateur. Relancez-les pour mettre à jour.
 
-**Windows (PowerShell)**
+**Windows** — ouvrir PowerShell et coller cette seule ligne :
+
+```powershell
+irm https://raw.githubusercontent.com/hamed122333/New-Box/claude/charming-maxwell-jjq9yf/scripts/installer-bureau.ps1 | iex
+```
+
+Ensuite, pour relancer le site : double-clic sur **`demarrer.bat`** dans le dossier `NewBox-3D` du Bureau.
+
+Équivalent manuel :
 
 ```powershell
 cd $([Environment]::GetFolderPath('Desktop'))
@@ -50,13 +58,19 @@ npm install
 npm run dev -- --open
 ```
 
-ou, une fois le dépôt cloné : `powershell -ExecutionPolicy Bypass -File scripts\installer-bureau.ps1`
-
 **macOS / Linux**
 
 ```bash
-bash scripts/installer-bureau.sh
+bash <(curl -fsSL https://raw.githubusercontent.com/hamed122333/New-Box/claude/charming-maxwell-jjq9yf/scripts/installer-bureau.sh)
 ```
+
+## Identité visuelle
+
+- Logo officiel : `src/assets/brand/logo-new-box.png` (repris du dépôt `Site-New-Box-Tunsie`) — en-tête,
+  écran de chargement, pied de page, favicon et **impression flexo sur la caisse 3D** (bleu + orange,
+  réserves blanches laissant voir le kraft).
+- Couleurs de la charte : bleu `#14259B`, orange `#F49C21`, bleu nuit `#0D1642` (variables en tête de
+  `src/styles/main.css`, constante `BRAND` dans `src/three/textures.js`).
 
 ## Structure
 

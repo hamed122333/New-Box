@@ -24,9 +24,12 @@ export const PALETTES = {
   white: { base: '#ebe5d8', light: '#f8f4ec', dark: '#cfc4b0', fibers: ['#c2b59c', '#ffffff', '#d9cfbd'] },
 };
 
+// Couleurs de la charte New Box (relevées sur le logo officiel)
+export const BRAND = { blue: '#14259b', orange: '#f49c21' };
+
 export const INKS = {
+  bleu: BRAND.blue,
   noir: '#231a14',
-  bleu: '#1d3a6b',
   rouge: '#a3261c',
   vert: '#1f5a3a',
 };
@@ -260,7 +263,51 @@ export function printedPanel(kind, o, aniso) {
   ctx.drawImage(ink, 0, 0);
   ctx.restore();
 
+  // Logo New Box imprimé dans ses propres couleurs (bleu + orange), les réserves
+  // blanches du logo laissent apparaître le papier comme sur une vraie impression.
+  if (kind === 'front' && !o.logo && o.brandLogo) printBrandLogo(ctx, W, H, o, r);
+
   return finishTexture(new THREE.CanvasTexture(c), aniso);
+}
+
+function logoBox(img, W, H) {
+  const maxW = W * 0.5;
+  const maxH = H * 0.56;
+  const k = Math.min(maxW / img.width, maxH / img.height);
+  const w = img.width * k;
+  const h = img.height * k;
+  return { x: W / 2 - w / 2, y: H * 0.39 - h / 2, w, h };
+}
+
+function printBrandLogo(ctx, W, H, o, r) {
+  const b = logoBox(o.brandLogo, W, H);
+  const layer = canvas(W, H);
+  const lc = layer.getContext('2d');
+  lc.drawImage(o.brandLogo, b.x, b.y, b.w, b.h);
+  // encre : on retire le blanc (non imprimé) puis on applique la trame
+  const data = lc.getImageData(Math.floor(b.x), Math.floor(b.y), Math.ceil(b.w) + 1, Math.ceil(b.h) + 1);
+  const d = data.data;
+  for (let i = 0; i < d.length; i += 4) {
+    const min = Math.min(d[i], d[i + 1], d[i + 2]);
+    if (min > 200) d[i + 3] = Math.max(0, d[i + 3] - (min - 200) * 5);
+  }
+  lc.putImageData(data, Math.floor(b.x), Math.floor(b.y));
+  lc.globalCompositeOperation = 'destination-out';
+  for (let i = 0; i < (b.w * b.h) / 70; i++) {
+    lc.fillStyle = `rgba(0,0,0,${0.1 + r() * 0.45})`;
+    lc.fillRect(b.x + r() * b.w, b.y + r() * b.h, 1 + r() * 1.5, 1 + r() * 1.5);
+  }
+  const white = o.palette === 'white';
+  ctx.save();
+  ctx.globalAlpha = white ? 0.96 : 0.86;
+  ctx.drawImage(layer, 0, 0);
+  if (!white) {
+    // l'encre se teinte légèrement au contact du kraft
+    ctx.globalCompositeOperation = 'multiply';
+    ctx.globalAlpha = 0.45;
+    ctx.drawImage(layer, 0, 0);
+  }
+  ctx.restore();
 }
 
 function drawLogoMark(ctx, x, y, s) {
@@ -315,7 +362,13 @@ function drawWordmark(ctx, cx, cy, size) {
 
 function drawFront(ctx, W, H, u, o) {
   const cx = W / 2;
-  if (o.logo) {
+  if (!o.logo && o.brandLogo) {
+    // le logo officiel est composé à part (printBrandLogo) ; ici la mention sous le logo
+    const b = logoBox(o.brandLogo, W, H);
+    ctx.textAlign = 'center';
+    ctx.font = `600 ${u * 4}px ${FONT_BODY}`;
+    ctx.fillText('EMBALLAGE EN CARTON ONDULÉ', cx, b.y + b.h + u * 6.5);
+  } else if (o.logo) {
     const img = o.logo;
     const maxW = W * 0.62;
     const maxH = H * 0.42;

@@ -144,7 +144,8 @@ src/lib/calc.js            ECT, McKee, flan, gerbage
 Récit 3D complet, configurateur MVP, calculs, responsive, build statique.
 
 ### Phase 1 — Contenu & marque (≈ 2 semaines)
-- Logo vectoriel officiel, couleurs de la charte, typographies
+- ✅ Logo officiel (PNG) et couleurs de la charte intégrés (bleu `#14259B`, orange `#F49C21`) ;
+  reste à obtenir une version **vectorielle (SVG)** du logo pour l'impression haute définition
 - Fiches techniques réelles : papiers utilisés, grammages, cannelures produites, résultats labo (ECT, BCT, Mullen, Cobb)
 - Photos / vidéos de l'usine (onduleuse, Bobst, impression) pour les sections Fabrication et Secteurs
 - Relecture des textes, version **anglaise** puis **arabe** (RTL)
@@ -172,7 +173,7 @@ Récit 3D complet, configurateur MVP, calculs, responsive, build statique.
 
 ## 7. Ce dont nous avons besoin de New Box
 
-1. Logo (SVG) et charte graphique
+1. Logo en SVG (le PNG officiel est déjà intégré) et charte graphique complète (typographies)
 2. Liste des cannelures et papiers réellement produits + résultats de laboratoire
 3. Photos HD de l'usine et des produits, références clients autorisées
 4. Téléphone, horaires, coordonnées commerciales, lien Google Maps

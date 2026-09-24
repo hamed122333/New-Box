@@ -3,7 +3,7 @@ import { GRADES, GRADE_ORDER, CONDITIONS } from '../data/grades.js';
 import { estimate, fmt } from '../lib/calc.js';
 
 const LIMITS = { L: [100, 800], W: [80, 600], H: [50, 800] };
-const DEFAULTS = { L: 400, W: 300, H: 300, flute: 'C', grade: 'standard', ink: 'noir', content: 10, condition: 'standard' };
+const DEFAULTS = { L: 400, W: 300, H: 300, flute: 'C', grade: 'standard', ink: 'bleu', content: 10, condition: 'standard' };
 
 /**
  * Configurateur façon « mockup 3D » : dimensions, cannelure, qualité, impression,
@@ -187,7 +187,7 @@ export class Configurator {
       `• Dimensions intérieures : ${s.L} × ${s.W} × ${s.H} mm`,
       `• Cannelure : ${FLUTES[s.flute].name} (${FLUTES[s.flute].thickness} mm)`,
       `• Qualité papier : ${GRADES[s.grade].name} — ${GRADES[s.grade].desc}`,
-      `• Impression : ${s.logo ? 'logo client (fichier à joindre)' : 'à définir'} — encre ${s.ink}`,
+      `• Impression : ${s.logo ? 'logo client (fichier à joindre)' : 'à définir'} — encre ${s.ink === 'bleu' ? 'bleu New Box' : s.ink}`,
       `• Poids du contenu : ${s.content} kg — stockage : ${CONDITIONS[s.condition].name}`,
       '',
       `Estimations du configurateur : ECT ≈ ${fmt(e.ect, 1)} kN/m, BCT ≈ ${fmt(e.bctKg)} kgf, poids caisse ≈ ${fmt(e.boxWeightG)} g.`,

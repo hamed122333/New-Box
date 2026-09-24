@@ -26,7 +26,7 @@ export class Experience {
     const plateGeo = new THREE.BoxGeometry(62, 2.4, 26);
     this.plateTop = new THREE.Mesh(plateGeo, steel);
     this.plateBottom = new THREE.Mesh(plateGeo, steel);
-    const accent = new THREE.MeshStandardMaterial({ color: 0xe0561f, roughness: 0.4, emissive: 0x5a1a05 });
+    const accent = new THREE.MeshStandardMaterial({ color: 0xf49c21, roughness: 0.4, emissive: 0x5a3200 }); // orange New Box
     this.arrow = new THREE.Group();
     const shaft = new THREE.Mesh(new THREE.CylinderGeometry(0.9, 0.9, 12, 20), accent);
     shaft.position.y = 9;
@@ -147,7 +147,7 @@ export class Experience {
         const lift = smooth(0, 0.22, st.stack);
         const drop = smooth(0.84, 1, st.stack);
         const hs = stack.heroSlot;
-        box.group.position.set(lerp(0, hs.x, lift), lerp(0, hs.y + 4.5, lift) - 4.5 * drop, lerp(0, hs.z, lift));
+        box.group.position.set(lerp(0, hs.x, lift), lerp(0, hs.y + 2.6, lift) - 2.6 * drop, lerp(0, hs.z, lift));
       } else box.group.position.set(0, 0, 0);
 
       this._interp(this.boxKey, st.camBox, pos, target);

@@ -17,12 +17,22 @@ import { ChapterUI } from './ui/chapters.js';
 import { Labels } from './ui/labels.js';
 import { Configurator } from './ui/configurator.js';
 import { GRADES } from './data/grades.js';
+import logoUrl from './assets/brand/logo-new-box.png';
 
 const root = document.documentElement;
-const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+// ?capture : horloge pilotée de l'extérieur (enregistrement vidéo image par image)
+const capture = new URLSearchParams(location.search).has('capture');
+const reduced = capture || matchMedia('(prefers-reduced-motion: reduce)').matches;
 const mobileMq = matchMedia('(max-width: 820px)');
 const coarse = matchMedia('(pointer: coarse)').matches;
 const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+const loadImage = (src) =>
+  new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => resolve(img);
+    img.onerror = reject;
+    img.src = src;
+  });
 
 root.classList.add('js');
 
@@ -75,17 +85,20 @@ async function init() {
     return;
   }
 
-  // Les textures sont dessinées avec les polices du site : on attend leur chargement.
+  // Les textures sont dessinées avec les polices du site et le logo officiel : on attend leur chargement.
+  const logoPromise = loadImage(logoUrl).catch(() => null);
   await Promise.race([
     Promise.all([
       document.fonts.load('700 64px "Space Grotesk Variable"'),
       document.fonts.load('600 32px "Inter Variable"'),
       document.fonts.load('400 32px "Inter Variable"'),
+      logoPromise,
     ]),
     wait(2500),
   ]).catch(() => {});
+  const brandLogo = await Promise.race([logoPromise, wait(0).then(() => null)]);
 
-  const box = new CorrugatedBox(stage.renderer).build();
+  const box = new CorrugatedBox(stage.renderer).build({ brandLogo });
   const board = new BoardSample(stage.renderer);
   const stack = new PalletStack(stage.renderer);
   stack.build(box);
@@ -139,19 +152,14 @@ async function init() {
   };
   setMode('story');
 
-  let last = performance.now();
   let first = true;
-  gsap.ticker.add(() => {
-    const now = performance.now();
-    const dt = Math.min(0.1, (now - last) / 1000);
-    last = now;
-
+  const frame = (dt, t) => {
     const wanted = visible.config ? 'config' : 'story';
     if (wanted !== mode) setMode(wanted);
 
     if (mode === 'story') {
       const time = story.tl.time();
-      xp.applyStory(state, reduced ? 0 : now / 1000, mobileMq.matches);
+      xp.applyStory(state, t, mobileMq.matches);
       chapters.update(time, state, visible.story);
       labels.update(state.world > 0.5 ? state.labels : 0, stage.size);
       if (visible.story || first) stage.render();
@@ -159,20 +167,48 @@ async function init() {
       chapters.update(0, { world: 0, fade: 0 }, false);
       labels.update(0, stage.size);
       cfg.measure(stage.size);
-      xp.applyConfig(cfg.view, controls, reduced ? 0 : dt);
+      xp.applyConfig(cfg.view, controls, dt);
       stage.render();
     }
     if (first) {
       first = false;
       hideLoader();
     }
+  };
+
+  let last = performance.now();
+  let clock = 0;
+  gsap.ticker.add(() => {
+    const now = performance.now();
+    const dt = Math.min(0.1, (now - last) / 1000);
+    last = now;
+    if (capture) {
+      if (first) frame(0, 0);
+      return;
+    }
+    frame(reduced ? 0 : dt, reduced ? 0 : now / 1000);
   });
 
   window.addEventListener('resize', () => ScrollTrigger.refresh());
   if (coarse) root.classList.add('is-touch');
 
-  // Accès de débogage depuis la console
-  window.__newbox = { state, story, stage, box, board, stack, xp, cfg };
+  // Accès de débogage depuis la console (+ pilotage image par image en mode ?capture)
+  window.__newbox = {
+    state,
+    story,
+    stage,
+    box,
+    board,
+    stack,
+    xp,
+    cfg,
+    ScrollTrigger,
+    step(dt) {
+      clock += dt;
+      ScrollTrigger.update();
+      frame(dt, clock);
+    },
+  };
 }
 
 init();
