@@ -63,6 +63,35 @@ function setupScroll() {
   return lenis;
 }
 
+/**
+ * Pendant l'écran de chargement : compile les shaders et envoie les textures au GPU pour
+ * tous les états (palette, vue macro, test ECT, double cannelure). Sans cela, le premier
+ * passage dans ces scènes bloque le fil principal et retarde les clics (INP).
+ */
+async function warmUp({ stage, board, stack, xp }) {
+  const r = stage.renderer;
+  stack.update(1);
+  xp.rig.visible = true;
+  board.setState({ from: 'BC', to: 'BC', t: 0, explode: 0 });
+  try {
+    await Promise.race([
+      Promise.all([r.compileAsync(stage.boxScene, stage.camera), r.compileAsync(stage.macroScene, stage.camera)]),
+      wait(4000),
+    ]);
+    // un rendu de chaque monde finalise programmes, ombres et textures
+    stage.world = 'box';
+    stage.render();
+    stage.world = 'macro';
+    stage.render();
+  } catch (err) {
+    console.warn('Pré-compilation incomplète :', err);
+  }
+  stage.world = 'box';
+  stack.update(0);
+  xp.rig.visible = false;
+  board.setState({ from: 'C', to: 'C', t: 0, explode: 0 });
+}
+
 function hideLoader() {
   const l = document.querySelector('[data-loader]');
   l.classList.add('is-done');
@@ -80,7 +109,7 @@ async function init() {
     console.warn('WebGL indisponible :', err);
     root.classList.add('no-webgl');
     setupScroll();
-    new Configurator(document.querySelector('#configurateur'), { onSpec: () => {}, onCapture: () => '' });
+    new Configurator(document.querySelector('#configurateur'), { onSpec: () => {}, onCapture: async () => null });
     hideLoader();
     return;
   }
@@ -104,6 +133,7 @@ async function init() {
   stack.build(box);
   const xp = new Experience({ stage, box, board, stack });
   const labels = new Labels(document.querySelector('[data-labels]'), board, stage.camera);
+  await warmUp({ stage, board, stack, xp });
 
   const story = buildStory({ reduced });
   const chapters = new ChapterUI(story);
@@ -131,8 +161,8 @@ async function init() {
   syncPanelScroll();
 
   const cfg = new Configurator(cfgRoot, {
-    onSpec: (patch) => {
-      box.build(patch);
+    onSpec: (patch, opts) => {
+      box.build(patch, opts);
       stack.build(box);
     },
     onCapture: () => stage.capture(),

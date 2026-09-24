@@ -1,6 +1,7 @@
 import { FLUTES, FLUTE_ORDER } from '../data/flutes.js';
 import { GRADES, GRADE_ORDER, CONDITIONS } from '../data/grades.js';
 import { estimate, fmt } from '../lib/calc.js';
+import { afterNextPaint } from '../lib/schedule.js';
 
 const LIMITS = { L: [100, 800], W: [80, 600], H: [50, 800] };
 const DEFAULTS = { L: 400, W: 300, H: 300, flute: 'C', grade: 'standard', ink: 'bleu', content: 10, condition: 'standard' };
@@ -51,14 +52,16 @@ export class Configurator {
       range.min = num.min = LIMITS[k][0];
       range.max = num.max = LIMITS[k][1];
       range.value = num.value = this.spec[k];
-      const commit = (v, from) => {
+      const commit = (v, from, mode) => {
         const val = Math.round(Math.min(LIMITS[k][1], Math.max(LIMITS[k][0], Number(v) || this.spec[k])));
         if (from !== range) range.value = val;
         if (from !== num) num.value = val;
-        this._set({ [k]: val });
+        this._set({ [k]: val }, mode);
       };
-      range.addEventListener('input', () => commit(range.value, range));
-      num.addEventListener('change', () => commit(num.value, num));
+      // pendant le glissement : géométrie seule ; au relâchement : textures (cotes imprimées)
+      range.addEventListener('input', () => commit(range.value, range, 'drag'));
+      range.addEventListener('change', () => commit(range.value, range, 'full'));
+      num.addEventListener('change', () => commit(num.value, num, 'full'));
     }
 
     $('[data-options="flute"]').addEventListener('click', (e) => {
@@ -68,10 +71,10 @@ export class Configurator {
       this._set({ flute: b.dataset.flute });
     });
     $('select[name="grade"]').addEventListener('change', (e) => this._set({ grade: e.target.value }));
-    $('select[name="condition"]').addEventListener('change', (e) => this._set({ condition: e.target.value }, false));
+    $('select[name="condition"]').addEventListener('change', (e) => this._set({ condition: e.target.value }, 'calc'));
     $('input[name="content"]').addEventListener('input', (e) => {
       $('[data-out="content"]').textContent = `${fmt(e.target.value)} kg`;
-      this._set({ content: Number(e.target.value) }, false);
+      this._set({ content: Number(e.target.value) }, 'calc');
     });
 
     this.root.querySelectorAll('input[name="ink"]').forEach((r) =>
@@ -106,12 +109,28 @@ export class Configurator {
     auto.checked = this.view.autoRotate;
     auto.addEventListener('change', () => (this.view.autoRotate = auto.checked));
 
-    $('[data-action="capture"]').addEventListener('click', () => {
-      const url = this.onCapture();
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `newbox-${this.spec.L}x${this.spec.W}x${this.spec.H}-${this.spec.flute}.png`;
-      a.click();
+    // Capture : bouton mis à jour tout de suite, rendu + encodage PNG (asynchrone) ensuite
+    const capBtn = $('[data-action="capture"]');
+    capBtn.addEventListener('click', () => {
+      if (capBtn.disabled) return;
+      const label = capBtn.textContent;
+      capBtn.disabled = true;
+      capBtn.textContent = 'Capture…';
+      afterNextPaint(async () => {
+        try {
+          const blob = await this.onCapture();
+          if (!blob) return;
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `newbox-${this.spec.L}x${this.spec.W}x${this.spec.H}-${this.spec.flute}.png`;
+          a.click();
+          setTimeout(() => URL.revokeObjectURL(url), 5000);
+        } finally {
+          capBtn.disabled = false;
+          capBtn.textContent = label;
+        }
+      });
     });
     $('[data-action="reset"]').addEventListener('click', () => this.reset());
     $('[data-action="quote"]').addEventListener('click', () => {
@@ -119,19 +138,29 @@ export class Configurator {
     });
   }
 
-  /** Mise à jour de la spécification ; `rebuild=false` pour les paramètres de calcul seuls. */
-  _set(patch, rebuild = true) {
+  /**
+   * Mise à jour de la spécification.
+   *  - 'full' : reconstruction complète (géométrie + textures imprimées) ;
+   *  - 'drag' : géométrie seule pendant un glissement, textures refaites au relâchement ;
+   *  - 'calc' : estimations seules, la 3D ne change pas.
+   * Les chiffres sont mis à jour immédiatement ; la 3D est reconstruite après l'image suivante
+   * et les rafales d'événements sont regroupées en une seule reconstruction.
+   */
+  _set(patch, mode = 'full') {
     Object.assign(this.spec, patch);
     this._refreshOutputs();
-    if (!rebuild) return;
-    // regroupe les rafales d'événements (curseurs) en une reconstruction par image
+    if (mode === 'calc') return;
     this._pending = { ...(this._pending || {}), ...patch };
-    if (this._raf) return;
-    this._raf = requestAnimationFrame(() => {
-      this._raf = null;
-      const p = this._pending;
+    if (mode === 'full') this._pendingFull = true;
+    if (this._scheduled) return;
+    this._scheduled = true;
+    afterNextPaint(() => {
+      this._scheduled = false;
+      const patch = this._pending;
+      const full = this._pendingFull;
       this._pending = null;
-      this.onSpec(p, this.spec);
+      this._pendingFull = false;
+      this.onSpec(patch, { deferTextures: !full });
     });
   }
 

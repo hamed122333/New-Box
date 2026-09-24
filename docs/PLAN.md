@@ -128,6 +128,9 @@ src/lib/calc.js            ECT, McKee, flan, gerbage
 - Aucune image, aucun modèle 3D à télécharger
 - Pixel ratio plafonné (2 sur ordinateur, 1,5 sur mobile), ombres 2048 px / 1024 px mobile
 - Rendu suspendu quand une section opaque recouvre le canvas
+- Interactions (INP) : aucun calcul lourd avant l'affichage suivant ; textures en cache, 2 faces
+  imprimées au lieu de 4, capture PNG asynchrone, shaders pré-compilés au chargement
+  (reconstruction de la caisse : ~21 s → 60 ms mesurés sans GPU)
 
 ### Accessibilité & robustesse
 

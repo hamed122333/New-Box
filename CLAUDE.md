@@ -28,6 +28,19 @@ Pas de suite de tests automatisés dans le dépôt. Vérification manuelle ou vi
 5. La console expose `window.__newbox` (état du scroll, scène, configurateur) pour le débogage.
    `?capture` dans l'URL passe en horloge pilotée (`__newbox.step(dt)`) pour l'enregistrement vidéo.
 
+## Performance (INP)
+
+- Ne jamais faire de travail lourd (textures Canvas, reconstruction 3D, encodage d'image) dans un
+  gestionnaire d'événement : mettre à jour le DOM, puis lancer le calcul avec `afterNextPaint()`
+  (`src/lib/schedule.js`). Le configurateur regroupe les rafales et, pendant un glissement de curseur,
+  ne reconstruit que la géométrie (`box.build(patch, { deferTextures: true })`).
+- Textures : tout ce qui ne dépend pas des dimensions est mis en cache dans `src/three/textures.js`
+  (`once()`, `userData.shared` = ne pas libérer). Canvas en `willReadFrequently` ; pas de
+  `getImageData` sur le chemin d'une interaction.
+- Pas d'écriture DOM identique à chaque image dans la boucle de rendu (styles invalidés).
+- Shaders pré-compilés pendant l'écran de chargement (`warmUp` dans `src/main.js`) : tout nouvel
+  objet/matériau visible seulement plus tard dans le récit doit y être rendu visible.
+
 ## Repères
 
 - Storyboard (timeline du scroll) : `src/scroll/story.js` ; hauteurs des chapitres : `data-units` dans `index.html`

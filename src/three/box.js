@@ -8,6 +8,7 @@ export const MM = 0.01;
 const SLOT_MM = 6; // fente entre rabats
 const TAPE_W = 0.5; // ruban 50 mm
 const TILE = 1.6; // taille d'une tuile de papier (unités)
+const TEX_KEYS = ['L', 'W', 'H', 'flute', 'grade', 'ink', 'logo', 'brandLogo']; // paramètres imprimés
 
 const clamp01 = (x) => Math.min(1, Math.max(0, x));
 export const smooth = (a, b, x) => {
@@ -54,26 +55,34 @@ export class CorrugatedBox {
     this._tmp = new THREE.Vector3();
   }
 
-  /** (Re)construit la caisse. Les textures ne sont régénérées que si nécessaire. */
-  build(partial = {}) {
+  /**
+   * (Re)construit la caisse. Les textures ne sont régénérées que si nécessaire.
+   * `deferTextures` (curseur en cours de glissement) ne refait que la géométrie : les textures
+   * existantes sont étirées jusqu'à la prochaine reconstruction complète.
+   */
+  build(partial = {}, { deferTextures = false } = {}) {
+    const { force, ...changes } = partial;
     const prev = this.spec;
-    this.spec = { ...prev, ...partial };
+    this.spec = { ...prev, ...changes };
     const s = this.spec;
     this.comp = boardComposition(s.flute, s.grade);
-    const needTex =
-      !this.mats ||
-      ['L', 'W', 'H', 'flute', 'grade', 'ink', 'logo', 'brandLogo'].some((k) => prev[k] !== s[k]) ||
-      partial.force;
-    if (needTex) this._buildMaterials();
+    const needTex = !this.mats || force || this._staleTextures || TEX_KEYS.some((k) => prev[k] !== s[k]);
+    if (needTex && deferTextures && this.mats) this._staleTextures = true;
+    else if (needTex) {
+      this._buildMaterials();
+      this._staleTextures = false;
+    }
     this._buildGeometry();
     this.update();
     return this;
   }
 
   _buildMaterials() {
+    // les textures mises en cache (papier, tranche…) sont partagées : on ne libère que les autres
+    const release = (t) => t && !t.userData.shared && t.dispose();
     this.mats?.all.forEach((m) => {
-      m.map?.dispose();
-      if (m.bumpMap && m.bumpMap !== this.bump) m.bumpMap.dispose();
+      release(m.map);
+      if (m.bumpMap !== this.bump) release(m.bumpMap);
       m.dispose();
     });
     const s = this.spec;
@@ -90,6 +99,7 @@ export class CorrugatedBox {
     const bumpFor = (wMm, hMm) => {
       if (!wMm) return this.bump;
       const b = this.bump.clone();
+      b.userData.shared = false;
       b.repeat.set((wMm * MM) / TILE, (hMm * MM) / TILE);
       return b;
     };
@@ -103,10 +113,9 @@ export class CorrugatedBox {
         ...extra,
       });
 
+    // deux faces imprimées suffisent : avant = arrière, côté gauche = côté droit
     const front = std(printedPanel('front', { ...common, w: s.L, h: s.H, seed: 11 }, this.aniso), {}, s.L, s.H);
-    const back = std(printedPanel('front', { ...common, w: s.L, h: s.H, seed: 17 }, this.aniso), {}, s.L, s.H);
-    const sideA = std(printedPanel('side', { ...common, w: s.W, h: s.H, seed: 13 }, this.aniso), {}, s.W, s.H);
-    const sideB = std(printedPanel('side', { ...common, w: s.W, h: s.H, seed: 19 }, this.aniso), {}, s.W, s.H);
+    const side = std(printedPanel('side', { ...common, w: s.W, h: s.H, seed: 13 }, this.aniso), {}, s.W, s.H);
     const outer = std(paperTile(palette, this.aniso, { seed: 5, stripes: 20 }));
     const inner = std(paperTile('kraftInner', this.aniso, { seed: 9 }), { roughness: 0.96 });
     const edgeTex = edgeTexture(s.flute, this.aniso);
@@ -119,7 +128,7 @@ export class CorrugatedBox {
       opacity: 0.92,
     });
     this.edgeTileU = edgeTex.userData.tileMm * MM;
-    this.mats = { front, back, sideA, sideB, outer, inner, edge, tape, all: [front, back, sideA, sideB, outer, inner, edge, tape] };
+    this.mats = { front, back: front, sideA: side, sideB: side, outer, inner, edge, tape, all: [front, side, outer, inner, edge, tape] };
   }
 
   _clearGeometry() {

@@ -31,8 +31,12 @@ export class ChapterUI {
       document.querySelectorAll('#story .chapter').forEach((el) => el.classList.toggle('is-active', el.id === id));
       this.rail.forEach((el) => el.classList.toggle('is-active', el.dataset.target === id));
     }
-    document.documentElement.dataset.world = st.world > 0.5 ? 'macro' : 'box';
-    document.documentElement.style.setProperty('--fade', st.fade.toFixed(3));
+    // n'écrire dans le DOM que si la valeur change : chaque écriture sur <html>
+    // invalide les styles de toute la page
+    const world = st.world > 0.5 ? 'macro' : 'box';
+    if (world !== this._world) document.documentElement.dataset.world = this._world = world;
+    const fade = st.fade.toFixed(3);
+    if (fade !== this._fade) document.documentElement.style.setProperty('--fade', (this._fade = fade));
 
     if (id === 'cannelures' || id === 'anatomie') this._updateFlute(st.flute);
     if (id === 'qualite') this._updateCounters(st.ect);
@@ -70,8 +74,8 @@ export class ChapterUI {
     const k = smooth(0.35, 0.95, p);
     for (const el of this.counters) {
       const key = el.dataset.counter;
-      const v = this.quality[key] * k;
-      el.textContent = fmt(v, key === 'ect' ? 1 : 0);
+      const text = fmt(this.quality[key] * k, key === 'ect' ? 1 : 0);
+      if (el.textContent !== text) el.textContent = text;
     }
   }
 

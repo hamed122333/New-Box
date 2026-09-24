@@ -37,10 +37,80 @@ export const INKS = {
 const FONT_HEAD = '"Space Grotesk Variable", "Space Grotesk", system-ui, sans-serif';
 const FONT_BODY = '"Inter Variable", Inter, system-ui, sans-serif';
 
+// Canvas « CPU » (willReadFrequently) : pas d'aller-retour GPU pour les lectures de pixels,
+// et l'envoi vers WebGL lit directement la mémoire. Tous les getContext('2d') suivants
+// renvoient ce même contexte.
 function canvas(w, h) {
   const c = document.createElement('canvas');
   c.width = Math.max(2, Math.round(w));
   c.height = Math.max(2, Math.round(h));
+  c.getContext('2d', { willReadFrequently: true });
+  return c;
+}
+
+// Cache : tout ce qui ne dépend pas des dimensions de la caisse n'est calculé qu'une fois.
+// Les textures partagées portent userData.shared et ne doivent pas être libérées par l'appelant.
+const memo = new Map();
+function once(key, make) {
+  if (!memo.has(key)) memo.set(key, make());
+  return memo.get(key);
+}
+function shared(tex) {
+  tex.userData.shared = true;
+  return tex;
+}
+
+const SHEET = 1280; // feuille de papier de référence (couvre un panneau sans répétition)
+
+/** Feuille de kraft pré-dessinée (fibres, marbrure) : la partie coûteuse, faite une seule fois. */
+function paperSheet(palName) {
+  return once(`sheet|${palName}`, () => {
+    const c = canvas(SHEET, SHEET);
+    paintPaper(c.getContext('2d'), SHEET, SHEET, PALETTES[palName], 7);
+    return c;
+  });
+}
+
+/** Petite tuile de « trame flexo » : lacunes d'encre, appliquée en motif (un seul tracé). */
+function halftoneTile() {
+  return once('halftone', () => {
+    const n = 256;
+    const c = canvas(n, n);
+    const ctx = c.getContext('2d');
+    const r = rng(99);
+    for (let i = 0; i < (n * n) / 90; i++) {
+      ctx.fillStyle = `rgba(0,0,0,${0.15 + r() * 0.5})`;
+      ctx.fillRect(r() * n, r() * n, 1 + r() * 1.5, 1 + r() * 1.5);
+    }
+    return c;
+  });
+}
+
+function applyHalftone(ctx, W, H) {
+  ctx.save();
+  ctx.globalCompositeOperation = 'destination-out';
+  ctx.fillStyle = ctx.createPattern(halftoneTile(), 'repeat');
+  ctx.fillRect(0, 0, W, H);
+  ctx.restore();
+}
+
+/** Logo prêt à imprimer (blancs retirés = réserves, trame appliquée), calculé une fois par image. */
+const logoInks = new WeakMap();
+function logoInk(img) {
+  let c = logoInks.get(img);
+  if (c) return c;
+  c = canvas(img.naturalWidth || img.width, img.naturalHeight || img.height);
+  const ctx = c.getContext('2d');
+  ctx.drawImage(img, 0, 0, c.width, c.height);
+  const data = ctx.getImageData(0, 0, c.width, c.height);
+  const d = data.data;
+  for (let i = 0; i < d.length; i += 4) {
+    const min = Math.min(d[i], d[i + 1], d[i + 2]);
+    if (min > 200) d[i + 3] = Math.max(0, d[i + 3] - (min - 200) * 5);
+  }
+  ctx.putImageData(data, 0, 0);
+  applyHalftone(ctx, c.width, c.height);
+  logoInks.set(img, c);
   return c;
 }
 
@@ -126,13 +196,19 @@ function finishTexture(tex, aniso, { repeat = false, srgb = true } = {}) {
 
 /** Tuile de papier sans impression (volets, faces intérieures, échantillon macro). */
 export function paperTile(palName, aniso, { size = 512, seed = 3, stripes = 0 } = {}) {
-  const c = canvas(size, size);
-  paintPaper(c.getContext('2d'), size, size, PALETTES[palName], seed, { stripes });
-  return finishTexture(new THREE.CanvasTexture(c), aniso, { repeat: true });
+  return once(`tile|${palName}|${size}|${seed}|${stripes}`, () => {
+    const c = canvas(size, size);
+    paintPaper(c.getContext('2d'), size, size, PALETTES[palName], seed, { stripes });
+    return shared(finishTexture(new THREE.CanvasTexture(c), aniso, { repeat: true }));
+  });
 }
 
 /** Carte de relief (niveaux de gris) partagée pour le grain du papier. */
 export function bumpTile(aniso, size = 512) {
+  return once(`bump|${size}`, () => shared(makeBump(aniso, size)));
+}
+
+function makeBump(aniso, size) {
   const c = canvas(size, size);
   const ctx = c.getContext('2d');
   paintPaper(ctx, size, size, { base: '#808080', light: '#9a9a9a', dark: '#666666', fibers: ['#5a5a5a', '#aaaaaa'] }, 11, {
@@ -146,6 +222,10 @@ export function bumpTile(aniso, size = 512) {
 // Tranche de carton : couvertures + onde(s), vue en coupe.
 // ---------------------------------------------------------------------------
 export function edgeTexture(fluteId, aniso) {
+  return once(`edge|${fluteId}`, () => shared(makeEdge(fluteId, aniso)));
+}
+
+function makeEdge(fluteId, aniso) {
   const flute = FLUTES[fluteId];
   const maxPitch = Math.max(...flute.layers.map((l) => l.pitch));
   const tileMm = maxPitch * 4;
@@ -234,9 +314,16 @@ export function printedPanel(kind, o, aniso) {
   const H = Math.round(o.h * scale);
   const c = canvas(W, H);
   const ctx = c.getContext('2d');
-  const pal = PALETTES[o.palette];
-  const flutePitch = o.comp.flute.layers.at(-1).pitch;
-  paintPaper(ctx, W, H, pal, o.seed, { stripes: flutePitch * scale });
+
+  // Papier : feuille pré-dessinée (miroir sur les côtés pour varier l'aspect)
+  ctx.save();
+  if (kind === 'side') {
+    ctx.translate(W, 0);
+    ctx.scale(-1, 1);
+  }
+  ctx.drawImage(paperSheet(o.palette), 0, 0, W, H, 0, 0, W, H);
+  ctx.restore();
+  drawWashboard(ctx, W, H, o.comp.flute.layers.at(-1).pitch * scale);
 
   // Calque d'encre séparé pour simuler la trame flexo, puis multiplication.
   const ink = canvas(W, H);
@@ -247,15 +334,7 @@ export function printedPanel(kind, o, aniso) {
 
   if (kind === 'front') drawFront(ic, W, H, u, o);
   else drawSide(ic, W, H, u, o);
-
-  // Trame : petites lacunes d'encre
-  const r = rng(o.seed + 99);
-  ic.globalCompositeOperation = 'destination-out';
-  for (let i = 0; i < (W * H) / 90; i++) {
-    ic.fillStyle = `rgba(0,0,0,${0.15 + r() * 0.5})`;
-    ic.fillRect(r() * W, r() * H, 1 + r() * 1.5, 1 + r() * 1.5);
-  }
-  ic.globalCompositeOperation = 'source-over';
+  applyHalftone(ic, W, H);
 
   ctx.save();
   ctx.globalAlpha = o.palette === 'white' ? 0.95 : 0.88;
@@ -265,9 +344,22 @@ export function printedPanel(kind, o, aniso) {
 
   // Logo New Box imprimé dans ses propres couleurs (bleu + orange), les réserves
   // blanches du logo laissent apparaître le papier comme sur une vraie impression.
-  if (kind === 'front' && !o.logo && o.brandLogo) printBrandLogo(ctx, W, H, o, r);
+  if (kind === 'front' && !o.logo && o.brandLogo) printBrandLogo(ctx, W, H, o);
 
   return finishTexture(new THREE.CanvasTexture(c), aniso);
+}
+
+/** Ondulations fantômes des cannelures sous la couverture (verticales). */
+function drawWashboard(ctx, W, H, pitch) {
+  if (pitch <= 2) return;
+  for (let x = -pitch; x < W + pitch; x += pitch) {
+    const g = ctx.createLinearGradient(x, 0, x + pitch, 0);
+    g.addColorStop(0, 'rgba(60,35,15,0.045)');
+    g.addColorStop(0.5, 'rgba(255,240,215,0.035)');
+    g.addColorStop(1, 'rgba(60,35,15,0.045)');
+    ctx.fillStyle = g;
+    ctx.fillRect(x, 0, pitch, H);
+  }
 }
 
 function logoBox(img, W, H) {
@@ -279,33 +371,18 @@ function logoBox(img, W, H) {
   return { x: W / 2 - w / 2, y: H * 0.39 - h / 2, w, h };
 }
 
-function printBrandLogo(ctx, W, H, o, r) {
+function printBrandLogo(ctx, W, H, o) {
   const b = logoBox(o.brandLogo, W, H);
-  const layer = canvas(W, H);
-  const lc = layer.getContext('2d');
-  lc.drawImage(o.brandLogo, b.x, b.y, b.w, b.h);
-  // encre : on retire le blanc (non imprimé) puis on applique la trame
-  const data = lc.getImageData(Math.floor(b.x), Math.floor(b.y), Math.ceil(b.w) + 1, Math.ceil(b.h) + 1);
-  const d = data.data;
-  for (let i = 0; i < d.length; i += 4) {
-    const min = Math.min(d[i], d[i + 1], d[i + 2]);
-    if (min > 200) d[i + 3] = Math.max(0, d[i + 3] - (min - 200) * 5);
-  }
-  lc.putImageData(data, Math.floor(b.x), Math.floor(b.y));
-  lc.globalCompositeOperation = 'destination-out';
-  for (let i = 0; i < (b.w * b.h) / 70; i++) {
-    lc.fillStyle = `rgba(0,0,0,${0.1 + r() * 0.45})`;
-    lc.fillRect(b.x + r() * b.w, b.y + r() * b.h, 1 + r() * 1.5, 1 + r() * 1.5);
-  }
+  const layer = logoInk(o.brandLogo);
   const white = o.palette === 'white';
   ctx.save();
   ctx.globalAlpha = white ? 0.96 : 0.86;
-  ctx.drawImage(layer, 0, 0);
+  ctx.drawImage(layer, b.x, b.y, b.w, b.h);
   if (!white) {
     // l'encre se teinte légèrement au contact du kraft
     ctx.globalCompositeOperation = 'multiply';
     ctx.globalAlpha = 0.45;
-    ctx.drawImage(layer, 0, 0);
+    ctx.drawImage(layer, b.x, b.y, b.w, b.h);
   }
   ctx.restore();
 }
@@ -548,6 +625,10 @@ function drawRecycle(ctx, x, y, s) {
 
 /** Face supérieure d'une caisse fermée (pour l'empilement palette). */
 export function topPanel(w, h, palette, aniso, seed = 21) {
+  return once(`top|${w}|${h}|${palette}|${seed}`, () => shared(makeTopPanel(w, h, palette, aniso, seed)));
+}
+
+function makeTopPanel(w, h, palette, aniso, seed) {
   const scale = 512 / Math.max(w, h);
   const W = Math.round(w * scale);
   const H = Math.round(h * scale);

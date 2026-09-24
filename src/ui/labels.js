@@ -22,7 +22,7 @@ export class Labels {
 
   update(visibility, size) {
     const on = visibility > 0.001;
-    this.container.style.visibility = on ? 'visible' : 'hidden';
+    if (on !== this._on) this.container.style.visibility = (this._on = on) ? 'visible' : 'hidden';
     if (!on) return;
     const { w, h } = size;
     for (const it of this.items) {
@@ -34,7 +34,7 @@ export class Labels {
       let side = it.side;
       if (side === 'right' && x + it.width > w - 8) side = 'left';
       else if (side === 'left' && x - it.width < 8) side = 'right';
-      it.el.classList.toggle('label--left', side === 'left');
+      if (side !== it.current) it.el.classList.toggle('label--left', (it.current = side) === 'left');
       // apparition échelonnée
       const k = Math.min(1, Math.max(0, visibility * 1.6 - it.order * 0.15));
       it.el.style.transform = `translate3d(${x.toFixed(1)}px, ${y.toFixed(1)}px, 0)`;

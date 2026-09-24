@@ -121,16 +121,19 @@ export class Stage {
     this.renderer.render(this.world === 'macro' ? this.macroScene : this.boxScene, this.camera);
   }
 
-  /** Capture PNG transparente, centrée (sans le décalage de mise en page). */
+  /**
+   * Capture PNG transparente, centrée (sans le décalage de mise en page).
+   * L'image est copiée tout de suite après le rendu ; l'encodage PNG (toBlob) est asynchrone.
+   * @returns {Promise<Blob|null>}
+   */
   capture() {
     const { x, y } = this.shift;
     this.camera.clearViewOffset();
     this.camera.updateProjectionMatrix();
     this.render();
-    const url = this.renderer.domElement.toDataURL('image/png');
+    const blob = new Promise((resolve) => this.renderer.domElement.toBlob(resolve, 'image/png'));
     this.shift.x = this.shift.y = -1;
     this.setShift(x, y);
-    this.render();
-    return url;
+    return blob;
   }
 }
