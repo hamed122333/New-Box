@@ -27,7 +27,7 @@ Prérequis : **Node.js 20.19+** (ou 22+) et Git.
 
 ```bash
 npm install
-npm run dev       # http://localhost:5173
+npm run dev       # http://localhost:5173  (npm start : idem + ouvre le navigateur)
 npm run build     # site statique dans dist/
 npm run preview   # prévisualiser le build
 ```
@@ -48,14 +48,15 @@ irm https://raw.githubusercontent.com/hamed122333/New-Box/claude/charming-maxwel
 
 Ensuite, pour relancer le site : double-clic sur **`demarrer.bat`** dans le dossier `NewBox-3D` du Bureau.
 
-Équivalent manuel :
+Équivalent manuel (sous PowerShell, utiliser `npm.cmd` : `npm` seul est bloqué quand l'exécution
+des scripts est désactivée, ce qui est le réglage par défaut de Windows) :
 
 ```powershell
 cd $([Environment]::GetFolderPath('Desktop'))
 git clone -b claude/charming-maxwell-jjq9yf https://github.com/hamed122333/New-Box.git NewBox-3D
 cd NewBox-3D
-npm install
-npm run dev -- --open
+npm.cmd install
+npm.cmd start
 ```
 
 **macOS / Linux**

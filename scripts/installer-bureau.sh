@@ -42,4 +42,4 @@ npm install
 echo
 echo "✅ Prêt ! Dossier : $TARGET"
 echo "   Lancement du site sur http://localhost:5173  (Ctrl+C pour arrêter)"
-npm run dev -- --open
+npm start
