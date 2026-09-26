@@ -15,10 +15,9 @@ qui transforme la visite en demande de devis.
 | Sur mesure | Le ruban se sépare, les rabats s'ouvrent |
 | Plongée | La caméra plonge sur la tranche : les cannelures apparaissent, fondu vers la macro |
 | Anatomie | Coupe éclatée : couvertures, cannelure, colle d'amidon + étiquettes 3D |
-| Cannelures | Morphing C → E → B → C → BC avec fiche technique dynamique |
+| Cannelures | Morphing C → F → E → B → C → BC avec fiche technique dynamique |
 | Qualité | Test ECT animé, compteurs ECT / BCT / éclatement / Cobb |
 | Fabrication | Le flan imprimé à plat se plie en caisse (onduleuse → flexo → Bobst → pliage-collage) |
-| Logistique | Palettisation sur palette Europe |
 | Logistique | Palette Europe chargée de caisses **livrées à plat** (paquets cerclés), caisse montée devant |
 | Produits & délais | Plaques PL/PLR (5 j), caisses CI/CV/CID/CVD (7–10 j), découpes DI/DV (12–15 j), cannelures, papiers, certifications |
 | Configurateur | Produit (code usine + délai), dimensions, cannelure F/E/B/C/EB/BC, papiers KL/KS/TL/TB + FL, logo, ouverture, mise à plat, BCT, gerbage, caisses à plat par palette, capture PNG, devis |
@@ -102,7 +101,8 @@ src/lib/calc.js        ECT, BCT (McKee), flan, gerbage
 
 - **Changer le rythme du récit** : `data-units` de chaque `<section class="chapter">` dans `index.html`
   (1 unité = 1 écran de scroll) et les positions des animations dans `src/scroll/story.js`.
-- **Papiers & performances** : `src/data/grades.js` (grammages, SCT, éclatement, Cobb).
+- **Produits & délais** : `src/data/products.js` (codes usine, libellés, délais, découpe).
+- **Papiers & performances** : `src/data/papers.js` (KL, KS, TL, TB, FL : grammages, SCT, éclatement, Cobb).
 - **Cannelures** : `src/data/flutes.js` (pas, hauteur, coefficient d'ondulation, épaisseur).
 - **Couleurs du site** : variables CSS en tête de `src/styles/main.css`.
 - **Console** : `window.__newbox` expose l'état, la scène et le configurateur pour le débogage.

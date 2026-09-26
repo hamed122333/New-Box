@@ -20,7 +20,7 @@ export class ChapterUI {
     this._step = -1;
 
     // Valeurs du test qualité : caisse imprimée double cannelure BC, KL / FL / TL, 400 × 300 × 300
-    const q = estimate({ product: 'CID', L: 400, W: 300, H: 300, flute: 'BC', ...STORY_PAPERS, content: 10, condition: 'standard' });
+    const q = estimate({ product: 'CI', L: 400, W: 300, H: 300, flute: 'BC', ...STORY_PAPERS, content: 10, condition: 'standard' });
     this.quality = { ect: q.ect, bct: q.bctKg, burst: q.burst, cobb: q.cobb };
   }
 

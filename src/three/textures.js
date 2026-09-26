@@ -324,6 +324,7 @@ export function printedPanel(kind, o, aniso) {
   ctx.drawImage(paperSheet(o.palette), 0, 0, W, H, 0, 0, W, H);
   ctx.restore();
   drawWashboard(ctx, W, H, o.comp.flute.layers.at(-1).pitch * scale);
+  if (kind === 'side' && o.handHole) drawHoleRim(ctx, o.w, o.h, scale);
   if (o.printed === false) return finishTexture(new THREE.CanvasTexture(c), aniso); // caisse vierge
   const layout = frontLayout(W, H, o);
 
@@ -522,16 +523,18 @@ function drawFront(ctx, W, H, u, o, layout) {
 
 function drawSide(ctx, W, H, u, o) {
   const { comp, dims } = o;
-  // Pictogrammes de manutention (ISO 780)
-  const s = u * 11;
-  drawArrowsUp(ctx, u * 12, u * 13, s);
-  drawGlass(ctx, u * 27, u * 13, s);
-  drawUmbrella(ctx, u * 42, u * 13, s);
+  // Pictogrammes de manutention (ISO 780) : en haut, ou en bas si la poignée découpée occupe le haut
+  const s = o.handHole ? u * 9 : u * 11;
+  const py = o.handHole ? H - u * 19 : u * 13;
+  const px = o.handHole ? [u * 10, u * 22, u * 34] : [u * 12, u * 27, u * 42];
+  drawArrowsUp(ctx, px[0], py, s);
+  drawGlass(ctx, px[1], py, s);
+  drawUmbrella(ctx, px[2], py, s);
 
   // Cachet qualité du fabricant
-  const R = Math.min(W, H) * 0.22;
+  const R = Math.min(W, H) * (o.handHole ? 0.2 : 0.22);
   const cx = W / 2;
-  const cy = H * 0.55;
+  const cy = H * (o.handHole ? 0.52 : 0.55);
   ctx.lineWidth = u * 0.8;
   ctx.beginPath();
   ctx.arc(cx, cy, R, 0, Math.PI * 2);
@@ -552,10 +555,10 @@ function drawSide(ctx, W, H, u, o) {
   ctx.fillText(comp.papers, cx, cy + R * 0.42);
 
   // Dimensions intérieures
-  ctx.textAlign = 'center';
+  ctx.textAlign = o.handHole ? 'right' : 'center';
   ctx.textBaseline = 'alphabetic';
   ctx.font = `600 ${u * 3.6}px ${FONT_BODY}`;
-  ctx.fillText(`${dims.L} × ${dims.W} × ${dims.H} mm`, cx, H - u * 7);
+  ctx.fillText(`${dims.L} × ${dims.W} × ${dims.H} mm`, o.handHole ? W - u * 6 : cx, H - u * 7);
   ctx.textBaseline = 'alphabetic';
 }
 
@@ -661,6 +664,58 @@ function drawRecycle(ctx, x, y, s) {
     ctx.fill();
     ctx.restore();
   }
+  ctx.restore();
+}
+
+/**
+ * Poignée découpée des caisses découpées (CID / CVD), en haut des petits côtés.
+ * Cotes en mm depuis le coin haut-gauche du panneau.
+ */
+export function handHole(wMm, hMm) {
+  const w = Math.min(wMm * 0.38, 110);
+  const h = Math.min(w * 0.32, hMm * 0.12);
+  return { cx: wMm / 2, cy: Math.max(hMm * 0.1, h / 2 + 25), w, h };
+}
+
+function stadiumPath(ctx, cx, cy, w, h) {
+  const r = h / 2;
+  ctx.beginPath();
+  ctx.moveTo(cx - w / 2 + r, cy - r);
+  ctx.lineTo(cx + w / 2 - r, cy - r);
+  ctx.arc(cx + w / 2 - r, cy, r, -Math.PI / 2, Math.PI / 2);
+  ctx.lineTo(cx - w / 2 + r, cy + r);
+  ctx.arc(cx - w / 2 + r, cy, r, Math.PI / 2, (Math.PI * 3) / 2);
+  ctx.closePath();
+}
+
+/** Masque d'opacité (blanc = carton, noir = découpe), lu via le 2e jeu d'UV (0–1 du panneau). */
+export function holeMask(wMm, hMm, aniso) {
+  return once(`hole|${wMm}|${hMm}`, () => {
+    const W = 512;
+    const H = Math.round((512 * hMm) / wMm);
+    const c = canvas(W, H);
+    const ctx = c.getContext('2d');
+    const k = W / wMm;
+    const hole = handHole(wMm, hMm);
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(0, 0, W, H);
+    ctx.fillStyle = '#000';
+    stadiumPath(ctx, hole.cx * k, hole.cy * k, hole.w * k, hole.h * k);
+    ctx.fill();
+    const tex = finishTexture(new THREE.CanvasTexture(c), aniso, { srgb: false });
+    tex.channel = 1;
+    return shared(tex);
+  });
+}
+
+/** Tranche de la découpe : liseré sombre autour du trou (le carton coupé). */
+function drawHoleRim(ctx, wMm, hMm, scale) {
+  const hole = handHole(wMm, hMm);
+  ctx.save();
+  ctx.strokeStyle = 'rgba(55,32,14,0.6)';
+  ctx.lineWidth = Math.max(3, 3.5 * scale);
+  stadiumPath(ctx, hole.cx * scale, hole.cy * scale, hole.w * scale + ctx.lineWidth, hole.h * scale + ctx.lineWidth);
+  ctx.stroke();
   ctx.restore();
 }
 

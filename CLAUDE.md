@@ -47,7 +47,8 @@ Pas de suite de tests automatisés dans le dépôt. Vérification manuelle ou vi
 - Application de l'état à la 3D (caméras, test ECT, palette, configurateur) : `src/experience.js`
 - Caisse FEFCO 0201 paramétrique : `src/three/box.js` ; coupe de carton : `src/three/board.js`
 - Textures procédurales, impression du logo : `src/three/textures.js`
-- Gamme et délais (codes usine CI, CV, CID, CVD, DI, DV, PL, PLR) : `src/data/products.js`
+- Gamme et délais (codes usine CI, CV, CID, CVD, DI, DV, PL, PLR) : `src/data/products.js` ;
+  CID / CVD = caisse imprimée / vierge **découpée** (poignées ajourées en 3D, masque `holeMask`)
 - Cannelures F, E, B, C (+ doubles EB, BC) : `src/data/flutes.js` ; qualités papier KL, KS, TL, TB, FL : `src/data/papers.js`
   (grammages et indices indicatifs, à valider par New Box) ; calculs ECT / McKee / palettisation à plat : `src/lib/calc.js`
 - Palette du récit : caisses livrées pliées-collées à plat, en paquets cerclés (`src/three/stack.js`)

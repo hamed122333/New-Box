@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { boardComposition, GLUE_FLAP_MM } from '../lib/calc.js';
 import { PRODUCTS } from '../data/products.js';
-import { printedPanel, plateTexture, paperTile, bumpTile, edgeTexture, INKS } from './textures.js';
+import { printedPanel, plateTexture, holeMask, handHole, paperTile, bumpTile, edgeTexture, INKS } from './textures.js';
 
 // 1 unité de scène = 100 mm
 export const MM = 0.01;
@@ -39,6 +39,13 @@ function panelGeometry(w, h, t, edgeTileU, printed) {
     else uv.setXY(i, x / TILE, y / TILE);
   }
   uv.needsUpdate = true;
+  // 2e jeu d'UV : coordonnées 0–1 du panneau sur toutes les faces (masque des découpes)
+  const uv1 = new Float32Array(pos.count * 2);
+  for (let i = 0; i < pos.count; i++) {
+    uv1[i * 2] = pos.getX(i) / w;
+    uv1[i * 2 + 1] = pos.getY(i) / h;
+  }
+  g.setAttribute('uv1', new THREE.BufferAttribute(uv1, 2));
   return g;
 }
 
@@ -104,6 +111,7 @@ export class CorrugatedBox {
     const common = {
       palette,
       printed: product.printed,
+      handHole: !!product.diecut,
       certs: s.certs,
       ink: INKS[s.ink] ?? INKS.bleu,
       comp: this.comp,
@@ -131,7 +139,9 @@ export class CorrugatedBox {
 
     // deux faces imprimées suffisent : avant = arrière, côté gauche = côté droit
     const front = std(printedPanel('front', { ...common, w: s.L, h: s.H, seed: 11 }, this.aniso), {}, s.L, s.H);
-    const side = std(printedPanel('side', { ...common, w: s.W, h: s.H, seed: 13 }, this.aniso), {}, s.W, s.H);
+    // caisse découpée : poignées ajourées sur les petits côtés (faces extérieure et intérieure)
+    const cut = product.diecut ? { alphaMap: holeMask(s.W, s.H, this.aniso), alphaTest: 0.5 } : {};
+    const side = std(printedPanel('side', { ...common, w: s.W, h: s.H, seed: 13 }, this.aniso), cut, s.W, s.H);
     const outer = std(paperTile(palette, this.aniso, { seed: 5, stripes: 20 }));
     const inner = std(paperTile('kraftInner', this.aniso, { seed: 9 }), { roughness: 0.96 });
     const edgeTex = edgeTexture(s.flute, this.aniso);
@@ -145,6 +155,10 @@ export class CorrugatedBox {
     });
     this.edgeTileU = edgeTex.userData.tileMm * MM;
     this.mats = { front, back: front, sideA: side, sideB: side, outer, inner, edge, tape, all: [front, side, outer, inner, edge, tape] };
+    if (product.diecut) {
+      this.mats.sideInner = std(paperTile('kraftInner', this.aniso, { seed: 9 }), { roughness: 0.96, ...cut });
+      this.mats.all.push(this.mats.sideInner);
+    }
     if (product.family === 'plaque') {
       const pitch = this.comp.flute.layers.at(-1).pitch;
       this.mats.plate = std(plateTexture({ w: s.L, h: s.W, palette, pitch, scored: product.scored }, this.aniso), {}, s.L, s.W);
@@ -192,7 +206,7 @@ export class CorrugatedBox {
 
     const widths = [L, W, L, W];
     const faces = [M.front, M.sideA, M.back, M.sideB];
-    const matsFor = (outer) => [M.edge, M.edge, M.edge, M.edge, outer, M.inner];
+    const matsFor = (outer, inner = M.inner) => [M.edge, M.edge, M.edge, M.edge, outer, inner];
     const plainMats = matsFor(M.outer);
 
     this.creases = [];
@@ -207,7 +221,8 @@ export class CorrugatedBox {
         this.creases.push(hinge);
       }
       parent.add(hinge);
-      hinge.add(this._mesh(panelGeometry(w, H, t, this.edgeTileU, true), matsFor(faces[i])));
+      const isSide = i % 2 === 1;
+      hinge.add(this._mesh(panelGeometry(w, H, t, this.edgeTileU, true), matsFor(faces[i], isSide && M.sideInner ? M.sideInner : M.inner)));
 
       const major = i % 2 === 0;
       for (const top of [true, false]) {
@@ -230,10 +245,12 @@ export class CorrugatedBox {
         }
       }
 
-      // Retours de ruban sur les petits côtés
+      // Retours de ruban sur les petits côtés (arrêtés au-dessus de la poignée si caisse découpée)
       if (!major) {
-        const tg = new THREE.BoxGeometry(TAPE_W, 0.6, 0.004);
-        tg.translate(w / 2, H - 0.3, t / 2 + 0.003);
+        const hole = this.product.diecut ? handHole(s.W, s.H) : null;
+        const len = hole ? Math.max(0.12, (hole.cy - hole.h / 2 - 8) * MM) : 0.6;
+        const tg = new THREE.BoxGeometry(TAPE_W, len, 0.004);
+        tg.translate(w / 2, H - len / 2, t / 2 + 0.003);
         const tm = this._mesh(tg, M.tape);
         tm.castShadow = false;
         hinge.add(tm);

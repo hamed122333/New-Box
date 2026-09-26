@@ -17,7 +17,6 @@ import { ChapterUI } from './ui/chapters.js';
 import { Labels } from './ui/labels.js';
 import { Configurator } from './ui/configurator.js';
 import { PAPERS, STORY_PAPERS } from './data/papers.js';
-import { DOUBLE_FLUTES } from './data/flutes.js';
 import { afterNextPaint } from './lib/schedule.js';
 import logoUrl from './assets/brand/logo-new-box.png';
 import certsUrl from './assets/brand/certifications.png';
@@ -198,7 +197,7 @@ async function init() {
     const needCase = box.family !== 'caisse' || !box.product.printed;
     if (!needCase && !stackDirty) return;
     afterNextPaint(() => {
-      if (needCase) box.build({ product: DOUBLE_FLUTES.includes(box.spec.flute) ? 'CID' : 'CI' });
+      if (needCase) box.build({ product: 'CI' });
       stack.build(box);
       stackDirty = false;
     });
