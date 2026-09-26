@@ -324,6 +324,8 @@ export function printedPanel(kind, o, aniso) {
   ctx.drawImage(paperSheet(o.palette), 0, 0, W, H, 0, 0, W, H);
   ctx.restore();
   drawWashboard(ctx, W, H, o.comp.flute.layers.at(-1).pitch * scale);
+  if (o.printed === false) return finishTexture(new THREE.CanvasTexture(c), aniso); // caisse vierge
+  const layout = frontLayout(W, H, o);
 
   // Calque d'encre séparé pour simuler la trame flexo, puis multiplication.
   const ink = canvas(W, H);
@@ -332,7 +334,7 @@ export function printedPanel(kind, o, aniso) {
   ic.strokeStyle = o.ink;
   const u = Math.min(W, H) / 100; // unité relative
 
-  if (kind === 'front') drawFront(ic, W, H, u, o);
+  if (kind === 'front') drawFront(ic, W, H, u, o, layout);
   else drawSide(ic, W, H, u, o);
   applyHalftone(ic, W, H);
 
@@ -344,7 +346,11 @@ export function printedPanel(kind, o, aniso) {
 
   // Logo New Box imprimé dans ses propres couleurs (bleu + orange), les réserves
   // blanches du logo laissent apparaître le papier comme sur une vraie impression.
-  if (kind === 'front' && !o.logo && o.brandLogo) printBrandLogo(ctx, W, H, o);
+  if (kind === 'front' && !o.logo && o.brandLogo) {
+    printBrandLogo(ctx, o, layout);
+    // Certifications (SGS FSSC 22000 · ISO 9001 · ISO 45001, FSC) imprimées sous le logo
+    if (layout.certs) printCerts(ctx, o, layout.certs);
+  }
 
   return finishTexture(new THREE.CanvasTexture(c), aniso);
 }
@@ -362,28 +368,64 @@ function drawWashboard(ctx, W, H, pitch) {
   }
 }
 
-function logoBox(img, W, H) {
-  const maxW = W * 0.5;
-  const maxH = H * 0.56;
-  const k = Math.min(maxW / img.width, maxH / img.height);
-  const w = img.width * k;
-  const h = img.height * k;
-  return { x: W / 2 - w / 2, y: H * 0.39 - h / 2, w, h };
+/**
+ * Mise en page de la face avant, empilée et centrée verticalement :
+ * logo New Box → mention « emballage en carton ondulé » → bandeau de certifications,
+ * au-dessus de la ligne du bas (recyclable / fabriqué en Tunisie). S'adapte à toutes proportions.
+ */
+function frontLayout(W, H, o) {
+  const u = Math.min(W, H) / 100;
+  const by = H - u * 13; // ligne du bas
+  const top = H * 0.06;
+  const bottom = by - u * 7;
+  const tag = u * 9; // hauteur réservée à la mention
+  const gap = u * 3;
+  let certs = null;
+  let hc = 0;
+  if (o.certs && !o.logo) {
+    const ar = o.certs.width / o.certs.height;
+    hc = Math.min((W * 0.5) / ar, (bottom - top) * 0.3);
+    certs = { w: hc * ar, h: hc };
+  }
+  let logo = null;
+  let tagY = 0;
+  if (o.brandLogo) {
+    const img = o.brandLogo;
+    const room = bottom - top - tag - (certs ? hc + gap : 0);
+    const k = Math.min((W * 0.5) / img.width, Math.min(H * 0.56, room) / img.height);
+    const w = img.width * k;
+    const h = img.height * k;
+    const block = h + tag + (certs ? gap + hc : 0);
+    const y0 = top + (bottom - top - block) / 2;
+    logo = { x: W / 2 - w / 2, y: y0, w, h };
+    tagY = y0 + h + u * 6.5;
+    if (certs) Object.assign(certs, { x: W / 2 - certs.w / 2, y: y0 + h + tag + gap });
+  }
+  return { u, by, certs: logo ? certs : null, logo, tagY };
 }
 
-function printBrandLogo(ctx, W, H, o) {
-  const b = logoBox(o.brandLogo, W, H);
-  const layer = logoInk(o.brandLogo);
+function printBrandLogo(ctx, o, layout) {
+  const b = layout.logo;
+  const ink = logoInk(o.brandLogo);
   const white = o.palette === 'white';
   ctx.save();
   ctx.globalAlpha = white ? 0.96 : 0.86;
-  ctx.drawImage(layer, b.x, b.y, b.w, b.h);
+  ctx.drawImage(ink, b.x, b.y, b.w, b.h);
   if (!white) {
     // l'encre se teinte légèrement au contact du kraft
     ctx.globalCompositeOperation = 'multiply';
     ctx.globalAlpha = 0.45;
-    ctx.drawImage(layer, b.x, b.y, b.w, b.h);
+    ctx.drawImage(ink, b.x, b.y, b.w, b.h);
   }
+  ctx.restore();
+}
+
+function printCerts(ctx, o, b) {
+  ctx.save();
+  // fond blanc de l'image = papier non imprimé (multiplication)
+  ctx.globalCompositeOperation = 'multiply';
+  ctx.globalAlpha = o.palette === 'white' ? 0.98 : 0.9;
+  ctx.drawImage(o.certs, b.x, b.y, b.w, b.h);
   ctx.restore();
 }
 
@@ -437,14 +479,13 @@ function drawWordmark(ctx, cx, cy, size) {
   return total;
 }
 
-function drawFront(ctx, W, H, u, o) {
+function drawFront(ctx, W, H, u, o, layout) {
   const cx = W / 2;
   if (!o.logo && o.brandLogo) {
     // le logo officiel est composé à part (printBrandLogo) ; ici la mention sous le logo
-    const b = logoBox(o.brandLogo, W, H);
     ctx.textAlign = 'center';
     ctx.font = `600 ${u * 4}px ${FONT_BODY}`;
-    ctx.fillText('EMBALLAGE EN CARTON ONDULÉ', cx, b.y + b.h + u * 6.5);
+    ctx.fillText('EMBALLAGE EN CARTON ONDULÉ', cx, layout.tagY);
   } else if (o.logo) {
     const img = o.logo;
     const maxW = W * 0.62;
@@ -508,7 +549,7 @@ function drawSide(ctx, W, H, u, o) {
   ctx.fillText(`ECT ${fmt(comp.ect, 1)} kN/m`, cx, cy - R * 0.08);
   ctx.fillText(`${fmt(comp.grammage)} g/m²`, cx, cy + R * 0.18);
   ctx.font = `500 ${u * 2.4}px ${FONT_BODY}`;
-  ctx.fillText(comp.grade.name.toUpperCase(), cx, cy + R * 0.42);
+  ctx.fillText(comp.papers, cx, cy + R * 0.42);
 
   // Dimensions intérieures
   ctx.textAlign = 'center';
@@ -621,6 +662,91 @@ function drawRecycle(ctx, x, y, s) {
     ctx.restore();
   }
   ctx.restore();
+}
+
+/** Plaque (PL) ou plaque rainée (PLR) : papier nu, rainures de pliage éventuelles. */
+export function plateTexture(o, aniso) {
+  const scale = 1280 / Math.max(o.w, o.h);
+  const W = Math.round(o.w * scale);
+  const H = Math.round(o.h * scale);
+  const c = canvas(W, H);
+  const ctx = c.getContext('2d');
+  ctx.drawImage(paperSheet(o.palette), 0, 0, W, H, 0, 0, W, H);
+  drawWashboard(ctx, W, H, o.pitch * scale);
+  if (o.scored) for (const f of [0.25, 0.75]) drawCrease(ctx, 0, H * f, W, H * f, H);
+  return finishTexture(new THREE.CanvasTexture(c), aniso);
+}
+
+function drawCrease(ctx, x0, y0, x1, y1, ref) {
+  const w = Math.max(1.5, ref * 0.0035);
+  ctx.save();
+  ctx.lineCap = 'butt';
+  ctx.strokeStyle = 'rgba(55,32,14,0.5)';
+  ctx.lineWidth = w;
+  ctx.beginPath();
+  ctx.moveTo(x0, y0);
+  ctx.lineTo(x1, y1);
+  ctx.stroke();
+  ctx.strokeStyle = 'rgba(255,240,215,0.35)';
+  ctx.lineWidth = w * 0.6;
+  ctx.beginPath();
+  ctx.moveTo(x0 + (y0 === y1 ? 0 : w), y0 + (y0 === y1 ? w : 0));
+  ctx.lineTo(x1 + (y0 === y1 ? 0 : w), y1 + (y0 === y1 ? w : 0));
+  ctx.stroke();
+  ctx.restore();
+}
+
+/**
+ * Dessus d'une caisse livrée à plat (pliée-collée) : face avant + côté imprimés côte à côte,
+ * rabats au-dessus et au-dessous, rainures et fentes. Réutilise les faces déjà dessinées.
+ */
+export function flatCaseTexture(o, aniso) {
+  const { L, W, H } = o; // mm
+  const fh = W / 2;
+  const a = L + W;
+  const b = H + W;
+  const scale = 1024 / Math.max(a, b);
+  const c = canvas(a * scale, b * scale);
+  const ctx = c.getContext('2d');
+  const S = (v) => v * scale;
+  ctx.drawImage(paperSheet(o.palette), 0, 0, c.width, c.height, 0, 0, c.width, c.height);
+  ctx.drawImage(o.front, 0, S(fh), S(L), S(H));
+  ctx.drawImage(o.side, S(L), S(fh), S(W), S(H));
+  drawCrease(ctx, 0, S(fh), c.width, S(fh), c.height);
+  drawCrease(ctx, 0, S(fh + H), c.width, S(fh + H), c.height);
+  drawCrease(ctx, S(L), S(fh), S(L), S(fh + H), c.height);
+  // fentes entre rabats
+  ctx.fillStyle = 'rgba(40,24,10,0.75)';
+  ctx.fillRect(S(L) - 2, 0, 4, S(fh));
+  ctx.fillRect(S(L) - 2, S(fh + H), 4, S(fh));
+  return finishTexture(new THREE.CanvasTexture(c), aniso);
+}
+
+/** Tranche coupée parallèlement aux cannelures : couches de papier droites. */
+export function layersTexture(fluteId, aniso) {
+  return once(`layers|${fluteId}`, () => {
+    const flute = FLUTES[fluteId];
+    const H = 160;
+    const c = canvas(32, H);
+    const ctx = c.getContext('2d');
+    const n = flute.layers.length;
+    const liner = Math.max(3, (0.28 * H) / flute.thickness);
+    const gap = (H - (n + 1) * liner) / n;
+    ctx.fillStyle = '#2e1e12';
+    ctx.fillRect(0, 0, 32, H);
+    let y = 0;
+    for (let i = 0; i <= n; i++) {
+      ctx.fillStyle = i === 0 ? '#b8864f' : '#c49d6c';
+      ctx.fillRect(0, y, 32, liner);
+      y += liner;
+      if (i < n) {
+        ctx.fillStyle = 'rgba(216,179,125,0.55)'; // onde vue de profil
+        ctx.fillRect(0, y + gap * 0.35, 32, gap * 0.3);
+        y += gap;
+      }
+    }
+    return shared(finishTexture(new THREE.CanvasTexture(c), aniso, { repeat: true }));
+  });
 }
 
 /** Face supérieure d'une caisse fermée (pour l'empilement palette). */

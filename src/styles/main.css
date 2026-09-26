@@ -354,6 +354,7 @@ html[data-world='macro'] .site-header .btn:not(.btn--ghost) {
   transition: opacity 0.4s;
 }
 
+html[data-story='off'] .rail,
 html[data-mode='config'] .rail {
   opacity: 0;
   pointer-events: none;
@@ -1006,6 +1007,165 @@ html:not([data-world='macro']) .chapter.is-active .chapter__content {
   max-width: 24ch;
 }
 
+/* ---------- produits & délais ---------- */
+
+.section--products {
+  border-top: 1px solid var(--line);
+}
+
+.lead-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.lead-card {
+  padding: 28px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: #fbf8f3;
+}
+
+.lead-card__time {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.lead-card__time b {
+  font: 650 clamp(40px, 4.4vw, 60px) / 1 var(--f-head);
+  letter-spacing: -0.03em;
+  color: var(--blue);
+}
+
+.lead-card__time span {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--orange);
+}
+
+.lead-card h3 {
+  font-size: 22px;
+  margin-bottom: 14px;
+}
+
+.codes {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 15px;
+  color: var(--ink-2);
+}
+
+.codes li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.codes abbr {
+  display: inline-grid;
+  place-items: center;
+  min-width: 46px;
+  height: 26px;
+  padding: 0 6px;
+  border-radius: 6px;
+  background: var(--navy);
+  color: #fff;
+  font: 700 12.5px/1 var(--f-head);
+  text-decoration: none;
+  letter-spacing: 0.04em;
+}
+
+.lead-card__note {
+  margin-top: 14px;
+  font-size: 13px;
+  color: var(--ink-3);
+}
+
+.spec-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.spec-row > div {
+  padding: 24px 28px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+}
+
+.spec-row h3 {
+  font-size: 18px;
+  margin-bottom: 12px;
+}
+
+.spec-row p:not(.chips-row) {
+  margin-top: 10px;
+  font-size: 14px;
+  color: var(--ink-2);
+}
+
+.chips-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.chips-row span {
+  display: inline-grid;
+  place-items: center;
+  min-width: 44px;
+  height: 36px;
+  padding: 0 10px;
+  border-radius: 8px;
+  background: var(--blue);
+  color: #fff;
+  font: 700 15px/1 var(--f-head);
+}
+
+.chips-row .chip--soft {
+  background: transparent;
+  border: 1.5px solid var(--blue);
+  color: var(--blue);
+}
+
+.certs {
+  display: grid;
+  grid-template-columns: minmax(240px, 420px) 1fr;
+  align-items: center;
+  gap: 32px;
+  margin-top: 16px;
+  padding: 24px 28px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: #fff;
+}
+
+.certs img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.certs h3 {
+  font-size: 18px;
+  margin-bottom: 8px;
+}
+
+.certs p {
+  font-size: 14.5px;
+  color: var(--ink-2);
+}
+
+.certs b {
+  color: var(--ink);
+}
+
 /* ---------- configurateur ---------- */
 
 .config {
@@ -1146,8 +1306,88 @@ input[type='range'] {
 
 .seg {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(6, 1fr);
   gap: 6px;
+}
+
+.seg__btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+/* produit (codes usine) + délai */
+.prod {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+}
+
+.prod__btn {
+  display: grid;
+  gap: 2px;
+  justify-items: start;
+  padding: 8px 9px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: #fff;
+  color: var(--ink);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s, color 0.2s;
+}
+
+.prod__btn strong {
+  font: 700 15px/1 var(--f-head);
+}
+
+.prod__btn span {
+  font-size: 11px;
+  line-height: 1.2;
+  color: var(--ink-3);
+}
+
+.prod__btn[aria-pressed='true'] {
+  background: var(--blue);
+  border-color: var(--blue);
+  color: #fff;
+}
+
+.prod__btn[aria-pressed='true'] span {
+  color: #c9d0f0;
+}
+
+.lead-time {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 4px 12px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: rgba(244, 156, 33, 0.14);
+  font-size: 13.5px;
+  color: var(--ink-2);
+}
+
+.lead-time b {
+  color: var(--ink);
+}
+
+.hint {
+  font-size: 13px;
+  color: var(--ink-3);
+}
+
+.hint b {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+/* sections propres à certains produits */
+.config:not([data-family='caisse']) [data-case-only],
+.config[data-printed='false'] [data-print-only],
+.config[data-family='plaque'] [data-dim-h] {
+  display: none !important;
 }
 
 .seg__btn {
@@ -1322,8 +1562,16 @@ input[type='range'] {
   margin: 0;
 }
 
-.results div:first-child {
+.results__main,
+.results__wide {
   grid-column: 1 / -1;
+}
+
+.results__wide small {
+  display: block;
+  margin-top: 2px;
+  font-size: 11.5px;
+  color: var(--muted-on-dark);
 }
 
 .results dt {
@@ -1337,7 +1585,7 @@ input[type='range'] {
   font-variant-numeric: tabular-nums;
 }
 
-.results div:first-child dd {
+.results__main dd {
   font-size: 32px;
   color: var(--orange);
 }
@@ -1524,6 +1772,13 @@ html:not(.js) .chapter__content::before,
 }
 
 @media (max-width: 1080px) {
+  .lead-grid {
+    grid-template-columns: 1fr;
+  }
+  .spec-row,
+  .certs {
+    grid-template-columns: 1fr;
+  }
   .site-nav {
     display: none;
   }
@@ -1700,7 +1955,12 @@ html:not(.js) .chapter__content::before,
 
   .config__summary {
     top: calc(var(--header-h) + 6px);
+    width: max-content;
+    max-width: calc(100% - 24px);
     font-size: 12px;
+    line-height: 1.35;
+    text-align: center;
+    white-space: normal;
   }
 
   .config__hint {

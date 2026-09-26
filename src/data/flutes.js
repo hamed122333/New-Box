@@ -7,11 +7,20 @@
 //
 // Pour les doubles cannelures, `layers[0]` est l'onde intérieure, `layers[1]` l'onde extérieure.
 
+const F = { pitch: 2.4, height: 0.75, takeUp: 1.25 };
 const E = { pitch: 3.3, height: 1.15, takeUp: 1.27 };
 const B = { pitch: 6.3, height: 2.5, takeUp: 1.33 };
 const C = { pitch: 7.6, height: 3.6, takeUp: 1.43 };
 
 export const FLUTES = {
+  F: {
+    id: 'F',
+    name: 'Cannelure F',
+    family: 'Simple cannelure · micro-onde fine',
+    thickness: 1.0,
+    layers: [F],
+    usage: 'Boîtes pliantes fines et étuis : surface très lisse pour une impression de précision.',
+  },
   E: {
     id: 'E',
     name: 'Cannelure E',
@@ -54,7 +63,10 @@ export const FLUTES = {
   },
 };
 
-export const FLUTE_ORDER = ['E', 'B', 'C', 'EB', 'BC'];
+// Cannelures produites par l'usine : F, E, B, C ; doubles cannelures combinées : EB, BC.
+export const SINGLE_FLUTES = ['F', 'E', 'B', 'C'];
+export const DOUBLE_FLUTES = ['EB', 'BC'];
+export const FLUTE_ORDER = [...SINGLE_FLUTES, ...DOUBLE_FLUTES];
 
 // Parcours de la section « Cannelures » du récit (index flottant animé au scroll).
-export const FLUTE_STORY = ['C', 'E', 'B', 'C', 'BC'];
+export const FLUTE_STORY = ['C', 'F', 'E', 'B', 'C', 'BC'];

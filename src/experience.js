@@ -79,12 +79,15 @@ export class Experience {
         return set(-6.4 * s, c.y + 4.2 * s, 9.4 * s, 0, c.y, 0);
       case 5:
       case 6: {
+        // palette chargée de caisses à plat + caisse montée posée devant
         const h = this.stack.height;
         const k = Math.max(0.85, h / 13);
-        const ang = i === 5 ? 0.62 : -0.5;
-        const r = (i === 5 ? 28 : 34) * k;
-        const py = i === 5 ? h * 0.7 + 5 * k : h * 0.95 + 6 * k;
-        return set(Math.sin(ang) * r, py, Math.cos(ang) * r, 0, h * 0.44, 0);
+        const ang = i === 5 ? 0.58 : -0.5;
+        const r = (i === 5 ? 36 : 40) * k;
+        // caméra haute : on voit le dessus des paquets (caisses à plat imprimées) et les feuillards
+        const py = i === 5 ? h * 1.2 + 5 * k : h * 1.35 + 6 * k;
+        const tz = 2;
+        return set(Math.sin(ang) * r, py, tz + Math.cos(ang) * r, 0.6, h * 0.42, tz);
       }
       default:
         return set(8, 5, 10, 0, 1.5, 0);
@@ -141,13 +144,12 @@ export class Experience {
       box.update();
       box.group.rotation.set(0, st.rotY + st.idle * 0.28 * Math.sin(time * 0.45), 0);
 
-      // palettisation : la caisse « héros » rejoint son emplacement en dernier
+      // palettisation : caisses livrées à plat ; la caisse montée glisse devant la palette
       stack.update(st.stack);
-      if (st.stack > 0.001 && stack.heroSlot) {
-        const lift = smooth(0, 0.22, st.stack);
-        const drop = smooth(0.84, 1, st.stack);
-        const hs = stack.heroSlot;
-        box.group.position.set(lerp(0, hs.x, lift), lerp(0, hs.y + 2.6, lift) - 2.6 * drop, lerp(0, hs.z, lift));
+      if (st.stack > 0.001 && stack.heroSpot) {
+        const k = smooth(0, 0.25, st.stack);
+        const hs = stack.heroSpot;
+        box.group.position.set(lerp(0, hs.x, k), 0, lerp(0, hs.z, k));
       } else box.group.position.set(0, 0, 0);
 
       this._interp(this.boxKey, st.camBox, pos, target);
@@ -204,12 +206,14 @@ export class Experience {
     const b = this.box;
     const cam = this.stage.camera;
     const k = 2 * Math.tan(THREE.MathUtils.degToRad(cam.fov) / 2);
+    const fit = (w, h) => Math.max(w / (k * cam.aspect * Math.max(0.2, fracW)), h / (k * Math.max(0.2, fracH)));
+    if (b.family === 'plaque') return fit(b.L * 1.15, b.W * 1.4);
     const flatK = smooth(0.3, 1, b.params.flat);
     const lidK = smooth(0, 0.6, b.params.lid) * (1 - flatK);
     const folded = Math.hypot(b.L, b.W, b.H + b.fh * lidK) * 1.3;
     const needW = lerp(folded, (2 * b.L + 2 * b.W + b.g) * 1.1, flatK);
     const needH = lerp(folded, (b.H + b.W) * 1.3, flatK);
-    return Math.max(needW / (k * cam.aspect * Math.max(0.2, fracW)), needH / (k * Math.max(0.2, fracH)));
+    return fit(needW, needH);
   }
 
   applyConfig(cfg, controls, dt) {
@@ -217,14 +221,18 @@ export class Experience {
     stage.world = 'box';
     stage.setShift(cfg.shiftX, cfg.shiftY);
     this.stack.group.visible = false;
-    box.params.lid = cfg.lid;
-    box.params.flat = cfg.flat;
-    box.params.tape = cfg.lid < 0.02 && cfg.flat < 0.02 ? 1 : 0;
+    // caisse : ouverture / mise à plat réglables ; découpe : flan à plat ; plaque : feuille
+    const isCase = box.family === 'caisse';
+    const lid = isCase ? cfg.lid : 0;
+    const flat = isCase ? cfg.flat : 1;
+    box.params.lid = lid;
+    box.params.flat = flat;
+    box.params.tape = isCase && lid < 0.02 && flat < 0.02 ? 1 : 0;
     box.update();
     box.group.position.set(0, 0, 0);
     if (cfg.autoRotate) cfg.angle += dt * 0.35;
     // à plat, le flan se présente de face
-    const flatK = smooth(0.3, 1, cfg.flat);
+    const flatK = smooth(0.3, 1, flat);
     const a = Math.atan2(Math.sin(cfg.angle), Math.cos(cfg.angle));
     box.group.rotation.set(0, a * (1 - flatK), 0);
 

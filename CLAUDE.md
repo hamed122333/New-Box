@@ -23,7 +23,7 @@ Pas de suite de tests automatisés dans le dépôt. Vérification manuelle ou vi
 2. Lancer `npm.cmd run dev`, ouvrir http://localhost:5173 : aucune erreur dans la console.
 3. Parcourir le récit : la caisse s'ouvre (01), plongée dans la tranche puis vue macro (02–03),
    morphing des cannelures jusqu'à BC (04), test ECT (05), flan qui se plie (06), palette (07).
-4. Configurateur : changer dimensions / cannelure / papier → la caisse et le BCT se mettent à jour ;
+4. Configurateur : changer produit / dimensions / cannelure / papiers → le modèle 3D, le délai et le BCT se mettent à jour ;
    « Capture PNG » télécharge une image ; « Demander un devis » ouvre un e-mail pré-rempli.
 5. La console expose `window.__newbox` (état du scroll, scène, configurateur) pour le débogage.
    `?capture` dans l'URL passe en horloge pilotée (`__newbox.step(dt)`) pour l'enregistrement vidéo.
@@ -47,6 +47,11 @@ Pas de suite de tests automatisés dans le dépôt. Vérification manuelle ou vi
 - Application de l'état à la 3D (caméras, test ECT, palette, configurateur) : `src/experience.js`
 - Caisse FEFCO 0201 paramétrique : `src/three/box.js` ; coupe de carton : `src/three/board.js`
 - Textures procédurales, impression du logo : `src/three/textures.js`
-- Valeurs papier / cannelures (indicatives, à valider par New Box) : `src/data/` ; calculs ECT / McKee : `src/lib/calc.js`
+- Gamme et délais (codes usine CI, CV, CID, CVD, DI, DV, PL, PLR) : `src/data/products.js`
+- Cannelures F, E, B, C (+ doubles EB, BC) : `src/data/flutes.js` ; qualités papier KL, KS, TL, TB, FL : `src/data/papers.js`
+  (grammages et indices indicatifs, à valider par New Box) ; calculs ECT / McKee / palettisation à plat : `src/lib/calc.js`
+- Palette du récit : caisses livrées pliées-collées à plat, en paquets cerclés (`src/three/stack.js`)
 - Logo officiel : `src/assets/brand/logo-new-box.png` ; charte : bleu `#14259B`, orange `#F49C21`, bleu nuit `#0D1642`
+- Certifications (SGS FSSC 22000, ISO 9001, ISO 45001 ; FSC C191615) : `src/assets/brand/certifications.png`,
+  imprimées sous le logo sur la face avant des caisses imprimées et affichées dans la section « Produits & délais »
 - Plan et feuille de route : `docs/PLAN.md`

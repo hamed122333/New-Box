@@ -68,10 +68,10 @@ export function buildStory({ reduced }) {
   to({ labels: 0, duration: 0.2 }, S.anatomie + 1.2);
   to({ explode: 0, duration: 0.4, ease: 'power2.inOut' }, S.anatomie + 1.25);
 
-  // 04 — Cannelures : C → E → B → C → BC
+  // 04 — Cannelures : C → F → E → B → C → BC (FLUTE_STORY)
   to({ camMacro: 2, duration: 0.6, ease: 'power1.inOut' }, S.cannelures - 0.1);
   to({ shiftX: 0.2, duration: 0.4 }, S.cannelures);
-  [0.15, 0.6, 1.05, 1.5].forEach((at, i) => to({ flute: i + 1, duration: 0.32, ease: 'power2.inOut' }, S.cannelures + at));
+  [0.12, 0.5, 0.88, 1.26, 1.64].forEach((at, i) => to({ flute: i + 1, duration: 0.3, ease: 'power2.inOut' }, S.cannelures + at));
 
   // 05 — Qualité : test ECT
   to({ camMacro: 3, duration: 0.7, ease: 'power1.inOut' }, S.qualite - 0.1);

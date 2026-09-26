@@ -19,7 +19,9 @@ qui transforme la visite en demande de devis.
 | Qualité | Test ECT animé, compteurs ECT / BCT / éclatement / Cobb |
 | Fabrication | Le flan imprimé à plat se plie en caisse (onduleuse → flexo → Bobst → pliage-collage) |
 | Logistique | Palettisation sur palette Europe |
-| Configurateur | Dimensions, cannelure, papier, logo, ouverture, mise à plat, BCT, gerbage, capture PNG, devis |
+| Logistique | Palette Europe chargée de caisses **livrées à plat** (paquets cerclés), caisse montée devant |
+| Produits & délais | Plaques PL/PLR (5 j), caisses CI/CV/CID/CVD (7–10 j), découpes DI/DV (12–15 j), cannelures, papiers, certifications |
+| Configurateur | Produit (code usine + délai), dimensions, cannelure F/E/B/C/EB/BC, papiers KL/KS/TL/TB + FL, logo, ouverture, mise à plat, BCT, gerbage, caisses à plat par palette, capture PNG, devis |
 
 ## Démarrer
 
@@ -81,6 +83,8 @@ bash <(curl -fsSL https://raw.githubusercontent.com/hamed122333/New-Box/claude/c
   réserves blanches laissant voir le kraft).
 - Couleurs de la charte : bleu `#14259B`, orange `#F49C21`, bleu nuit `#0D1642` (variables en tête de
   `src/styles/main.css`, constante `BRAND` dans `src/three/textures.js`).
+- Certifications SGS (FSSC 22000, ISO 9001, ISO 45001) et FSC C191615 : `src/assets/brand/certifications.png`,
+  imprimées sous le logo sur les caisses et présentées dans la section « Produits & délais ».
 
 ## Structure
 
@@ -90,7 +94,7 @@ src/experience.js      applique l'état du scroll à la 3D (caméras, test ECT, 
 src/scroll/story.js    timeline maître : tout le storyboard est ici
 src/three/             caisse FEFCO 0201, coupe de carton, palette, textures procédurales
 src/ui/                chapitres, étiquettes 3D, configurateur
-src/data/              cannelures & qualités papier  ← valeurs à valider par New Box
+src/data/              produits & délais, cannelures, qualités papier  ← valeurs à valider par New Box
 src/lib/calc.js        ECT, BCT (McKee), flan, gerbage
 ```
 

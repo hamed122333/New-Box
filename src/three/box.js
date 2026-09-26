@@ -1,14 +1,15 @@
 import * as THREE from 'three';
 import { boardComposition, GLUE_FLAP_MM } from '../lib/calc.js';
-import { GRADES } from '../data/grades.js';
-import { printedPanel, paperTile, bumpTile, edgeTexture, INKS } from './textures.js';
+import { PRODUCTS } from '../data/products.js';
+import { printedPanel, plateTexture, paperTile, bumpTile, edgeTexture, INKS } from './textures.js';
 
 // 1 unité de scène = 100 mm
 export const MM = 0.01;
 const SLOT_MM = 6; // fente entre rabats
 const TAPE_W = 0.5; // ruban 50 mm
 const TILE = 1.6; // taille d'une tuile de papier (unités)
-const TEX_KEYS = ['L', 'W', 'H', 'flute', 'grade', 'ink', 'logo', 'brandLogo']; // paramètres imprimés
+// paramètres qui changent l'impression / les textures
+const TEX_KEYS = ['product', 'L', 'W', 'H', 'flute', 'outer', 'inner', 'ink', 'logo', 'brandLogo', 'certs'];
 
 const clamp01 = (x) => Math.min(1, Math.max(0, x));
 export const smooth = (a, b, x) => {
@@ -49,7 +50,19 @@ export class CorrugatedBox {
     this.root = new THREE.Group();
     this.group.add(this.root);
     this.params = { lid: 0, flat: 0, tape: 1 };
-    this.spec = { L: 400, W: 300, H: 300, flute: 'C', grade: 'standard', ink: 'bleu', logo: null, brandLogo: null };
+    this.spec = {
+      product: 'CI', // CI, CV, CID, CVD (caisse), DI, DV (découpe), PL, PLR (plaque) — voir data/products.js
+      L: 400,
+      W: 300,
+      H: 300, // pour une plaque : L × W = format de la plaque, H inutilisé
+      flute: 'C',
+      outer: 'KL',
+      inner: 'TL',
+      ink: 'bleu',
+      logo: null,
+      brandLogo: null,
+      certs: null,
+    };
     this._disposables = [];
     this.bump = bumpTile(this.aniso);
     this._tmp = new THREE.Vector3();
@@ -65,7 +78,7 @@ export class CorrugatedBox {
     const prev = this.spec;
     this.spec = { ...prev, ...changes };
     const s = this.spec;
-    this.comp = boardComposition(s.flute, s.grade);
+    this.comp = boardComposition(s.flute, s.outer, s.inner);
     const needTex = !this.mats || force || this._staleTextures || TEX_KEYS.some((k) => prev[k] !== s[k]);
     if (needTex && deferTextures && this.mats) this._staleTextures = true;
     else if (needTex) {
@@ -86,9 +99,12 @@ export class CorrugatedBox {
       m.dispose();
     });
     const s = this.spec;
-    const palette = GRADES[s.grade].color === 'white' ? 'white' : 'kraft';
+    const product = PRODUCTS[s.product];
+    const palette = this.comp.color === 'white' ? 'white' : 'kraft';
     const common = {
       palette,
+      printed: product.printed,
+      certs: s.certs,
       ink: INKS[s.ink] ?? INKS.bleu,
       comp: this.comp,
       dims: { L: s.L, W: s.W, H: s.H },
@@ -129,6 +145,11 @@ export class CorrugatedBox {
     });
     this.edgeTileU = edgeTex.userData.tileMm * MM;
     this.mats = { front, back: front, sideA: side, sideB: side, outer, inner, edge, tape, all: [front, side, outer, inner, edge, tape] };
+    if (product.family === 'plaque') {
+      const pitch = this.comp.flute.layers.at(-1).pitch;
+      this.mats.plate = std(plateTexture({ w: s.L, h: s.W, palette, pitch, scored: product.scored }, this.aniso), {}, s.L, s.W);
+      this.mats.all.push(this.mats.plate);
+    }
   }
 
   _clearGeometry() {
@@ -157,6 +178,17 @@ export class CorrugatedBox {
     const slot = SLOT_MM * MM;
     const g = GLUE_FLAP_MM * MM;
     Object.assign(this, { L, W, H, t, fh, g });
+
+    // Plaque (PL / PLR) : une seule feuille, présentée debout comme un flan
+    if (this.family === 'plaque') {
+      const geo = panelGeometry(L, W, t, this.edgeTileU, true);
+      geo.translate(-L / 2, 0.25, 0);
+      this.root.add(this._mesh(geo, [M.edge, M.edge, M.edge, M.edge, M.plate, M.inner]));
+      this.creases = [];
+      this.flaps = [];
+      this.tapes = [];
+      return;
+    }
 
     const widths = [L, W, L, W];
     const faces = [M.front, M.sideA, M.back, M.sideB];
@@ -226,6 +258,10 @@ export class CorrugatedBox {
 
   /** Applique les paramètres lid (0 fermé → 1 ouvert), flat (0 monté → 1 à plat), tape. */
   update() {
+    if (this.family === 'plaque') {
+      this.root.position.set(0, 0, 0);
+      return;
+    }
     const { lid, flat, tape } = this.params;
     const { L, W, H, t, fh, g } = this;
     const flapFold = 1 - smooth(0, 0.45, flat);
@@ -261,6 +297,7 @@ export class CorrugatedBox {
 
   /** Centre visuel (espace local du groupe) selon l'état plié / ouvert / à plat. */
   center(target = new THREE.Vector3()) {
+    if (this.family === 'plaque') return target.set(0, this.W / 2 + 0.25, 0);
     const flatK = smooth(0.3, 1, this.params.flat);
     const lidK = smooth(0, 0.6, this.params.lid) * (1 - flatK);
     return target.set(0, lerp(this.H / 2 + (this.fh * lidK) / 2, this.fh + 0.25 + this.H / 2, flatK), 0);
@@ -274,6 +311,14 @@ export class CorrugatedBox {
     const up = new THREE.Vector3(0, 1, 0).transformDirection(h.matrixWorld);
     const out = new THREE.Vector3(0, 0, 1).transformDirection(h.matrixWorld);
     return { tip, up, out };
+  }
+
+  get product() {
+    return PRODUCTS[this.spec.product];
+  }
+
+  get family() {
+    return this.product.family;
   }
 
   get size() {

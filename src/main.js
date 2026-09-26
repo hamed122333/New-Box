@@ -16,8 +16,11 @@ import { state, buildStory } from './scroll/story.js';
 import { ChapterUI } from './ui/chapters.js';
 import { Labels } from './ui/labels.js';
 import { Configurator } from './ui/configurator.js';
-import { GRADES } from './data/grades.js';
+import { PAPERS, STORY_PAPERS } from './data/papers.js';
+import { DOUBLE_FLUTES } from './data/flutes.js';
+import { afterNextPaint } from './lib/schedule.js';
 import logoUrl from './assets/brand/logo-new-box.png';
+import certsUrl from './assets/brand/certifications.png';
 
 const root = document.documentElement;
 // ?capture : horloge pilotée de l'extérieur (enregistrement vidéo image par image)
@@ -37,8 +40,8 @@ const loadImage = (src) =>
 root.classList.add('js');
 
 function fillPaperLabels() {
-  const g = GRADES.standard;
-  const text = { outer: `${g.outer.name} ${g.outer.gsm} g/m²`, fluting: `${g.fluting.name} ${g.fluting.gsm} g/m²`, inner: `${g.inner.name} ${g.inner.gsm} g/m²` };
+  const label = (p) => `${p.code} · ${p.name} ${p.gsm} g/m²`;
+  const text = { outer: label(PAPERS[STORY_PAPERS.outer]), fluting: label(PAPERS.FL), inner: label(PAPERS[STORY_PAPERS.inner]) };
   document.querySelectorAll('[data-paper]').forEach((el) => (el.textContent = text[el.dataset.paper] ?? ''));
 }
 
@@ -116,18 +119,22 @@ async function init() {
 
   // Les textures sont dessinées avec les polices du site et le logo officiel : on attend leur chargement.
   const logoPromise = loadImage(logoUrl).catch(() => null);
+  const certsPromise = loadImage(certsUrl).catch(() => null); // SGS FSSC 22000 · ISO 9001 · ISO 45001, FSC
   await Promise.race([
     Promise.all([
       document.fonts.load('700 64px "Space Grotesk Variable"'),
       document.fonts.load('600 32px "Inter Variable"'),
       document.fonts.load('400 32px "Inter Variable"'),
       logoPromise,
+      certsPromise,
     ]),
     wait(2500),
   ]).catch(() => {});
-  const brandLogo = await Promise.race([logoPromise, wait(0).then(() => null)]);
+  const ready = (p) => Promise.race([p, wait(0).then(() => null)]);
+  const brandLogo = await ready(logoPromise);
+  const certs = await ready(certsPromise);
 
-  const box = new CorrugatedBox(stage.renderer).build({ brandLogo });
+  const box = new CorrugatedBox(stage.renderer).build({ brandLogo, certs });
   const board = new BoardSample(stage.renderer);
   const stack = new PalletStack(stage.renderer);
   stack.build(box);
@@ -160,10 +167,12 @@ async function init() {
   mobileMq.addEventListener('change', syncPanelScroll);
   syncPanelScroll();
 
+  // la palette n'est visible que dans le récit : on la recalcule en y revenant
+  let stackDirty = false;
   const cfg = new Configurator(cfgRoot, {
     onSpec: (patch, opts) => {
       box.build(patch, opts);
-      stack.build(box);
+      stackDirty = true;
     },
     onCapture: () => stage.capture(),
   });
@@ -171,6 +180,8 @@ async function init() {
   // Quelle partie de la page est visible ?
   const visible = { story: true, config: false };
   ScrollTrigger.create({ trigger: '#story', start: 'top bottom', end: 'bottom top', onToggle: (s) => (visible.story = s.isActive) });
+  // le rail des chapitres (au milieu de l'écran) disparaît dès que le récit quitte le centre
+  ScrollTrigger.create({ trigger: '#story', start: 'top center', end: 'bottom 55%', onToggle: (s) => (root.dataset.story = s.isActive ? 'on' : 'off') });
   ScrollTrigger.create({ trigger: cfgRoot, start: 'top bottom', end: 'bottom top', onToggle: (s) => (visible.config = s.isActive) });
 
   let mode = 'story';
@@ -178,7 +189,19 @@ async function init() {
     mode = m;
     root.dataset.mode = m;
     controls.enabled = m === 'config';
-    if (m === 'config') xp.enterConfig(controls);
+    if (m === 'config') {
+      // le récit montre toujours une caisse imprimée : on rétablit le produit choisi
+      if (box.spec.product !== cfg.spec.product) afterNextPaint(() => box.build({ product: cfg.spec.product }));
+      xp.enterConfig(controls);
+      return;
+    }
+    const needCase = box.family !== 'caisse' || !box.product.printed;
+    if (!needCase && !stackDirty) return;
+    afterNextPaint(() => {
+      if (needCase) box.build({ product: DOUBLE_FLUTES.includes(box.spec.flute) ? 'CID' : 'CI' });
+      stack.build(box);
+      stackDirty = false;
+    });
   };
   setMode('story');
 

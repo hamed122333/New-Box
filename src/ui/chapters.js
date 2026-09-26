@@ -1,5 +1,6 @@
 import { FLUTES, FLUTE_STORY } from '../data/flutes.js';
 import { boardComposition, estimate, fmt } from '../lib/calc.js';
+import { STORY_PAPERS } from '../data/papers.js';
 import { smooth } from '../three/box.js';
 
 /**
@@ -18,8 +19,8 @@ export class ChapterUI {
     this._flute = null;
     this._step = -1;
 
-    // Valeurs du test qualité : double cannelure BC, qualité standard, caisse 400 × 300 × 300
-    const q = estimate({ L: 400, W: 300, H: 300, flute: 'BC', grade: 'standard', content: 10, condition: 'standard' });
+    // Valeurs du test qualité : caisse imprimée double cannelure BC, KL / FL / TL, 400 × 300 × 300
+    const q = estimate({ product: 'CID', L: 400, W: 300, H: 300, flute: 'BC', ...STORY_PAPERS, content: 10, condition: 'standard' });
     this.quality = { ect: q.ect, bct: q.bctKg, burst: q.burst, cobb: q.cobb };
   }
 
@@ -49,7 +50,7 @@ export class ChapterUI {
     if (id === this._flute || !this.fluteCard) return;
     this._flute = id;
     const fl = FLUTES[id];
-    const comp = boardComposition(id, 'standard');
+    const comp = boardComposition(id, STORY_PAPERS.outer, STORY_PAPERS.inner);
     const set = (k, v) => {
       const el = this.fluteCard.querySelector(`[data-f="${k}"]`);
       if (el) el.textContent = v;

@@ -82,6 +82,22 @@ Un seul canvas WebGL en arrière-plan, deux « mondes » (caisse à l'échelle /
 
 ---
 
+### Critères de l'usine intégrés
+
+| Famille | Codes | Délai de fabrication |
+|---|---|---|
+| Plaques | PL (plaque), PLR (plaque rainée) | 5 jours |
+| Caisses américaines | CI (imprimée), CV (vierge), CID / CVD (double cannelure) | 7 à 10 jours |
+| Découpes | DI (imprimée), DV (vierge) | 12 à 15 jours |
+
+- Cannelures : F, E, B, C ; doubles cannelures EB, BC (CID / CVD)
+- Qualités papier : couvertures KL, KS, TL, TB ; cannelure FL
+- Livraison : caisses pliées-collées **à plat**, en paquets cerclés sur palette Europe (estimation du nombre par palette)
+- Certifications imprimées sur les caisses : SGS FSSC 22000, ISO 9001, ISO 45001 ; FSC C191615
+
+> Libellés à confirmer par New Box : signification exacte de **KS** et **TB**, et du « D » de CID / CVD
+> (interprété ici comme « double cannelure »).
+
 ## 5. Architecture technique
 
 | Couche | Choix | Pourquoi |
