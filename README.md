@@ -19,8 +19,10 @@ qui transforme la visite en demande de devis.
 | Qualité | Test ECT animé, compteurs ECT / BCT / éclatement / Cobb |
 | Fabrication | Le flan imprimé à plat se plie en caisse (onduleuse → flexo → Bobst → pliage-collage) |
 | Logistique | Palette Europe chargée de caisses **livrées à plat** (paquets cerclés), caisse montée devant |
+| La gamme | Travelling sur les autres produits : boîte pizza qui s'ouvre sur la pizza, boîte e-commerce avec message intérieur, plateau à poignées qui se remplit d'oranges, croisillons qui s'emboîtent ; étiquettes cliquables |
+| Notre gamme en 3D | Cartes produits avec vignettes 3D et bouton « Personnaliser en 3D » (configurateur pré-réglé) |
 | Produits & délais | Plaques PL/PLR (5 j), caisses CI/CV/CID/CVD (7–10 j), découpes DI/DV (12–15 j), cannelures, papiers, certifications |
-| Configurateur | Produit (code usine + délai), dimensions, cannelure F/E/B/C/EB/BC, papiers KL/KS/TL/TB + FL, logo, ouverture, mise à plat, BCT, gerbage, caisses à plat par palette, capture PNG, devis |
+| Configurateur | Produit (code usine + délai), **modèle de découpe** pour DI/DV (pizza, e-commerce, plateau, croisillons), dimensions, cannelure F/E/B/C/EB/BC, papiers KL/KS/TL/TB + FL, logo, ouverture, mise à plat, BCT, gerbage, unités à plat par palette, capture PNG, devis |
 
 ## Démarrer
 
@@ -91,7 +93,8 @@ bash <(curl -fsSL https://raw.githubusercontent.com/hamed122333/New-Box/claude/c
 src/main.js            amorçage (scène, scroll, modes récit / configurateur)
 src/experience.js      applique l'état du scroll à la 3D (caméras, test ECT, palette)
 src/scroll/story.js    timeline maître : tout le storyboard est ici
-src/three/             caisse FEFCO 0201, coupe de carton, palette, textures procédurales
+src/three/             caisse FEFCO 0201, découpes (pizza, e-commerce, plateau, croisillons), gamme,
+                       coupe de carton, palette, textures procédurales
 src/ui/                chapitres, étiquettes 3D, configurateur
 src/data/              produits & délais, cannelures, qualités papier  ← valeurs à valider par New Box
 src/lib/calc.js        ECT, BCT (McKee), flan, gerbage
@@ -102,6 +105,8 @@ src/lib/calc.js        ECT, BCT (McKee), flan, gerbage
 - **Changer le rythme du récit** : `data-units` de chaque `<section class="chapter">` dans `index.html`
   (1 unité = 1 écran de scroll) et les positions des animations dans `src/scroll/story.js`.
 - **Produits & délais** : `src/data/products.js` (codes usine, libellés, délais, découpe).
+- **Modèles de découpe** : `src/data/styles.js` (dimensions types, bornes, cannelure, flan à plat) ;
+  disposition de la gamme dans le récit : `src/three/lineup.js`.
 - **Papiers & performances** : `src/data/papers.js` (KL, KS, TL, TB, FL : grammages, SCT, éclatement, Cobb).
 - **Cannelures** : `src/data/flutes.js` (pas, hauteur, coefficient d'ondulation, épaisseur).
 - **Couleurs du site** : variables CSS en tête de `src/styles/main.css`.

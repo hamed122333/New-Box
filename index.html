@@ -42,6 +42,24 @@
       </div>
     </div>
 
+    <div class="tags" data-tags aria-hidden="true">
+      <a class="tag" data-tag="caisse" href="#configurateur" tabindex="-1" data-preset='{"product":"CI","L":400,"W":300,"H":300,"flute":"C"}'>
+        <b>Caisse américaine</b><span>CI · CV · 7–10 j</span>
+      </a>
+      <a class="tag" data-tag="pizza" href="#configurateur" tabindex="-1" data-preset='{"product":"DI","style":"pizza"}'>
+        <b>Boîte pizza</b><span>DI · 12–15 j</span>
+      </a>
+      <a class="tag" data-tag="mailer" href="#configurateur" tabindex="-1" data-preset='{"product":"DI","style":"mailer"}'>
+        <b>Boîte e-commerce</b><span>DI · 12–15 j</span>
+      </a>
+      <a class="tag" data-tag="tray" href="#configurateur" tabindex="-1" data-preset='{"product":"DI","style":"tray"}'>
+        <b>Plateau fruits &amp; légumes</b><span>DI · 12–15 j</span>
+      </a>
+      <a class="tag" data-tag="divider" href="#configurateur" tabindex="-1" data-preset='{"product":"DV","style":"divider"}'>
+        <b>Croisillons</b><span>DV · 12–15 j</span>
+      </a>
+    </div>
+
     <header class="site-header">
       <a class="brand" href="#hero">
         <img class="brand__logo" src="/src/assets/brand/logo-new-box.png" alt="New Box Tunisia — accueil" width="604" height="634" />
@@ -50,7 +68,7 @@
         <a href="#anatomie">Matière</a>
         <a href="#cannelures">Cannelures</a>
         <a href="#fabrication">Fabrication</a>
-        <a href="#produits">Produits &amp; délais</a>
+        <a href="#modeles">Nos produits</a>
         <a href="#configurateur">Configurateur 3D</a>
       </nav>
       <a class="btn btn--small" href="#contact">Demander un devis</a>
@@ -65,6 +83,7 @@
       <a class="rail__item" data-target="qualite" href="#qualite"><span>Qualité</span></a>
       <a class="rail__item" data-target="fabrication" href="#fabrication"><span>Fabrication</span></a>
       <a class="rail__item" data-target="palette" href="#palette"><span>Logistique</span></a>
+      <a class="rail__item" data-target="gamme" href="#gamme"><span>La gamme</span></a>
       <a class="rail__item" data-target="engagement" href="#engagement"><span>Engagement</span></a>
     </nav>
 
@@ -201,9 +220,26 @@
           </div>
         </section>
 
+        <section class="chapter" id="gamme" data-units="2.2">
+          <div class="chapter__content">
+            <p class="eyebrow"><span class="num">08</span>La gamme</p>
+            <h2>Bien plus que des caisses.</h2>
+            <p>
+              Avec la découpe Bobst, le carton prend toutes les formes : boîtes pizza, boîtes e-commerce à couvercle,
+              plateaux fruits et légumes à poignées, croisillons de calage. Imprimés à vos couleurs, livrés à plat.
+            </p>
+            <ul class="chips chips--links">
+              <li><a href="#configurateur" data-preset='{"product":"DI","style":"pizza"}'>Boîte pizza</a></li>
+              <li><a href="#configurateur" data-preset='{"product":"DI","style":"mailer"}'>E-commerce</a></li>
+              <li><a href="#configurateur" data-preset='{"product":"DI","style":"tray"}'>Plateau</a></li>
+              <li><a href="#configurateur" data-preset='{"product":"DV","style":"divider"}'>Croisillons</a></li>
+            </ul>
+          </div>
+        </section>
+
         <section class="chapter" id="engagement" data-units="2">
           <div class="chapter__content">
-            <p class="eyebrow"><span class="num">08</span>Engagement</p>
+            <p class="eyebrow"><span class="num">09</span>Engagement</p>
             <h2>Un matériau qui revient toujours.</h2>
             <p>
               Le carton ondulé est mono-matériau et 100 % recyclable. Dans notre usine, les chutes sont compactées en
@@ -250,6 +286,88 @@
             <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M11 4 4 9l3 5 3-2v16h12V12l3 2 3-5-7-5c-1 2-3 3-5 3s-4-1-5-3Z" /></svg>
             <h3>Textile &amp; chaussure</h3>
             <p>Cartons d’expédition export aux formats normés, marquage colis.</p>
+          </article>
+        </div>
+      </section>
+
+      <!-- ============ NOTRE GAMME EN 3D ============ -->
+      <section class="section section--models" id="modeles">
+        <header class="section__head">
+          <p class="eyebrow">Notre gamme en 3D</p>
+          <h2>Choisissez un modèle, nous le fabriquons à vos mesures.</h2>
+          <p>Chaque emballage s’ouvre dans le configurateur : dimensions, cannelure, papiers et impression, avec le délai de fabrication.</p>
+        </header>
+        <div class="model-grid">
+          <article class="model-card">
+            <div class="model-card__thumb"><canvas data-thumb="caisse" width="560" height="420"></canvas></div>
+            <div class="model-card__body">
+              <p class="model-card__codes"><abbr>CI</abbr><abbr>CV</abbr><span>7–10 jours</span></p>
+              <h3>Caisse américaine</h3>
+              <p>Le standard du transport (FEFCO 0201), imprimée ou vierge, simple ou double cannelure.</p>
+              <a class="btn btn--small" href="#configurateur" data-preset='{"product":"CI","L":400,"W":300,"H":300,"flute":"C"}'>Personnaliser en 3D</a>
+            </div>
+          </article>
+          <article class="model-card">
+            <div class="model-card__thumb"><canvas data-thumb="caisse-decoupee" width="560" height="420"></canvas></div>
+            <div class="model-card__body">
+              <p class="model-card__codes"><abbr>CID</abbr><abbr>CVD</abbr><span>7–10 jours</span></p>
+              <h3>Caisse à poignées</h3>
+              <p>Caisse découpée : poignées ajourées pour la manutention, aération possible.</p>
+              <a class="btn btn--small" href="#configurateur" data-preset='{"product":"CID","L":400,"W":300,"H":250,"flute":"B","lid":0.7}'>Personnaliser en 3D</a>
+            </div>
+          </article>
+          <article class="model-card">
+            <div class="model-card__thumb"><canvas data-thumb="pizza" width="560" height="420"></canvas></div>
+            <div class="model-card__body">
+              <p class="model-card__codes"><abbr>DI</abbr><abbr>DV</abbr><span>12–15 jours</span></p>
+              <h3>Boîte pizza</h3>
+              <p>Micro-cannelure E, couvercle à rabat rentrant, impression alimentaire à vos couleurs.</p>
+              <a class="btn btn--small" href="#configurateur" data-preset='{"product":"DI","style":"pizza"}'>Personnaliser en 3D</a>
+            </div>
+          </article>
+          <article class="model-card">
+            <div class="model-card__thumb"><canvas data-thumb="mailer" width="560" height="420"></canvas></div>
+            <div class="model-card__body">
+              <p class="model-card__codes"><abbr>DI</abbr><abbr>DV</abbr><span>12–15 jours</span></p>
+              <h3>Boîte e-commerce</h3>
+              <p>Boîte postale à couvercle (FEFCO 0427) : marque à l’extérieur, message à l’intérieur.</p>
+              <a class="btn btn--small" href="#configurateur" data-preset='{"product":"DI","style":"mailer"}'>Personnaliser en 3D</a>
+            </div>
+          </article>
+          <article class="model-card">
+            <div class="model-card__thumb"><canvas data-thumb="tray" width="560" height="420"></canvas></div>
+            <div class="model-card__body">
+              <p class="model-card__codes"><abbr>DI</abbr><abbr>DV</abbr><span>12–15 jours</span></p>
+              <h3>Plateau fruits &amp; légumes</h3>
+              <p>Plateau ouvert gerbable à poignées, pour agrumes, dattes et primeurs à l’export.</p>
+              <a class="btn btn--small" href="#configurateur" data-preset='{"product":"DI","style":"tray"}'>Personnaliser en 3D</a>
+            </div>
+          </article>
+          <article class="model-card">
+            <div class="model-card__thumb"><canvas data-thumb="divider" width="560" height="420"></canvas></div>
+            <div class="model-card__body">
+              <p class="model-card__codes"><abbr>DV</abbr><abbr>DI</abbr><span>12–15 jours</span></p>
+              <h3>Croisillons</h3>
+              <p>Séparateurs emboîtés qui calent bouteilles, bocaux et pièces fragiles dans la caisse.</p>
+              <a class="btn btn--small" href="#configurateur" data-preset='{"product":"DV","style":"divider"}'>Personnaliser en 3D</a>
+            </div>
+          </article>
+          <article class="model-card">
+            <div class="model-card__thumb"><canvas data-thumb="plaque" width="560" height="420"></canvas></div>
+            <div class="model-card__body">
+              <p class="model-card__codes"><abbr>PL</abbr><abbr>PLR</abbr><span>5 jours</span></p>
+              <h3>Plaques</h3>
+              <p>Plaques simple ou double cannelure, rainées à vos cotes pour vos propres lignes.</p>
+              <a class="btn btn--small" href="#configurateur" data-preset='{"product":"PLR","L":1200,"W":800}'>Personnaliser en 3D</a>
+            </div>
+          </article>
+          <article class="model-card model-card--cta">
+            <div class="model-card__body">
+              <p class="eyebrow">Sur mesure</p>
+              <h3>Un autre emballage en tête ?</h3>
+              <p>Présentoir, calage, fourreau, caisse télescopique : envoyez-nous votre besoin, notre bureau d’études dessine la découpe.</p>
+              <a class="btn btn--light btn--small" href="#contact">Parlons-en</a>
+            </div>
           </article>
         </div>
       </section>
@@ -326,7 +444,7 @@
       <section class="config" id="configurateur">
         <div class="config__viewer" data-viewer>
           <p class="config__summary" data-out="summary"></p>
-          <p class="config__hint">Glissez pour faire tourner la caisse</p>
+          <p class="config__hint">Glissez pour faire tourner le modèle</p>
           <p class="config__nogl">La vue 3D nécessite WebGL. Les estimations restent disponibles.</p>
         </div>
 
@@ -341,6 +459,11 @@
             <legend>Produit</legend>
             <div class="prod" data-options="product" role="group" aria-label="Type de produit"></div>
             <p class="lead-time"><span data-out="product-name"></span><b>Délai : <span data-out="lead"></span></b></p>
+            <div class="styles" data-decoupe-only>
+              <p class="styles__title">Modèle de découpe</p>
+              <div class="style" data-options="style" role="group" aria-label="Modèle de découpe"></div>
+              <p class="hint" data-out="style-desc"></p>
+            </div>
           </fieldset>
 
           <fieldset>
@@ -392,8 +515,8 @@
 
           <fieldset>
             <legend>Vue</legend>
-            <label class="slider" data-case-only><span>Ouverture des rabats</span><input type="range" name="lid" min="0" max="1" step="0.01" value="0" /></label>
-            <label class="slider" data-case-only><span>Mise à plat (flan / plan de découpe)</span><input type="range" name="flat" min="0" max="1" step="0.01" value="0" /></label>
+            <label class="slider" data-view="lid"><span data-out="lid-label">Ouverture des rabats</span><input type="range" name="lid" min="0" max="1" step="0.01" value="0" /></label>
+            <label class="slider" data-view="flat"><span>Mise à plat (flan / plan de découpe)</span><input type="range" name="flat" min="0" max="1" step="0.01" value="0" /></label>
             <label class="toggle"><input type="checkbox" name="autorotate" /><span>Rotation automatique</span></label>
           </fieldset>
 
@@ -444,7 +567,7 @@
           </div>
           <div>
             <h3>Produits</h3>
-            <p>Plaques · Caisses américaines · Découpes imprimées · Croisillons · Calages sur mesure</p>
+            <p>Plaques · Caisses américaines · Boîtes pizza · Boîtes e-commerce · Plateaux · Croisillons · Calages sur mesure</p>
           </div>
           <div>
             <h3>Web</h3>

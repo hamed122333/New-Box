@@ -7,7 +7,7 @@ import { printedPanel, plateTexture, holeMask, handHole, paperTile, bumpTile, ed
 export const MM = 0.01;
 const SLOT_MM = 6; // fente entre rabats
 const TAPE_W = 0.5; // ruban 50 mm
-const TILE = 1.6; // taille d'une tuile de papier (unités)
+export const TILE = 1.6; // taille d'une tuile de papier (unités)
 // paramètres qui changent l'impression / les textures
 const TEX_KEYS = ['product', 'L', 'W', 'H', 'flute', 'outer', 'inner', 'ink', 'logo', 'brandLogo', 'certs'];
 
@@ -23,7 +23,7 @@ export const lerp = (a, b, t) => a + (b - a) * t;
  * Les tranches reçoivent des UV « au millimètre » pour la texture de cannelure,
  * la face extérieure des UV 0–1 si elle est imprimée.
  */
-function panelGeometry(w, h, t, edgeTileU, printed) {
+export function panelGeometry(w, h, t, edgeTileU, printed, printedInner = false) {
   const g = new THREE.BoxGeometry(w, h, t);
   g.translate(w / 2, h / 2, 0);
   const pos = g.attributes.position;
@@ -35,7 +35,7 @@ function panelGeometry(w, h, t, edgeTileU, printed) {
     const across = (pos.getZ(i) + t / 2) / t;
     if (face <= 1) uv.setXY(i, y / edgeTileU, across);
     else if (face <= 3) uv.setXY(i, x / edgeTileU, across);
-    else if (face === 4 && printed) uv.setXY(i, x / w, y / h);
+    else if ((face === 4 && printed) || (face === 5 && printedInner)) uv.setXY(i, x / w, y / h);
     else uv.setXY(i, x / TILE, y / TILE);
   }
   uv.needsUpdate = true;

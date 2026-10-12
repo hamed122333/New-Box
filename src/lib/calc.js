@@ -1,6 +1,7 @@
 import { FLUTES } from '../data/flutes.js';
 import { PAPERS, FLUTING, CONDITIONS } from '../data/papers.js';
 import { PRODUCTS, leadText } from '../data/products.js';
+import { styleBlank } from '../data/styles.js';
 
 export const GLUE_FLAP_MM = 35;
 const G = 9.81;
@@ -71,7 +72,7 @@ export function blankArea(L, W, H) {
  */
 export function flatFormat(family, s, thicknessMm) {
   if (family === 'plaque') return { a: s.L, b: s.W, thick: thicknessMm };
-  if (family === 'decoupe') return { a: 2 * s.L + 2 * s.W + GLUE_FLAP_MM, b: s.H + s.W, thick: thicknessMm };
+  if (family === 'decoupe') return styleBlank(s.style, s, thicknessMm);
   return { a: s.L + s.W + 20, b: s.H + s.W, thick: 2 * thicknessMm };
 }
 
@@ -91,9 +92,10 @@ export function estimate(s) {
   const product = PRODUCTS[s.product] ?? PRODUCTS.CI;
   const comp = boardComposition(s.flute, s.outer, s.inner);
   const isCase = product.family === 'caisse';
-  const area = product.family === 'plaque' ? (s.L * s.W) / 1e6 : blankArea(s.L, s.W, s.H);
+  const flat = flatFormat(product.family, s, comp.thickness);
+  const area = product.family === 'plaque' ? (s.L * s.W) / 1e6 : product.family === 'decoupe' ? flat.area : blankArea(s.L, s.W, s.H);
   const weightG = area * comp.grammage;
-  const pallet = palletLoad(flatFormat(product.family, s, comp.thickness));
+  const pallet = palletLoad(flat);
 
   const out = { ...comp, product, lead: leadText(product), isCase, area, weightG, boxWeightG: weightG, pallet };
   if (!isCase) return out;

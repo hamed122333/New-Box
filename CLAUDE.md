@@ -22,9 +22,12 @@ Pas de suite de tests automatisés dans le dépôt. Vérification manuelle ou vi
 1. `npm.cmd run build` doit réussir sans erreur.
 2. Lancer `npm.cmd run dev`, ouvrir http://localhost:5173 : aucune erreur dans la console.
 3. Parcourir le récit : la caisse s'ouvre (01), plongée dans la tranche puis vue macro (02–03),
-   morphing des cannelures jusqu'à BC (04), test ECT (05), flan qui se plie (06), palette (07).
+   morphing des cannelures jusqu'à BC (04), test ECT (05), flan qui se plie (06), palette (07),
+   la gamme (08 : pizza, e-commerce, plateau, croisillons qui s'animent, étiquettes cliquables).
 4. Configurateur : changer produit / dimensions / cannelure / papiers → le modèle 3D, le délai et le BCT se mettent à jour ;
+   en DI / DV, le sélecteur « Modèle de découpe » affiche pizza, e-commerce, plateau ou croisillons ;
    « Capture PNG » télécharge une image ; « Demander un devis » ouvre un e-mail pré-rempli.
+   Section « Notre gamme en 3D » : vignettes rendues, « Personnaliser en 3D » pré-règle le configurateur.
 5. La console expose `window.__newbox` (état du scroll, scène, configurateur) pour le débogage.
    `?capture` dans l'URL passe en horloge pilotée (`__newbox.step(dt)`) pour l'enregistrement vidéo.
 
@@ -39,7 +42,8 @@ Pas de suite de tests automatisés dans le dépôt. Vérification manuelle ou vi
   `getImageData` sur le chemin d'une interaction.
 - Pas d'écriture DOM identique à chaque image dans la boucle de rendu (styles invalidés).
 - Shaders pré-compilés pendant l'écran de chargement (`warmUp` dans `src/main.js`) : tout nouvel
-  objet/matériau visible seulement plus tard dans le récit doit y être rendu visible.
+  objet/matériau visible seulement plus tard dans le récit doit y être rendu visible. Les vignettes de
+  la vitrine sont rendues juste après (`renderThumbs`), toujours sous l'écran de chargement.
 
 ## Repères
 
@@ -52,6 +56,10 @@ Pas de suite de tests automatisés dans le dépôt. Vérification manuelle ou vi
 - Cannelures F, E, B, C (+ doubles EB, BC) : `src/data/flutes.js` ; qualités papier KL, KS, TL, TB, FL : `src/data/papers.js`
   (grammages et indices indicatifs, à valider par New Box) ; calculs ECT / McKee / palettisation à plat : `src/lib/calc.js`
 - Palette du récit : caisses livrées pliées-collées à plat, en paquets cerclés (`src/three/stack.js`)
+- Découpes DI / DV : modèles pizza (FEFCO 0426), e-commerce (0427), plateau, croisillons dans `src/data/styles.js`
+  (dimensions types, bornes, flan) et `src/three/models.js` (`DieCutModel`, mêmes charnières que la caisse) ;
+  chapitre « La gamme » : `src/three/lineup.js` + étiquettes `src/ui/tags.js` ; le configurateur pilote
+  la caisse ou le `DieCutModel` selon la famille (`syncSubject` dans `src/main.js`)
 - Logo officiel : `src/assets/brand/logo-new-box.png` ; charte : bleu `#14259B`, orange `#F49C21`, bleu nuit `#0D1642`
 - Certifications (SGS FSSC 22000, ISO 9001, ISO 45001 ; FSC C191615) : `src/assets/brand/certifications.png`,
   imprimées sous le logo sur la face avant des caisses imprimées et affichées dans la section « Produits & délais »
