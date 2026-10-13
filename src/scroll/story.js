@@ -24,11 +24,6 @@ export const state = {
   flute: 0, // index flottant dans FLUTE_STORY
   ect: 0, // test de compression sur chant
   stack: 0, // palettisation
-  range: 0, // 0 = palette, 1 = la gamme (pizza, e-commerce, plateau, croisillons)
-  rangeOpen: 0, // ouverture des boîtes à couvercle
-  rangeFill: 0, // remplissage du plateau
-  rangeBuild: 0, // assemblage des croisillons
-  rangeTags: 0, // étiquettes produits
 };
 
 /**
@@ -96,23 +91,10 @@ export function buildStory({ reduced }) {
   to({ tape: 1, duration: 0.2 }, S.palette - 0.05);
   to({ camBox: 5, duration: 0.9, ease: 'power1.inOut' }, S.palette);
   to({ shiftX: 0.18, duration: 0.4 }, S.palette);
-  to({ stack: 1, duration: 1.05 }, S.palette + 0.05);
+  to({ stack: 1, duration: 1.3 }, S.palette + 0.05);
 
-  // 08 — La gamme : la palette laisse place aux autres produits (sous le voile) ; la caméra longe
-  // la rangée pendant que les boîtes s'ouvrent, que le plateau se remplit et que les croisillons s'emboîtent
-  to({ fade: 1, duration: 0.2, ease: 'power1.in' }, S.gamme - 0.3);
-  to({ range: 1, camBox: 6, shiftX: 0.2, duration: 0.01 }, S.gamme - 0.08);
-  to({ fade: 0, duration: 0.25, ease: 'power1.out' }, S.gamme - 0.05);
-  to({ rangeTags: 1, duration: 0.3 }, S.gamme + 0.1);
-  to({ rangeOpen: 1, duration: 1.0, ease: 'none' }, S.gamme + 0.12);
-  to({ camBox: 7, duration: 0.6, ease: 'power1.inOut' }, S.gamme + 0.55);
-  to({ rangeFill: 1, duration: 0.55 }, S.gamme + 0.85);
-  to({ camBox: 8, duration: 0.5, ease: 'power1.inOut' }, S.gamme + 1.15);
-  to({ rangeBuild: 1, duration: 0.45, ease: 'power2.inOut' }, S.gamme + 1.3);
-
-  // 09 — Engagement : plan en enfilade sur toute la gamme
-  to({ rangeTags: 0, duration: 0.25 }, S.engagement - 0.2);
-  to({ camBox: 9, duration: 1, ease: 'power1.inOut' }, S.engagement);
+  // 08 — Engagement
+  to({ camBox: 6, duration: 1 }, S.engagement);
   to({ shiftX: 0.12, duration: 0.5 }, S.engagement);
 
   tl.set({}, {}, total);

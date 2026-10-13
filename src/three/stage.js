@@ -45,9 +45,6 @@ export class Stage {
     sc.near = 1;
     sc.far = 50;
     this.boxScene.add(key);
-    this.key = key;
-    this._shadowBounds = { left: sc.left, right: sc.right, top: sc.top, bottom: sc.bottom };
-    this._shadowSpan = 1;
     const fill = new THREE.DirectionalLight(0xdfe8ff, 0.6);
     fill.position.set(-10, 6, -4);
     this.boxScene.add(fill);
@@ -105,50 +102,6 @@ export class Stage {
     if (Math.abs(ox) < 0.5 && Math.abs(oy) < 0.5) this.camera.clearViewOffset();
     else this.camera.setViewOffset(w, h, ox, oy, w, h);
     this.camera.updateProjectionMatrix();
-  }
-
-  /** Agrandit la zone couverte par les ombres (scène « gamme », plus large que la caisse seule). */
-  setShadowSpan(k) {
-    if (k === this._shadowSpan) return;
-    this._shadowSpan = k;
-    const sc = this.key.shadow.camera;
-    for (const side of ['left', 'right', 'top', 'bottom']) sc[side] = this._shadowBounds[side] * k;
-    sc.updateProjectionMatrix();
-  }
-
-  /**
-   * Vignette d'un objet : rendu de la scène « caisse » cadré sur une sphère (centre, rayon),
-   * copié aussitôt dans un canvas 2D (avant que le navigateur n'affiche le canvas WebGL).
-   */
-  snapshot(ctx, { center, radius, dir, fill = 0.86 }) {
-    const cam = this.camera;
-    const gl = this.renderer.domElement;
-    const tw = ctx.canvas.width;
-    const th = ctx.canvas.height;
-    let ch = gl.height;
-    let cw = (ch * tw) / th;
-    if (cw > gl.width) {
-      cw = gl.width;
-      ch = (cw * th) / tw;
-    }
-    const tanV = Math.tan(THREE.MathUtils.degToRad(cam.fov) / 2) * (ch / gl.height);
-    const tanH = tanV * (cw / ch);
-    const d = radius / Math.sin(Math.atan(Math.min(tanV, tanH) * fill));
-    const saved = { pos: cam.position.clone(), quat: cam.quaternion.clone(), near: cam.near, far: cam.far };
-    cam.clearViewOffset();
-    cam.position.copy(center).addScaledVector(dir, d);
-    cam.lookAt(center);
-    cam.near = d * 0.05;
-    cam.far = d * 20;
-    cam.updateProjectionMatrix();
-    this.renderer.render(this.boxScene, cam);
-    ctx.clearRect(0, 0, tw, th);
-    ctx.drawImage(gl, (gl.width - cw) / 2, (gl.height - ch) / 2, cw, ch, 0, 0, tw, th);
-    cam.position.copy(saved.pos);
-    cam.quaternion.copy(saved.quat);
-    cam.near = saved.near;
-    cam.far = saved.far;
-    this.applyShift();
   }
 
   /** Place la caméra et ajuste near/far à la distance de visée (précision du Z-buffer). */

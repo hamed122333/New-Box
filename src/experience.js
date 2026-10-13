@@ -7,16 +7,14 @@ const tmpA = new THREE.Vector3();
 const tmpB = new THREE.Vector3();
 const tmpC = new THREE.Vector3();
 const tmpD = new THREE.Vector3();
-const Y = new THREE.Vector3(0, 1, 0);
 
 /**
  * Applique l'état (récit ou configurateur) aux objets 3D et à la caméra.
  */
 export class Experience {
-  constructor({ stage, box, board, stack, lineup, diecut }) {
-    Object.assign(this, { stage, box, board, stack, lineup, diecut });
-    diecut.group.visible = false;
-    stage.boxScene.add(box.group, stack.group, lineup.group, diecut.group);
+  constructor({ stage, box, board, stack }) {
+    Object.assign(this, { stage, box, board, stack });
+    stage.boxScene.add(box.group, stack.group);
     stage.macroScene.add(board.group);
     this._buildTestRig();
     this.fitFactor = 1;
@@ -52,7 +50,6 @@ export class Experience {
       out.target.set(tx, ty, tz);
       out.pos.set(px, py, pz).sub(out.target).multiplyScalar(f).add(out.target);
     };
-    const gamme = (tx, ty) => set(tx + 6.2, ty + 9.2, 17.6, tx, ty, 0);
     switch (i) {
       case 0:
         return set(c.x + 6.2 * s, c.y + 5.4 * s, c.z + 10.2 * s, 0, c.y - 0.1, 0);
@@ -80,25 +77,18 @@ export class Experience {
       }
       case 4:
         return set(-6.4 * s, c.y + 4.2 * s, 9.4 * s, 0, c.y, 0);
-      case 5: {
+      case 5:
+      case 6: {
         // palette chargée de caisses à plat + caisse montée posée devant
         const h = this.stack.height;
         const k = Math.max(0.85, h / 13);
-        const r = 36 * k;
+        const ang = i === 5 ? 0.58 : -0.5;
+        const r = (i === 5 ? 36 : 40) * k;
         // caméra haute : on voit le dessus des paquets (caisses à plat imprimées) et les feuillards
+        const py = i === 5 ? h * 1.2 + 5 * k : h * 1.35 + 6 * k;
         const tz = 2;
-        return set(Math.sin(0.58) * r, h * 1.2 + 5 * k, tz + Math.cos(0.58) * r, 0.6, h * 0.42, tz);
+        return set(Math.sin(ang) * r, py, tz + Math.cos(ang) * r, 0.6, h * 0.42, tz);
       }
-      // la gamme : travelling le long de la rangée (caisse + pizza, e-commerce + plateau,
-      // plateau + croisillons), puis plan en enfilade pour l'engagement
-      case 6:
-        return gamme(-6.1, 0.9);
-      case 7:
-        return gamme(2.6, 0.6);
-      case 8:
-        return gamme(7.4, 0.9);
-      case 9:
-        return set(23.5, 9.4, 17, 3.2, 0.6, -0.6);
       default:
         return set(8, 5, 10, 0, 1.5, 0);
     }
@@ -138,7 +128,7 @@ export class Experience {
 
   // ------------------------------------------------------------ récit
   applyStory(st, time, mobile) {
-    const { stage, box, board, stack, lineup } = this;
+    const { stage, box, board, stack } = this;
     const macro = st.world > 0.5;
     stage.world = macro ? 'macro' : 'box';
     stage.setShift(mobile ? 0 : st.shiftX, mobile ? -0.16 : 0);
@@ -156,18 +146,7 @@ export class Experience {
 
       // palettisation : caisses livrées à plat ; la caisse montée glisse devant la palette
       stack.update(st.stack);
-      // la gamme : la palette laisse place aux autres produits (changement sous le voile)
-      const range = st.range > 0.5;
-      lineup.group.visible = range;
-      box.group.visible = true;
-      this.diecut.group.visible = false;
-      stage.setShadowSpan(range ? 1.35 : 1);
-      if (range) {
-        stack.group.visible = false;
-        lineup.update({ open: st.rangeOpen, fill: st.rangeFill, build: st.rangeBuild });
-        box.group.position.copy(lineup.boxSlot.pos);
-        box.group.rotation.set(0, lineup.boxSlot.rotY, 0);
-      } else if (st.stack > 0.001 && stack.heroSpot) {
+      if (st.stack > 0.001 && stack.heroSpot) {
         const k = smooth(0, 0.25, st.stack);
         const hs = stack.heroSpot;
         box.group.position.set(lerp(0, hs.x, k), 0, lerp(0, hs.z, k));
@@ -208,40 +187,26 @@ export class Experience {
   }
 
   // ------------------------------------------------------------ configurateur
-  /** Sujet du configurateur : la caisse (caisses, plaques) ou le modèle de découpe (DI / DV). */
-  _subject(useDie) {
-    return useDie && this.diecut.mats ? this.diecut : this.box;
-  }
-
-  enterConfig(controls, useDie = false) {
+  enterConfig(controls) {
     const { stage, box, stack } = this;
     stage.world = 'box';
-    stage.setShadowSpan(1);
     stack.update(0);
-    this.lineup.group.visible = false;
-    for (const m of [box, this.diecut]) {
-      m.group.position.set(0, 0, 0);
-      m.group.rotation.set(0, 0, 0);
-    }
+    box.group.position.set(0, 0, 0);
+    box.group.rotation.set(0, 0, 0);
     this.fitFactor = this._fit(false);
-    const subject = this._subject(useDie);
-    const center = subject.center(new THREE.Vector3());
+    const center = box.center(new THREE.Vector3());
     const dir = new THREE.Vector3(0.62, 0.46, 0.9).normalize();
-    stage.camera.position.copy(center).addScaledVector(dir, this._configDistance(0.55, 0.9, subject));
+    stage.camera.position.copy(center).addScaledVector(dir, this._configDistance(0.55, 0.9));
     controls.target.copy(center);
     controls.update();
   }
 
-  /** Distance caméra pour que le sujet tienne dans la zone d'aperçu. */
-  _configDistance(fracW = 1, fracH = 1, subject = this.box) {
-    const b = subject;
+  /** Distance caméra pour que la caisse (ou le flan) tienne dans la zone d'aperçu. */
+  _configDistance(fracW = 1, fracH = 1) {
+    const b = this.box;
     const cam = this.stage.camera;
     const k = 2 * Math.tan(THREE.MathUtils.degToRad(cam.fov) / 2);
     const fit = (w, h) => Math.max(w / (k * cam.aspect * Math.max(0.2, fracW)), h / (k * Math.max(0.2, fracH)));
-    if (b === this.diecut) {
-      const d = 2 * b.radius();
-      return fit(d * 1.02, d * 0.92);
-    }
     if (b.family === 'plaque') return fit(b.L * 1.15, b.W * 1.4);
     const flatK = smooth(0.3, 1, b.params.flat);
     const lidK = smooth(0, 0.6, b.params.lid) * (1 - flatK);
@@ -251,16 +216,11 @@ export class Experience {
     return fit(needW, needH);
   }
 
-  applyConfig(cfg, controls, dt, useDie = false) {
+  applyConfig(cfg, controls, dt) {
     const { stage, box } = this;
     stage.world = 'box';
     stage.setShift(cfg.shiftX, cfg.shiftY);
     this.stack.group.visible = false;
-    this.lineup.group.visible = false;
-    const subject = this._subject(useDie);
-    box.group.visible = subject === box;
-    this.diecut.group.visible = subject !== box;
-    if (subject !== box) return this._applyDieConfig(cfg, controls, dt);
     // caisse : ouverture / mise à plat réglables ; découpe : flan à plat ; plaque : feuille
     const isCase = box.family === 'caisse';
     const lid = isCase ? cfg.lid : 0;
@@ -277,40 +237,16 @@ export class Experience {
     box.group.rotation.set(0, a * (1 - flatK), 0);
 
     const center = box.center(tmpA);
-    this._frame(controls, center, flatK, tmpC.set(0, 0.12, 1).normalize(), this._configDistance(cfg.fracW, cfg.fracH));
-  }
-
-  /** Découpes : boîte pizza, e-commerce, plateau, croisillons. */
-  _applyDieConfig(cfg, controls, dt) {
-    const m = this.diecut;
-    const st = m.style;
-    m.params.lid = st.lid ? cfg.lid : 0;
-    m.params.flat = st.noFlat ? 0 : cfg.flat;
-    m.params.fill = 1;
-    m.update();
-    m.group.position.set(0, 0, 0);
-    if (cfg.autoRotate) cfg.angle += dt * 0.35;
-    // à plat, le plan de découpe se présente vu de dessus
-    const flatK = smooth(0.3, 1, m.params.flat);
-    const a = Math.atan2(Math.sin(cfg.angle), Math.cos(cfg.angle)) * (1 - flatK);
-    m.group.rotation.set(0, a, 0);
-    const center = m.center(tmpA).applyAxisAngle(Y, a);
-    this._frame(controls, center, flatK, m.flatViewDir, this._configDistance(cfg.fracW, cfg.fracH, m));
-  }
-
-  /** Recentre la cible, approche la distance voulue et oriente la vue « à plat ». */
-  _frame(controls, center, flatK, flatDir, dist) {
-    const cam = this.stage.camera;
     controls.target.lerp(center, 0.12);
-    const off = tmpB.copy(cam.position).sub(controls.target);
+    const off = tmpB.copy(stage.camera.position).sub(controls.target);
     const len = off.length();
-    if (flatK > 0) off.normalize().lerp(flatDir, flatK * 0.12);
-    off.setLength(lerp(len, dist, 0.1));
-    cam.position.copy(controls.target).add(off);
+    if (flatK > 0) off.normalize().lerp(tmpC.set(0, 0.12, 1).normalize(), flatK * 0.12);
+    off.setLength(lerp(len, this._configDistance(cfg.fracW, cfg.fracH), 0.1));
+    stage.camera.position.copy(controls.target).add(off);
     controls.update();
-    const d = cam.position.distanceTo(controls.target);
-    cam.near = Math.max(0.01, d * 0.02);
-    cam.far = d * 40;
-    cam.updateProjectionMatrix();
+    const d = stage.camera.position.distanceTo(controls.target);
+    stage.camera.near = Math.max(0.01, d * 0.02);
+    stage.camera.far = d * 40;
+    stage.camera.updateProjectionMatrix();
   }
 }

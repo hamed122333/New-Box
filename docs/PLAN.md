@@ -51,10 +51,8 @@ Un seul canvas WebGL en arrière-plan, deux « mondes » (caisse à l'échelle /
 | 4 | **Cannelures** | Morphing continu C → E → B → C → BC (double cannelure) | Fiche dynamique : épaisseur, pas, hauteur, coefficient, grammage, ECT | 2,4 |
 | 5 | **Qualité** | L'échantillon se dresse, la presse descend (test ECT) | Compteurs ECT, BCT, éclatement, Cobb | 1,5 |
 | 6 | **Fabrication** | Retour au monde caisse : le **flan imprimé à plat** se plie en caisse | Onduleuse → impression flexo 4 couleurs → découpe Bobst → pliage-collage | 1,8 |
-| 7 | **Logistique** | Palette Europe chargée de caisses **à plat** (paquets cerclés), la caisse « héros » se pose devant | Livrées à plat, prêtes à monter | 1,5 |
-| 8 | **La gamme** | La palette laisse place à une rangée de produits que la caméra longe : boîte pizza (couvercle qui s'ouvre sur la pizza), boîte e-commerce (message intérieur), plateau à poignées (les oranges tombent), croisillons (qui s'emboîtent) ; étiquettes cliquables | Découpes Bobst DI / DV, 12 à 15 jours | 2,2 |
-| 9 | **Engagement** | Plan en enfilade sur toute la gamme | 100 % recyclable, chutes compactées en balles | 2 |
-| — | **Notre gamme en 3D** | Cartes avec vignettes 3D (rendues au chargement) | « Personnaliser en 3D » → configurateur pré-réglé | — |
+| 7 | **Logistique** | Palette Europe, les caisses tombent couche par couche, la caisse « héros » se pose en dernier | Plan de palettisation, gerbage | 1,5 |
+| 8 | **Engagement** | Plan large sur la palette | 100 % recyclable, chutes compactées en balles | 2 |
 | — | Secteurs · Chiffres | (sections pleines) | Segmentation par filière | — |
 | — | **Configurateur 3D** | Caisse manipulable | Conversion → devis | — |
 
@@ -62,9 +60,6 @@ Un seul canvas WebGL en arrière-plan, deux « mondes » (caisse à l'échelle /
 
 ## 4. Configurateur 3D (MVP livré dans ce prototype)
 
-- Produit (codes usine + délai) ; pour les découpes DI / DV, **modèle** : boîte pizza (FEFCO 0426),
-  boîte e-commerce (FEFCO 0427), plateau fruits & légumes à poignées, croisillons — chacun avec ses
-  dimensions types, ses bornes, sa cannelure par défaut, son ouverture et sa mise à plat (plan de découpe)
 - Dimensions intérieures L × l × H (curseurs + saisie), limites 100–800 / 80–600 / 50–800 mm
 - Cannelure **E, B, C, EB, BC** (épaisseur réelle de la tranche, texture de coupe adaptée)
 - Qualité papier : Économique (testliner), Standard (kraftliner), Renforcé, Blanc (white top)
@@ -137,8 +132,6 @@ src/three/stage.js         renderer, caméra, lumières, deux scènes
 src/three/box.js           caisse FEFCO 0201 paramétrique
 src/three/board.js         échantillon de carton en coupe (morphing / éclaté)
 src/three/stack.js         palette Europe + plan de palettisation instancié
-src/three/models.js        découpes : boîte pizza, boîte e-commerce, plateau, croisillons
-src/three/lineup.js        la gamme (chapitre 08) : rangée de produits animés
 src/three/textures.js      textures procédurales (kraft, impression, tranche, bois)
 src/ui/*.js                chapitres, étiquettes 3D, configurateur
 src/data/*.js              cannelures, qualités papier  ← à valider par New Box
@@ -177,8 +170,7 @@ Récit 3D complet, configurateur MVP, calculs, responsive, build statique.
 - Relecture des textes, version **anglaise** puis **arabe** (RTL)
 
 ### Phase 2 — Configurateur avancé (≈ 3–4 semaines)
-- ✅ Catalogue de découpes : boîte pizza (0426), **boîte e-commerce (0427, type Pacdora)**, plateaux, croisillons ;
-  à venir : 0203 (caisse télescopique), présentoirs, calages
+- Catalogue FEFCO : 0201 (caisse américaine), **0427 (boîte postale type Pacdora)**, 0203, plateaux, croisillons
 - Import de visuels **par face**, positionnement / échelle du logo, jusqu'à 4 couleurs
 - **Export du plan de découpe** (SVG / PDF coté, traits de coupe et de rainage)
 - Enregistrement de la configuration (lien partageable) et formulaire de devis relié au CRM / e-mail

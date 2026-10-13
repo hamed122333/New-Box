@@ -1,21 +1,19 @@
 import { FLUTES, FLUTE_ORDER } from '../data/flutes.js';
 import { PAPERS, OUTER_ORDER, INNER_ORDER, FLUTING, CONDITIONS } from '../data/papers.js';
 import { PRODUCTS, PRODUCT_ORDER, flutesFor } from '../data/products.js';
-import { STYLES, STYLE_ORDER } from '../data/styles.js';
 import { estimate, fmt } from '../lib/calc.js';
 import { afterNextPaint } from '../lib/schedule.js';
 
-// Dimensions (mm) : caisse / découpe = dimensions intérieures L × l × H ; plaque = format L × l.
-// Les découpes prennent les bornes de leur modèle (src/data/styles.js).
+// Dimensions (mm) : caisse / découpe = dimensions intérieures L × l × H ; plaque = format L × l
 const LIMITS = {
   caisse: { L: [100, 800], W: [80, 600], H: [50, 800] },
+  decoupe: { L: [100, 800], W: [80, 600], H: [50, 800] },
   plaque: { L: [300, 2400], W: [200, 1600], H: [50, 800] },
 };
 const LEGENDS = { caisse: 'Dimensions intérieures', decoupe: 'Dimensions de la boîte', plaque: 'Format de la plaque' };
 const UNITS = { caisse: ['caisse', 'caisses'], decoupe: ['découpe', 'découpes'], plaque: ['plaque', 'plaques'] };
 const WEIGHT_LABEL = { caisse: 'Poids de la caisse', decoupe: 'Poids du flan', plaque: 'Poids de la plaque' };
-const DEFAULTS = { product: 'CI', style: 'pizza', L: 400, W: 300, H: 300, flute: 'C', outer: 'KL', inner: 'TL', ink: 'bleu', content: 10, condition: 'standard' };
-const FAMILY_DIMS = { caisse: { L: 400, W: 300, H: 300 }, plaque: { L: 1200, W: 800, H: 300 } };
+const DEFAULTS = { product: 'CI', L: 400, W: 300, H: 300, flute: 'C', outer: 'KL', inner: 'TL', ink: 'bleu', content: 10, condition: 'standard' };
 const INK_NAMES = { bleu: 'bleu New Box', noir: 'noir', rouge: 'rouge', vert: 'vert' };
 
 const clamp = (v, [a, b]) => Math.round(Math.min(b, Math.max(a, v)));
@@ -31,7 +29,6 @@ export class Configurator {
     this.onCapture = onCapture;
     this.spec = { ...DEFAULTS, logo: null };
     this.view = { lid: 0, flat: 0, angle: -0.5, autoRotate: true, shiftX: 0, shiftY: 0, fracW: 0.55, fracH: 0.9 };
-    this._dims = {}; // dernières dimensions par famille / modèle
     this.viewer = root.querySelector('[data-viewer]');
     this._pending = null;
     this._renderOptions();
@@ -44,32 +41,12 @@ export class Configurator {
     return PRODUCTS[this.spec.product];
   }
 
-  get style() {
-    return this.product.family === 'decoupe' ? STYLES[this.spec.style] : null;
-  }
-
-  /** Bornes d'une dimension pour le produit (et le modèle de découpe) courant. */
-  _limits(k, product = this.product, style = this.spec.style) {
-    return product.family === 'decoupe' ? STYLES[style].limits[k] : LIMITS[product.family][k];
-  }
-
-  /** Clé de mémoire des dimensions : famille, ou modèle pour les découpes. */
-  _dimKey(product = this.product, style = this.spec.style) {
-    return product.family === 'decoupe' ? `decoupe:${style}` : product.family;
-  }
-
   _renderOptions() {
     const $ = (s) => this.root.querySelector(s);
     $('[data-options="product"]').innerHTML = PRODUCT_ORDER.map((code) => {
       const p = PRODUCTS[code];
       return `<button type="button" class="prod__btn" data-product="${code}" aria-pressed="false" title="${p.name}">
           <strong>${code}</strong><span>${p.short}</span>
-        </button>`;
-    }).join('');
-    $('[data-options="style"]').innerHTML = STYLE_ORDER.map((id) => {
-      const st = STYLES[id];
-      return `<button type="button" class="style__btn" data-style="${id}" aria-pressed="false" title="${st.name} — ${st.ref}">
-          <strong>${st.short}</strong><span>${st.ref}</span>
         </button>`;
     }).join('');
     $('[data-options="flute"]').innerHTML = FLUTE_ORDER.map(
@@ -94,17 +71,13 @@ export class Configurator {
       const b = e.target.closest('[data-product]');
       if (b) this.selectProduct(b.dataset.product);
     });
-    $('[data-options="style"]').addEventListener('click', (e) => {
-      const b = e.target.closest('[data-style]');
-      if (b) this.selectStyle(b.dataset.style);
-    });
 
     // Dimensions : curseur + champ numérique synchronisés
     for (const k of ['L', 'W', 'H']) {
       const range = $(`input[type=range][name=${k}]`);
       const num = $(`input[type=number][name=${k}]`);
       const commit = (v, from, mode) => {
-        const val = clamp(Number(v) || this.spec[k], this._limits(k));
+        const val = clamp(Number(v) || this.spec[k], LIMITS[this.product.family][k]);
         if (from !== range) range.value = val;
         if (from !== num) num.value = val;
         this._set({ [k]: val }, mode);
@@ -155,7 +128,6 @@ export class Configurator {
 
     const lid = $('input[name="lid"]');
     lid.addEventListener('input', () => (this.view.lid = Number(lid.value)));
-    this._lidInput = lid;
     const flat = $('input[name="flat"]');
     flat.addEventListener('input', () => (this.view.flat = Number(flat.value)));
     const auto = $('input[name="autorotate"]');
@@ -176,8 +148,7 @@ export class Configurator {
           const url = URL.createObjectURL(blob);
           const a = document.createElement('a');
           a.href = url;
-          const name = this.style ? `${this.spec.product}-${this.spec.style}` : this.spec.product;
-          a.download = `newbox-${name}-${this._dimsText('x')}-${this.spec.flute}.png`;
+          a.download = `newbox-${this.spec.product}-${this._dimsText('x')}-${this.spec.flute}.png`;
           a.click();
           setTimeout(() => URL.revokeObjectURL(url), 5000);
         } finally {
@@ -192,72 +163,14 @@ export class Configurator {
     });
   }
 
-  /**
-   * Change de produit : cannelures autorisées et bornes des dimensions suivent. En changeant de
-   * famille (caisse → découpe…), on retrouve les dernières dimensions utilisées pour cette famille.
-   */
+  /** Change de produit : cannelures autorisées et bornes des dimensions suivent. */
   selectProduct(code) {
     const p = PRODUCTS[code];
     const patch = { product: code };
-    if (p.family !== this.product.family) {
-      this._dims[this._dimKey()] = this._dimsOf(this.spec);
-      const st = STYLES[this.spec.style];
-      Object.assign(patch, this._dims[this._dimKey(p)] ?? (p.family === 'decoupe' ? { ...st.dims, flute: st.flute } : FAMILY_DIMS[p.family]));
-      if (p.family === 'decoupe') this._openFor(this.spec.style);
-    }
-    const flute = patch.flute ?? this.spec.flute;
-    if (!flutesFor(p).includes(flute)) patch.flute = p.walls === 2 ? 'BC' : 'C';
+    if (!flutesFor(p).includes(this.spec.flute)) patch.flute = p.walls === 2 ? 'BC' : 'C';
     for (const k of ['L', 'W', 'H']) {
-      const v = clamp(patch[k] ?? this.spec[k], this._limits(k, p));
+      const v = clamp(this.spec[k], LIMITS[p.family][k]);
       if (v !== this.spec[k]) patch[k] = v;
-    }
-    this._set(patch);
-    this._syncUI();
-  }
-
-  /** Modèle de découpe (pizza, e-commerce, plateau, croisillons) : dimensions et cannelure types. */
-  selectStyle(id) {
-    if (!STYLES[id]) return;
-    if (id === this.spec.style && this.product.family === 'decoupe') return;
-    if (this.product.family === 'decoupe') this._dims[this._dimKey()] = this._dimsOf(this.spec);
-    const st = STYLES[id];
-    const patch = { style: id, ...(this._dims[this._dimKey(this.product, id)] ?? { ...st.dims, flute: st.flute }) };
-    this._openFor(id);
-    this._set(patch);
-    this._syncUI();
-  }
-
-  _dimsOf(s) {
-    return { L: s.L, W: s.W, H: s.H, flute: s.flute };
-  }
-
-  /** Boîtes à couvercle : on les présente entrouvertes pour montrer l'intérieur. */
-  _openFor(id) {
-    const lid = STYLES[id].lid && id !== 'divider' ? 0.62 : 0;
-    this.view.lid = lid;
-    this.view.flat = 0;
-    if (this._lidInput) this._lidInput.value = lid;
-    const flat = this.root.querySelector('input[name="flat"]');
-    if (flat) flat.value = 0;
-  }
-
-  /**
-   * Préréglage (vitrine « Notre gamme ») : produit, modèle, dimensions, cannelure.
-   * @param {{product:string, style?:string, L?:number, W?:number, H?:number, flute?:string}} p
-   */
-  preset(p) {
-    const product = PRODUCTS[p.product] ?? this.product;
-    const style = p.style ?? this.spec.style;
-    const base = product.family === 'decoupe' ? STYLES[style] : null;
-    const patch = { product: product.code, style, ...(base ? { ...base.dims, flute: base.flute } : {}) };
-    for (const k of ['L', 'W', 'H', 'flute', 'outer', 'inner']) if (p[k] != null) patch[k] = p[k];
-    for (const k of ['L', 'W', 'H']) if (patch[k] != null) patch[k] = clamp(patch[k], this._limits(k, product, style));
-    if (base) this._openFor(style);
-    else {
-      this.view.lid = p.lid ?? 0;
-      this.view.flat = 0;
-      if (this._lidInput) this._lidInput.value = this.view.lid;
-      this.root.querySelector('input[name="flat"]').value = 0;
     }
     this._set(patch);
     this._syncUI();
@@ -267,16 +180,9 @@ export class Configurator {
   _syncUI() {
     const $ = (s) => this.root.querySelector(s);
     const p = this.product;
-    const st = this.style;
     this.root.dataset.family = p.family;
     this.root.dataset.printed = String(p.printed);
-    // curseurs de vue : ouverture (caisse, boîte à couvercle, croisillons), mise à plat (sauf croisillons)
-    this.root.dataset.lid = String(p.family === 'caisse' || !!st?.lid);
-    this.root.dataset.flat = String(p.family === 'caisse' || (!!st && !st.noFlat));
     this.root.querySelectorAll('[data-product]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.product === p.code)));
-    this.root.querySelectorAll('[data-style]').forEach((b) => b.setAttribute('aria-pressed', String(!!st && b.dataset.style === st.id)));
-    $('[data-out="lid-label"]').textContent = st?.lidLabel ?? 'Ouverture des rabats';
-    $('[data-out="style-desc"]').textContent = st ? st.desc : '';
     const allowed = flutesFor(p);
     this.root.querySelectorAll('[data-flute]').forEach((b) => {
       b.disabled = !allowed.includes(b.dataset.flute);
@@ -284,7 +190,7 @@ export class Configurator {
     });
     $('[data-dims-legend]').textContent = LEGENDS[p.family];
     for (const k of ['L', 'W', 'H']) {
-      const [min, max] = this._limits(k);
+      const [min, max] = LIMITS[p.family][k];
       for (const el of this.root.querySelectorAll(`input[name=${k}]`)) {
         el.min = min;
         el.max = max;
@@ -333,7 +239,6 @@ export class Configurator {
     $('[data-logo-name]').textContent = 'Aucun fichier';
     this.root.classList.remove('has-logo');
     Object.assign(this.view, { lid: 0, flat: 0 });
-    this._dims = {};
     this._set({ ...DEFAULTS, logo: null });
     this._syncUI();
   }
@@ -351,8 +256,7 @@ export class Configurator {
       const el = this.root.querySelector(`[data-out="${k}"]`);
       if (el && el.textContent !== v) el.textContent = v;
     };
-    const st = this.style;
-    out('product-name', st ? `${p.code} — ${st.name}` : `${p.code} — ${p.name}`);
+    out('product-name', `${p.code} — ${p.name}`);
     out('lead', e.lead);
     out('ect', `${fmt(e.ect, 1)} kN/m`);
     out('grammage', `${fmt(e.grammage)} g/m²`);
@@ -360,7 +264,7 @@ export class Configurator {
     out('weight-label', WEIGHT_LABEL[p.family]);
     out('weight', `${fmt(e.weightG)} g`);
     out('burst', `${fmt(e.burst)} kPa`);
-    const [one, many] = st?.unit ?? UNITS[p.family];
+    const [one, many] = UNITS[p.family];
     const n = e.pallet.perPallet;
     out('pallet', `≈ ${fmt(n)} ${n > 1 ? many : one} à plat`);
     out('pallet-note', `${e.pallet.perLayer} paquet${e.pallet.perLayer > 1 ? 's' : ''} × ${fmt(e.pallet.perPile)} · palette 1200 × 800, 1,10 m de charge`);
@@ -372,8 +276,7 @@ export class Configurator {
       const gauge = this.root.querySelector('[data-gauge]');
       if (gauge) gauge.style.setProperty('--p', Math.min(1, e.bctKg / 900).toFixed(3));
     }
-    const what = st ? `${p.code} · ${st.name}` : p.code;
-    out('summary', `${what} · ${this._dimsText()} mm · ${FLUTES[this.spec.flute].name} · ${e.papers} · ${e.lead}`);
+    out('summary', `${p.code} · ${this._dimsText()} mm · ${FLUTES[this.spec.flute].name} · ${e.papers} · ${e.lead}`);
   }
 
   mailto() {
@@ -386,7 +289,6 @@ export class Configurator {
       '',
       'Je souhaite recevoir un devis pour :',
       `• Produit : ${p.code} — ${p.name}${p.family === 'caisse' ? ' (caisse américaine FEFCO 0201)' : ''}`,
-      ...(this.style ? [`• Modèle : ${this.style.name} (${this.style.ref})`] : []),
       `• ${dims}`,
       `• Cannelure : ${FLUTES[s.flute].name} (${FLUTES[s.flute].thickness} mm)`,
       `• Papiers : ${e.papers}`,
@@ -401,7 +303,7 @@ export class Configurator {
       'Quantité souhaitée : ',
       'Société / contact : ',
     );
-    const subject = `Demande de devis — ${p.code}${this.style ? ` ${this.style.short}` : ''} ${this._dimsText('×')} ${s.flute}`;
+    const subject = `Demande de devis — ${p.code} ${this._dimsText('×')} ${s.flute}`;
     return `mailto:info@newbox.com.tn?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(lines.join('\n'))}`;
   }
 
