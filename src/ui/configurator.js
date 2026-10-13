@@ -31,6 +31,9 @@ export class Configurator {
     this.view = { lid: 0, flat: 0, angle: -0.5, autoRotate: true, shiftX: 0, shiftY: 0, fracW: 0.55, fracH: 0.9 };
     this.viewer = root.querySelector('[data-viewer]');
     this._pending = null;
+    // lien depuis l'espace grands comptes : ?produit=CI&L=400&W=300&H=300&cannelure=B&ext=KL&int=TL
+    this.fromUrl = this._readUrl();
+    if (this.fromUrl) Object.assign(this.spec, this.fromUrl);
     this._renderOptions();
     this._bind();
     this._syncUI();
@@ -39,6 +42,20 @@ export class Configurator {
 
   get product() {
     return PRODUCTS[this.spec.product];
+  }
+
+  /** Spécification passée dans l'URL (valeurs inconnues ignorées, dimensions bornées). */
+  _readUrl() {
+    const q = new URLSearchParams(window.location.search);
+    if (!q.has('produit') && !q.has('cannelure')) return null;
+    const patch = {};
+    const product = PRODUCTS[q.get('produit')] ?? PRODUCTS[this.spec.product];
+    patch.product = product.code;
+    for (const k of ['L', 'W', 'H']) if (q.has(k)) patch[k] = clamp(Number(q.get(k)) || this.spec[k], LIMITS[product.family][k]);
+    if (flutesFor(product).includes(q.get('cannelure'))) patch.flute = q.get('cannelure');
+    if (OUTER_ORDER.includes(q.get('ext'))) patch.outer = q.get('ext');
+    if (INNER_ORDER.includes(q.get('int'))) patch.inner = q.get('int');
+    return patch;
   }
 
   _renderOptions() {

@@ -175,6 +175,12 @@ async function init() {
     },
     onCapture: () => stage.capture(),
   });
+  // configuration reçue par l'URL (bouton « Voir en 3D » de l'espace grands comptes)
+  if (cfg.fromUrl)
+    afterNextPaint(() => {
+      box.build(cfg.fromUrl);
+      stackDirty = true;
+    });
 
   // Quelle partie de la page est visible ?
   const visible = { story: true, config: false };

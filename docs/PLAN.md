@@ -169,6 +169,16 @@ Récit 3D complet, configurateur MVP, calculs, responsive, build statique.
 - Photos / vidéos de l'usine (onduleuse, Bobst, impression) pour les sections Fabrication et Secteurs
 - Relecture des textes, version **anglaise** puis **arabe** (RTL)
 
+### Phase 1 bis — Espaces investisseurs et grands comptes ✅ *(cette branche)*
+- `investisseurs.html` : thèse d'investissement, baromètre mondial du papier, benchmark des papetiers, simulateurs
+  de sensibilité et d'investissement, feuille de route proposée.
+- `grands-comptes.html` : optimiseur de carton (coût matière minimal à résistance donnée), clause d'indexation,
+  bassin d'approvisionnement, PPWR, programme et demande d'accord-cadre.
+- À fournir par New Box : chiffres internes (chiffre d'affaires, volumes, capacité, part de papier importé, marges),
+  prix d'achat réels des papiers, modalités réelles du programme grands comptes, idées et projets de la direction à
+  chiffrer dans le simulateur d'investissement ; abonnement à un indice de prix (Fastmarkets ou EUWID) pour la clause
+  d'indexation.
+
 ### Phase 2 — Configurateur avancé (≈ 3–4 semaines)
 - Catalogue FEFCO : 0201 (caisse américaine), **0427 (boîte postale type Pacdora)**, 0203, plateaux, croisillons
 - Import de visuels **par face**, positionnement / échelle du logo, jusqu'à 4 couleurs

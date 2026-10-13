@@ -10,6 +10,12 @@ export default defineConfig({
     target: 'es2020',
     chunkSizeWarningLimit: 900,
     rollupOptions: {
+      // trois pages : l'expérience 3D et les deux espaces (légers, sans 3D)
+      input: {
+        main: 'index.html',
+        investisseurs: 'investisseurs.html',
+        grandsComptes: 'grands-comptes.html',
+      },
       output: {
         manualChunks(id) {
           if (id.includes('node_modules/three')) return 'three';

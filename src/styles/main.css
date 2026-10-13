@@ -259,6 +259,7 @@ html[data-world='macro'] .site-header .btn:not(.btn--ghost) {
 
 .site-nav {
   display: flex;
+  align-items: center;
   gap: 26px;
   margin-left: auto;
   font-size: 14px;
@@ -272,6 +273,26 @@ html[data-world='macro'] .site-header .btn:not(.btn--ghost) {
 
 .site-nav a:hover {
   opacity: 1;
+}
+
+/* liens vers les espaces grands comptes / investisseurs */
+.site-nav .site-nav__space {
+  padding: 3px 10px;
+  border: 1px solid rgba(20, 37, 155, 0.35);
+  border-radius: 999px;
+  color: var(--blue);
+  opacity: 1;
+}
+
+.site-nav .site-nav__space:hover {
+  background: var(--blue);
+  color: #fff;
+}
+
+@media (max-width: 1360px) {
+  .site-nav {
+    gap: 18px;
+  }
 }
 
 /* ---------- boutons ---------- */
@@ -1655,7 +1676,7 @@ input[type='range'] {
 
 .contact__info {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: 32px;
   padding-top: 32px;
   border-top: 1px solid rgba(243, 238, 230, 0.16);

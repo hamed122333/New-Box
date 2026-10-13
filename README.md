@@ -22,6 +22,18 @@ qui transforme la visite en demande de devis.
 | Produits & délais | Plaques PL/PLR (5 j), caisses CI/CV/CID/CVD (7–10 j), découpes DI/DV (12–15 j), cannelures, papiers, certifications |
 | Configurateur | Produit (code usine + délai), dimensions, cannelure F/E/B/C/EB/BC, papiers KL/KS/TL/TB + FL, logo, ouverture, mise à plat, BCT, gerbage, caisses à plat par palette, capture PNG, devis |
 
+## Deux espaces dédiés (pages légères, sans 3D)
+
+| Page | Pour qui | Contenu |
+|---|---|---|
+| `investisseurs.html` | Bailleurs de fonds, direction | Thèse d'investissement (export record, PPWR), **baromètre mondial du papier** (niveaux €/t, hausses 2026, chronologie), **benchmark de 10 papetiers** (Tunisie, Méditerranée, mondial), simulateur de sensibilité au prix du papier, simulateur d'investissement (délai de retour, VAN, TRI), feuille de route, certifications, contact |
+| `grands-comptes.html` | Grands clients | **Optimiseur de carton** (72 compositions comparées : la moins chère qui tient la charge, économie et papier épargné par an, bouton « Voir en 3D »), **clause d'indexation papier** simulée, bassin d'approvisionnement, conformité PPWR, programme grands comptes, demande d'accord-cadre |
+
+Les chiffres de marché viennent d'une veille d'octobre 2026 (`src/data/market.js`) : chaque valeur cite sa source
+et sa date. Les cotations officielles (Fastmarkets, EUWID) étant payantes, ce sont des valeurs indicatives tirées des
+communiqués publics et de la presse spécialisée. Les simulateurs partent d'hypothèses de démonstration, à remplacer par
+les chiffres de New Box.
+
 ## Démarrer
 
 Prérequis : **Node.js 20.19+** (ou 22+) et Git.
@@ -95,6 +107,9 @@ src/three/             caisse FEFCO 0201, coupe de carton, palette, textures pro
 src/ui/                chapitres, étiquettes 3D, configurateur
 src/data/              produits & délais, cannelures, qualités papier  ← valeurs à valider par New Box
 src/lib/calc.js        ECT, BCT (McKee), flan, gerbage
+investisseurs.html     espace investisseurs & direction  ┐ pages légères : src/portal/*.js,
+grands-comptes.html    espace grands comptes             ┘ src/styles/portal.css, graphiques SVG maison
+src/data/market.js     veille marché : prix du papier, papetiers, contexte tunisien (sources datées)
 ```
 
 ## Réglages rapides
@@ -106,6 +121,9 @@ src/lib/calc.js        ECT, BCT (McKee), flan, gerbage
 - **Cannelures** : `src/data/flutes.js` (pas, hauteur, coefficient d'ondulation, épaisseur).
 - **Couleurs du site** : variables CSS en tête de `src/styles/main.css`.
 - **Console** : `window.__newbox` expose l'état, la scène et le configurateur pour le débogage.
+- **Veille marché** : `src/data/market.js` (prix, mouvements, chronologie, papetiers, cours EUR/TND) ; mettre à jour
+  `UPDATED` et les sources à chaque révision.
+- **Lien direct vers le configurateur** : `index.html?produit=CI&L=400&W=300&H=300&cannelure=B&ext=KL&int=TL#configurateur`.
 
 > Les performances affichées sont des **estimations indicatives** (formule de McKee, indices papier moyens) et
 > doivent être remplacées par les mesures du laboratoire avant une mise en ligne.
