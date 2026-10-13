@@ -10,11 +10,12 @@ export default defineConfig({
     target: 'es2020',
     chunkSizeWarningLimit: 900,
     rollupOptions: {
-      // trois pages : l'expérience 3D et les deux espaces (légers, sans 3D)
+      // l'expérience 3D et les pages légères (sans 3D) : partenaires, grands comptes, dossier marché
       input: {
         main: 'index.html',
-        investisseurs: 'investisseurs.html',
+        partenaires: 'partenaires.html',
         grandsComptes: 'grands-comptes.html',
+        dossierMarche: 'dossier-marche.html',
       },
       output: {
         manualChunks(id) {

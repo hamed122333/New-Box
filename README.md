@@ -22,12 +22,13 @@ qui transforme la visite en demande de devis.
 | Produits & délais | Plaques PL/PLR (5 j), caisses CI/CV/CID/CVD (7–10 j), découpes DI/DV (12–15 j), cannelures, papiers, certifications |
 | Configurateur | Produit (code usine + délai), dimensions, cannelure F/E/B/C/EB/BC, papiers KL/KS/TL/TB + FL, logo, ouverture, mise à plat, BCT, gerbage, caisses à plat par palette, capture PNG, devis |
 
-## Deux espaces dédiés (pages légères, sans 3D)
+## Espaces dédiés (pages légères, sans 3D)
 
 | Page | Pour qui | Contenu |
 |---|---|---|
-| `investisseurs.html` | Bailleurs de fonds, direction | Thèse d'investissement (export record, PPWR), **baromètre mondial du papier** (niveaux €/t, hausses 2026, chronologie), **benchmark de 10 papetiers** (Tunisie, Méditerranée, mondial), simulateur de sensibilité au prix du papier, simulateur d'investissement (délai de retour, VAN, TRI), feuille de route, certifications, contact |
+| `partenaires.html` | Nos partenaires actuels (bailleurs de fonds), la direction | Page simple et visuelle : rendus 3D de la caisse New Box, chiffres clés, parcours depuis 2020, savoir-faire, marché porteur (export, PPWR), trois priorités, rendez-vous à Kairouan. Bouton **▶ Présenter** : plein écran, une section par écran, flèches du clavier |
 | `grands-comptes.html` | Grands clients | **Optimiseur de carton** (72 compositions comparées : la moins chère qui tient la charge, économie et papier épargné par an, bouton « Voir en 3D »), **clause d'indexation papier** simulée, bassin d'approvisionnement, conformité PPWR, programme grands comptes, demande d'accord-cadre |
+| `dossier-marche.html` | Direction, partenaires (annexe détaillée) | Baromètre mondial du papier (niveaux €/t, hausses 2026, chronologie), benchmark de 10 papetiers, simulateurs de sensibilité au prix du papier et de projet (délai de retour, VAN, TRI) |
 
 Les chiffres de marché viennent d'une veille d'octobre 2026 (`src/data/market.js`) : chaque valeur cite sa source
 et sa date. Les cotations officielles (Fastmarkets, EUWID) étant payantes, ce sont des valeurs indicatives tirées des
@@ -107,8 +108,10 @@ src/three/             caisse FEFCO 0201, coupe de carton, palette, textures pro
 src/ui/                chapitres, étiquettes 3D, configurateur
 src/data/              produits & délais, cannelures, qualités papier  ← valeurs à valider par New Box
 src/lib/calc.js        ECT, BCT (McKee), flan, gerbage
-investisseurs.html     espace investisseurs & direction  ┐ pages légères : src/portal/*.js,
-grands-comptes.html    espace grands comptes             ┘ src/styles/portal.css, graphiques SVG maison
+partenaires.html       espace partenaires (présentation) ┐
+grands-comptes.html    espace grands comptes             ├ pages légères : src/portal/*.js,
+dossier-marche.html    dossier marché détaillé           ┘ src/styles/portal.css, graphiques SVG maison
+src/assets/partners/   rendus 3D de la caisse (WebP) utilisés par l'espace partenaires
 src/data/market.js     veille marché : prix du papier, papetiers, contexte tunisien (sources datées)
 ```
 

@@ -169,9 +169,11 @@ Récit 3D complet, configurateur MVP, calculs, responsive, build statique.
 - Photos / vidéos de l'usine (onduleuse, Bobst, impression) pour les sections Fabrication et Secteurs
 - Relecture des textes, version **anglaise** puis **arabe** (RTL)
 
-### Phase 1 bis — Espaces investisseurs et grands comptes ✅ *(cette branche)*
-- `investisseurs.html` : thèse d'investissement, baromètre mondial du papier, benchmark des papetiers, simulateurs
-  de sensibilité et d'investissement, feuille de route proposée.
+### Phase 1 bis — Espaces partenaires et grands comptes ✅ *(cette branche)*
+- `partenaires.html` : pour nos partenaires actuels (bailleurs de fonds) et la direction — page simple et visuelle
+  (rendus 3D, chiffres clés, parcours, marché, trois priorités), avec un mode présentation plein écran.
+- `dossier-marche.html` (annexe) : baromètre mondial du papier, benchmark des papetiers, simulateurs de sensibilité
+  et de projet.
 - `grands-comptes.html` : optimiseur de carton (coût matière minimal à résistance donnée), clause d'indexation,
   bassin d'approvisionnement, PPWR, programme et demande d'accord-cadre.
 - À fournir par New Box : chiffres internes (chiffre d'affaires, volumes, capacité, part de papier importé, marges),

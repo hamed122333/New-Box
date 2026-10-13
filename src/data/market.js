@@ -200,7 +200,7 @@ export const SUPPLIERS = [
 
 export const SCOPES = { local: 'Tunisie', med: 'Méditerranée', world: 'Mondial' };
 
-/** Contexte tunisien et marché (pour les investisseurs et les grands comptes). */
+/** Contexte tunisien et marché (pour les partenaires et les grands comptes). */
 export const CONTEXT = {
   market: { value: '≈ 225 Md$', label: 'marché mondial de l’emballage en carton ondulé en 2025, +3,3 %/an prévus jusqu’en 2035', src: 'gmi' },
   olive: { value: '4 780 MDT', label: 'exportations d’huile d’olive en 10 mois de campagne 2025-2026 (381 200 t, +50,8 % en volume)', src: 'olive' },

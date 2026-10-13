@@ -25,8 +25,9 @@ Pas de suite de tests automatisés dans le dépôt. Vérification manuelle ou vi
    morphing des cannelures jusqu'à BC (04), test ECT (05), flan qui se plie (06), palette (07).
 4. Configurateur : changer produit / dimensions / cannelure / papiers → le modèle 3D, le délai et le BCT se mettent à jour ;
    « Capture PNG » télécharge une image ; « Demander un devis » ouvre un e-mail pré-rempli.
-5. Espaces `investisseurs.html` et `grands-comptes.html` : aucune erreur console, curseurs des simulateurs réactifs,
-   filtres du benchmark, optimiseur de carton ; « Voir en 3D » ouvre le configurateur réglé (paramètres d'URL).
+5. Pages `partenaires.html` (mode « Présenter » : plein écran, flèches du clavier, Échap), `grands-comptes.html`
+   et `dossier-marche.html` : aucune erreur console, curseurs des simulateurs réactifs, filtres du benchmark,
+   optimiseur de carton ; « Voir en 3D » ouvre le configurateur réglé (paramètres d'URL).
 6. La console expose `window.__newbox` (état du scroll, scène, configurateur) pour le débogage.
    `?capture` dans l'URL passe en horloge pilotée (`__newbox.step(dt)`) pour l'enregistrement vidéo.
 
@@ -57,8 +58,10 @@ Pas de suite de tests automatisés dans le dépôt. Vérification manuelle ou vi
 - Logo officiel : `src/assets/brand/logo-new-box.png` ; charte : bleu `#14259B`, orange `#F49C21`, bleu nuit `#0D1642`
 - Certifications (SGS FSSC 22000, ISO 9001, ISO 45001 ; FSC C191615) : `src/assets/brand/certifications.png`,
   imprimées sous le logo sur la face avant des caisses imprimées et affichées dans la section « Produits & délais »
-- Espaces investisseurs / grands comptes : `investisseurs.html`, `grands-comptes.html` (entrées Vite dans
-  `vite.config.js`), code `src/portal/` (`ui.js` utilitaires et info-bulles, `charts.js` graphiques SVG sans
+- « Bailleurs de fonds » = nos **partenaires actuels** (pas des investisseurs à démarcher) : `partenaires.html`,
+  page simple et visuelle à présenter à la direction (rendus 3D de la caisse dans `src/assets/partners/`, obtenus
+  avec `__newbox.stage.capture()` en mode `?capture`). Annexe chiffrée : `dossier-marche.html`.
+  Grands clients : `grands-comptes.html`. Entrées Vite dans `vite.config.js` ; code `src/portal/` (`ui.js` utilitaires et info-bulles, `charts.js` graphiques SVG sans
   bibliothèque, `market-ui.js` rendus partagés), styles `src/styles/portal.css` (palette de graphiques validée :
   `--series-1` #3550d0, `--series-2` #e07a12). Pas de Three.js ni de GSAP sur ces pages : les garder légères.
 - Veille marché (prix du papier, papetiers, contexte tunisien) : `src/data/market.js` — chaque chiffre a une source
