@@ -61,6 +61,9 @@ Pas de suite de tests automatisés dans le dépôt. Vérification manuelle ou vi
 - « Bailleurs de fonds » = nos **partenaires actuels** (pas des investisseurs à démarcher) : `partenaires.html`,
   page simple et visuelle à présenter à la direction (rendus 3D de la caisse dans `src/assets/partners/`, obtenus
   avec `__newbox.stage.capture()` en mode `?capture`). Annexe chiffrée : `dossier-marche.html`.
+  Courbe de croissance (chiffre d'affaires / volume) : `src/portal/growth.js`, données dans `src/data/partners.js` —
+  **valeurs fictives** (`DEMO = true` affiche « Données d'illustration ») : ne jamais les présenter comme réelles ;
+  les remplacer par les chiffres New Box puis passer `DEMO` à `false`.
   Grands clients : `grands-comptes.html`. Entrées Vite dans `vite.config.js` ; code `src/portal/` (`ui.js` utilitaires et info-bulles, `charts.js` graphiques SVG sans
   bibliothèque, `market-ui.js` rendus partagés), styles `src/styles/portal.css` (palette de graphiques validée :
   `--series-1` #3550d0, `--series-2` #e07a12). Pas de Three.js ni de GSAP sur ces pages : les garder légères.

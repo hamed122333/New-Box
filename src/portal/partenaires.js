@@ -1,5 +1,7 @@
 import { CONTEXT } from '../data/market.js';
-import { el, sourceLink } from './ui.js';
+import { GROWTH, DEMO } from '../data/partners.js';
+import { el, fmt, sourceLink } from './ui.js';
+import { GrowthChart } from './growth.js';
 
 const $ = (s) => document.querySelector(s);
 const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -25,6 +27,114 @@ $('[data-market]').replaceChildren(
     );
   }),
 );
+
+// ------------------------------------------------------------------ croissance (chiffre d'affaires / volume)
+const chartBox = $('[data-growth-chart]');
+const growth = new GrowthChart(chartBox, { years: GROWTH.years, forecastFrom: GROWTH.forecastFrom });
+const $g = (k) => document.querySelector(`[data-g="${k}"]`);
+let growthKey = 'ca';
+let heroAnim = 0;
+
+/** Chiffres clés d'une série : dernière année réalisée, croissance sur un an, multiplicateur, TCAM. */
+function growthStats(s) {
+  const yrs = GROWTH.years;
+  const li = (GROWTH.forecastFrom ? yrs.indexOf(GROWTH.forecastFrom) : yrs.length) - 1;
+  const bi = Math.max(0, yrs.indexOf(GROWTH.firstFullYear));
+  const last = s.values[li];
+  const base = s.values[bi];
+  const n = yrs[li] - yrs[bi];
+  return {
+    year: yrs[li],
+    last,
+    yoy: last / s.values[li - 1] - 1,
+    mult: last / base,
+    base: yrs[bi],
+    cagr: n > 0 ? (last / base) ** (1 / n) - 1 : 0,
+    forecast: GROWTH.forecastFrom ? s.values[li + 1] : null,
+  };
+}
+
+/** Le grand chiffre monte jusqu'à sa valeur (sauf mouvement réduit). */
+function countTo(node, value, decimals) {
+  cancelAnimationFrame(heroAnim);
+  if (reduced) return (node.textContent = fmt(value, decimals));
+  const from = Number(node.dataset.v || 0);
+  const t0 = performance.now();
+  const tick = (t) => {
+    const k = Math.min(1, (t - t0) / 900);
+    const v = from + (value - from) * (1 - (1 - k) ** 3);
+    node.textContent = fmt(v, decimals);
+    if (k < 1) heroAnim = requestAnimationFrame(tick);
+  };
+  node.dataset.v = value;
+  heroAnim = requestAnimationFrame(tick);
+}
+
+function showGrowth(key, animate) {
+  growthKey = key;
+  const s = GROWTH.series[key];
+  const st = growthStats(s);
+  document.querySelectorAll('[data-series]').forEach((b) => b.setAttribute('aria-selected', String(b.dataset.series === key)));
+  $g('kicker').textContent = `${s.label} ${st.year}`;
+  if (animate) countTo($g('value'), st.last, s.decimals);
+  else $g('value').textContent = fmt(st.last, s.decimals);
+  $g('unit').textContent = s.unit;
+  $g('yoy').textContent = `${st.yoy >= 0 ? '▲ +' : '▼ '}${fmt(st.yoy * 100, 0)} % sur un an`;
+  $g('mult').textContent = `×${fmt(st.mult, 1)}`;
+  $g('multNote').textContent = `depuis ${st.base}, première année pleine`;
+  $g('cagr').textContent = `+${fmt(st.cagr * 100, 0)} %`;
+  $g('cagrNote').textContent = `par an en moyenne, ${st.base}-${st.year}`;
+  $g('forecast').textContent = st.forecast == null ? '—' : `${fmt(st.forecast, s.decimals)} ${s.unit}`;
+  $g('forecastNote').textContent = `prévision ${st.year + 1}`;
+  growth.setSeries(s, animate);
+  // vue tableau (mêmes données)
+  $('[data-growth-table]').replaceChildren(
+    el(
+      'table',
+      { class: 'data-table data-table--dark' },
+      el('thead', {}, el('tr', {}, ['Année', `${s.label} (${s.unit})`, 'Sur un an'].map((h) => el('th', { scope: 'col', text: h })))),
+      el(
+        'tbody',
+        {},
+        GROWTH.years.map((y, i) =>
+          el(
+            'tr',
+            {},
+            el('td', { text: y >= (GROWTH.forecastFrom ?? Infinity) ? `${y} (prévision)` : String(y) }),
+            el('td', { class: 'num', text: fmt(s.values[i], s.decimals) }),
+            el('td', { class: 'num', text: i ? `${s.values[i] >= s.values[i - 1] ? '+' : ''}${fmt((s.values[i] / s.values[i - 1] - 1) * 100, 0)} %` : '—' }),
+          ),
+        ),
+      ),
+    ),
+  );
+}
+
+$('[data-demo]').hidden = !DEMO;
+document.querySelector('.g-tabs').addEventListener('click', (e) => {
+  const b = e.target.closest('[data-series]');
+  if (b && b.dataset.series !== growthKey) showGrowth(b.dataset.series, true);
+});
+const growthToggle = $('[data-growth-toggle]');
+growthToggle.addEventListener('click', () => {
+  const table = $('[data-growth-table]');
+  table.hidden = !table.hidden;
+  chartBox.hidden = !table.hidden;
+  growthToggle.textContent = table.hidden ? 'Voir les données' : 'Voir la courbe';
+});
+showGrowth('ca', false);
+$g('value').dataset.v = 0;
+$g('value').textContent = '0';
+const growthIo = new IntersectionObserver(
+  ([e]) => {
+    if (!e.isIntersecting) return;
+    growth.reveal();
+    countTo($g('value'), growthStats(GROWTH.series[growthKey]).last, GROWTH.series[growthKey].decimals);
+    growthIo.disconnect();
+  },
+  { threshold: 0.25 },
+);
+growthIo.observe(document.querySelector('.pt-growth'));
 
 // ------------------------------------------------------------------ apparition au défilement + compteurs
 const count = (node) => {

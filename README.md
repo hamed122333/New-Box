@@ -26,7 +26,7 @@ qui transforme la visite en demande de devis.
 
 | Page | Pour qui | Contenu |
 |---|---|---|
-| `partenaires.html` | Nos partenaires actuels (bailleurs de fonds), la direction | Page simple et visuelle : rendus 3D de la caisse New Box, chiffres clés, parcours depuis 2020, savoir-faire, marché porteur (export, PPWR), trois priorités, rendez-vous à Kairouan. Bouton **▶ Présenter** : plein écran, une section par écran, flèches du clavier |
+| `partenaires.html` | Nos partenaires actuels (bailleurs de fonds), la direction | Page simple et visuelle : rendus 3D de la caisse New Box, chiffres clés, **courbe de croissance animée** (chiffre d'affaires / volume depuis 2020, prévision ; données d'illustration à remplacer dans `src/data/partners.js`), parcours depuis 2020, savoir-faire, marché porteur (export, PPWR), trois priorités, rendez-vous à Kairouan. Bouton **▶ Présenter** : plein écran, une section par écran, flèches du clavier |
 | `grands-comptes.html` | Grands clients | **Optimiseur de carton** (72 compositions comparées : la moins chère qui tient la charge, économie et papier épargné par an, bouton « Voir en 3D »), **clause d'indexation papier** simulée, bassin d'approvisionnement, conformité PPWR, programme grands comptes, demande d'accord-cadre |
 | `dossier-marche.html` | Direction, partenaires (annexe détaillée) | Baromètre mondial du papier (niveaux €/t, hausses 2026, chronologie), benchmark de 10 papetiers, simulateurs de sensibilité au prix du papier et de projet (délai de retour, VAN, TRI) |
 
