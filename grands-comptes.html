@@ -42,6 +42,25 @@
       <!-- indicateurs -->
       <section class="grid" aria-label="Indicateurs clés" style="margin-bottom: 16px" data-kpis></section>
 
+      <!-- prix des bobines : courbe animée -->
+      <section class="card" id="prix" aria-labelledby="t-trend" data-in style="margin-bottom: 16px">
+        <div class="card__head">
+          <div>
+            <h2 id="t-trend">Prix des bobines : la hausse de 2026</h2>
+            <p>Hausses cumulées des papiers pour carton ondulé en Europe depuis janvier 2026, en €/t. Survolez la courbe.</p>
+          </div>
+          <div class="toolbar">
+            <div class="legend" data-trend-legend></div>
+            <button type="button" class="btn btn--ghost" data-trend-replay style="min-height: 32px; font-size: 13px">Rejouer</button>
+          </div>
+        </div>
+        <div class="trend">
+          <div class="chart" data-trend></div>
+          <aside class="trend__side" data-trend-side></aside>
+        </div>
+        <p class="card__foot" data-trend-src></p>
+      </section>
+
       <!-- benchmark : graphique principal -->
       <section class="card" id="benchmark" aria-labelledby="t-bench" data-in style="margin-bottom: 16px">
         <div class="card__head">

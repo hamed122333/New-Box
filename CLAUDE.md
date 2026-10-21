@@ -61,7 +61,7 @@ Pas de suite de tests automatisés dans le dépôt. Vérification manuelle ou vi
 - Plan et feuille de route : `docs/PLAN.md`
 - Tableaux de bord `grands-comptes.html` (acheteurs : benchmark des papetiers, prix du papier, programme) et
   `partenaires.html` (partenaires financiers actuels : croissance, marché, engagements) : code `src/dash/`
-  (`common.js` utilitaires, `accounts.js`, `partners.js`), styles `src/styles/dashboard.css`, entrées Vite dans
+  (`common.js` utilitaires, `accounts.js`, `partners.js`, `trend.js` courbe animée des prix des bobines), styles `src/styles/dashboard.css`, entrées Vite dans
   `vite.config.js`. Pas de Three.js ni de GSAP sur ces pages. Engagements de service à valider par la direction.
 - Veille papier, papetiers et contexte tunisien :
   `src/data/market.js` — chaque chiffre a une source datée dans `SOURCES` ; n'en ajouter aucun sans source.

@@ -1256,3 +1256,90 @@ td small {
     font-size: 11px;
   }
 }
+
+/* ---------- courbe des prix des bobines ---------- */
+@keyframes tring {
+  0% { transform: scale(1); opacity: 0.6; }
+  100% { transform: scale(3.6); opacity: 0; }
+}
+
+.trend {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 260px;
+  gap: 20px;
+}
+
+.trend__side {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  border-left: 1px solid var(--line);
+  padding-left: 20px;
+}
+
+.trend__stat {
+  display: grid;
+  gap: 4px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: var(--bg);
+}
+
+.trend__val {
+  font: 600 30px/1.1 var(--f-head);
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+
+.trend__ann {
+  display: grid;
+  gap: 2px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 1px dashed #9aa6e8;
+  font-size: 13px;
+}
+
+.trend__ann b {
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--blue);
+}
+
+.trend__why {
+  margin-top: auto;
+  font-size: 12px;
+  color: var(--ink-2);
+}
+
+.tdot {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.tring {
+  fill: none;
+  stroke-width: 2;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: tring 1.8s cubic-bezier(0.1, 0.7, 0.2, 1) infinite;
+}
+
+.tcross {
+  stroke: var(--ink);
+  stroke-dasharray: 3 3;
+  opacity: 0;
+}
+
+@media (max-width: 1080px) {
+  .trend {
+    grid-template-columns: 1fr;
+  }
+
+  .trend__side {
+    border-left: 0;
+    border-top: 1px solid var(--line);
+    padding: 16px 0 0;
+  }
+}

@@ -32,7 +32,7 @@ $('[data-kpis]').append(
       'article',
       { class: 'card kpi span-3', 'data-in': true },
       h('span', { class: 'kpi__label', text: k.label }),
-      h('b', { class: 'kpi__value' }, k.value, h('small', { text: k.unit })),
+      h('b', { class: 'kpi__value' }, h('span', { 'data-count': k.value, text: k.value }), h('small', { text: k.unit })),
       h('span', { class: 'kpi__meta' }, h('span', { class: 'delta delta--good', text: '▲' }), h('span', { text: k.meta })),
       spark(k.sp),
     ),
@@ -83,6 +83,9 @@ function draw(play) {
   const yb = (v) => pad.t + (1 - v / B.top) * (H - pad.t - pad.b);
   const s = svg('svg', { viewBox: `0 0 ${w} ${H}`, role: 'img', 'aria-label': `Chiffre d’affaires et volume de ${years[0]} à ${years.at(-1)}` });
   const defs = svg('defs');
+  const ag = svg('linearGradient', { id: 'ca-grad', x1: 0, x2: 0, y1: 0, y2: 1 });
+  ag.append(svg('stop', { offset: '0%', 'stop-color': '#14259b', 'stop-opacity': 0.16 }), svg('stop', { offset: '100%', 'stop-color': '#14259b', 'stop-opacity': 0 }));
+  defs.append(ag);
   const pat = svg('pattern', { id: 'fc-hatch', width: 6, height: 6, patternUnits: 'userSpaceOnUse', patternTransform: 'rotate(45)' });
   pat.append(svg('rect', { width: 6, height: 6, fill: '#eef0fb' }), svg('line', { x1: 0, y1: 0, x2: 0, y2: 6, stroke: '#c5cdf2', 'stroke-width': 2 }));
   defs.append(pat);
@@ -103,12 +106,24 @@ function draw(play) {
   });
   const pts = ca.values.map((v, i) => [cx(i), ya(v)]);
   const path = (p) => p.map(([x, y], i) => `${i ? 'L' : 'M'}${x},${y}`).join(' ');
-  const solid = svg('path', { class: 'ln', d: path(pts.slice(0, fi)) });
-  s.append(solid, svg('path', { class: 'ln ln--fc', d: path(pts.slice(fi - 1)) }));
+  const real = pts.slice(0, fi);
+  const area = svg('path', { d: `${path(real)} L${real.at(-1)[0]},${H - pad.b} L${real[0][0]},${H - pad.b} Z`, fill: 'url(#ca-grad)' });
+  const solid = svg('path', { class: 'ln', d: path(real) });
+  const fc = svg('path', { class: 'ln ln--fc', d: path(pts.slice(fi - 1)) });
+  s.append(area, solid, fc);
+  const pops = [];
   pts.forEach(([x, y], i) => {
-    s.append(svg('circle', { class: 'pt', cx: x, cy: y, r: 4 }));
-    if (i === last || i === 0 || i === fi) s.append(svg('text', { class: 'lbl', x, y: y - 10, 'text-anchor': 'middle' }, fmt(ca.values[i], 1)));
+    const c = svg('circle', { class: 'pt tdot', cx: x, cy: y, r: 4 });
+    s.append(c);
+    pops.push([c]);
+    if (i === last || i === 0 || i === fi) {
+      const t = svg('text', { class: 'lbl tdot', x, y: y - 10, 'text-anchor': 'middle' }, fmt(ca.values[i], 1));
+      s.append(t);
+      pops[i].push(t);
+    }
   });
+  const ring = svg('circle', { class: 'tring', cx: pts[last][0], cy: pts[last][1], r: 5, stroke: '#14259b' });
+  s.append(ring);
   years.forEach((_, i) => {
     const hit = svg('rect', { class: 'hit', x: cx(i) - band / 2, y: 0, width: band, height: H });
     hit.addEventListener('pointerenter', () => showYear(i));
@@ -119,7 +134,15 @@ function draw(play) {
   if (play && !reduced) {
     cols.forEach((c, i) => animate(c, [{ transform: 'scaleY(0)', transformOrigin: 'bottom', transformBox: 'fill-box' }, { transform: 'scaleY(1)', transformOrigin: 'bottom', transformBox: 'fill-box' }], { duration: 600, delay: i * 60 }));
     const len = solid.getTotalLength();
-    animate(solid, [{ strokeDasharray: len, strokeDashoffset: len }, { strokeDasharray: len, strokeDashoffset: 0 }], { duration: 1100, delay: 250 });
+    const lineDur = 1400;
+    animate(solid, [{ strokeDasharray: len, strokeDashoffset: len }, { strokeDasharray: len, strokeDashoffset: 0 }], { duration: lineDur, delay: 300 });
+    animate(area, [{ opacity: 0 }, { opacity: 1 }], { duration: 900, delay: 700 });
+    animate(fc, [{ opacity: 0 }, { opacity: 1 }], { duration: 500, delay: 300 + lineDur });
+    animate(ring, [{ opacity: 0 }, { opacity: 0 }], { duration: 300 + lineDur });
+    pops.forEach((els, i) => {
+      const delay = 300 + (i / (n - 1)) * lineDur;
+      els.forEach((e) => animate(e, [{ opacity: 0, transform: 'scale(0)' }, { opacity: 1, transform: 'scale(1.6)', offset: 0.6 }, { opacity: 1, transform: 'scale(1)' }], { duration: 500, delay }));
+    });
   }
 }
 
@@ -144,6 +167,28 @@ new IntersectionObserver((e, io) => {
 
 // ---------- contexte de marché ----------
 $('[data-ctx]').append(...Object.values(CONTEXT).map((c) => h('div', {}, h('b', { text: c.value }), h('p', { text: c.label }), srcLink(SOURCES[c.src]))));
+
+// compteurs des indicateurs à l'entrée dans l'écran
+const kpiBox = $('[data-kpis]');
+new IntersectionObserver((e, io) => {
+  if (!e[0].isIntersecting || reduced) return io.disconnect();
+  kpiBox.querySelectorAll('[data-count]').forEach((el, j) => {
+    const raw = el.dataset.count;
+    const target = parseFloat(raw.replace(/[^\d,.-]/g, '').replace(/\s/g, '').replace(',', '.'));
+    const dec = raw.includes(',') ? raw.split(',')[1].length : 0;
+    const sign = raw.startsWith('+') ? '+' : '';
+    const t0 = performance.now() + j * 120;
+    const step = (t) => {
+      const k = Math.max(0, Math.min(1, (t - t0) / 1200));
+      el.textContent = sign + fmt(target * (1 - (1 - k) ** 3), dec);
+      if (k < 1) requestAnimationFrame(step);
+      else el.textContent = raw;
+    };
+    requestAnimationFrame(step);
+  });
+  io.disconnect();
+}, { threshold: 0.5 }).observe(kpiBox);
+$('[data-replay]')?.addEventListener('click', () => draw(true));
 
 reveal();
 mailtoForm($('[data-form]'), (d) => `Partenaires New Box — ${d.get('demande')} (${d.get('institution')})`);

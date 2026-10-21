@@ -1,5 +1,6 @@
 import { $, h, fmt, srcLink, reveal, animate, mailtoForm, tip, hideTip } from './common.js';
-import { SOURCES, UPDATED, PRICE_LEVELS, MOVES, TIMELINE, SUPPLIERS, SCOPES, TUNISIA_IMPLIED, EUR_TND } from '../data/market.js';
+import { trendChart } from './trend.js';
+import { PRICE_TREND, SOURCES, UPDATED, PRICE_LEVELS, MOVES, TIMELINE, SUPPLIERS, SCOPES, TUNISIA_IMPLIED, EUR_TND } from '../data/market.js';
 
 const COLORS = { local: '#f49c21', med: '#3550d0', world: '#0d1642' };
 const tonsText = (t) => (t >= 1e6 ? `${fmt(t / 1e6, 2).replace(/,?0+$/, '')} Mt` : `${fmt(t)} t`);
@@ -29,6 +30,16 @@ $('[data-kpis]').append(
     ),
   ),
 );
+
+// ---------- prix des bobines : courbe animée ----------
+trendChart($('[data-trend]'), {
+  data: PRICE_TREND,
+  sources: SOURCES,
+  legend: $('[data-trend-legend]'),
+  side: $('[data-trend-side]'),
+  srcNote: $('[data-trend-src]'),
+  replay: $('[data-trend-replay]'),
+});
 
 // ---------- benchmark ----------
 let zone = 'all';

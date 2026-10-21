@@ -221,3 +221,36 @@ export const CONTEXT = {
   ppwr: { value: '12 août 2026', label: 'entrée en application du règlement européen PPWR (UE 2025/40), y compris pour les emballages fabriqués hors UE', src: 'ppwr' },
   fx: { value: `${EUR_TND.toFixed(4).replace('.', ',')} DT`, label: 'pour 1 € (cours BCT du 10 septembre 2026)', src: 'eurTnd' },
 };
+
+/**
+ * Hausses cumulées des papiers européens depuis janvier 2026 (€/t), aux dates des relevés publiés.
+ * Entre deux relevés le tracé est une simple liaison : seuls les points sont des valeurs sourcées.
+ */
+export const PRICE_TREND = {
+  months: ['janv.', 'févr.', 'mars', 'avr.', 'mai', 'juin', 'juil.', 'août', 'sept.'],
+  year: 2026,
+  series: [
+    {
+      key: 'kraft',
+      label: 'Kraftliner (fibre vierge)',
+      color: '#14259b',
+      points: [
+        { m: 0, v: 0, note: 'base janvier 2026' },
+        { m: 3, v: 30, note: '+30 €/t en avril', src: 'fresh26' },
+        { m: 8, v: 200, note: '+200 €/t cumulés en septembre', src: 'fmSept' },
+      ],
+    },
+    {
+      key: 'recy',
+      label: 'Testliner recyclé',
+      color: '#f49c21',
+      points: [
+        { m: 0, v: 0, note: 'base janvier 2026' },
+        { m: 3, v: 90, note: '+90 €/t en avril', src: 'fresh26' },
+        { m: 8, v: 150, note: '+60 €/t de plus en septembre', src: 'fmSept' },
+      ],
+    },
+  ],
+  /** Annonce postérieure au dernier relevé (non cumulée dans les courbes). */
+  announce: { m: 8, text: 'SCA annonce encore +100 €/t sur le kraftliner', src: 'sca100' },
+};
