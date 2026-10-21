@@ -1,3 +1,4 @@
+import { resolve } from 'node:path';
 import { defineConfig } from 'vite';
 
 // base relative : le build fonctionne dans n'importe quel sous-dossier
@@ -10,6 +11,11 @@ export default defineConfig({
     target: 'es2020',
     chunkSizeWarningLimit: 900,
     rollupOptions: {
+      input: {
+        index: resolve(import.meta.dirname, 'index.html'),
+        'grands-comptes': resolve(import.meta.dirname, 'grands-comptes.html'),
+        partenaires: resolve(import.meta.dirname, 'partenaires.html'),
+      },
       output: {
         manualChunks(id) {
           if (id.includes('node_modules/three')) return 'three';
