@@ -4,8 +4,8 @@ import { CorrugatedBox } from '../three/box.js';
 import logoUrl from '../assets/brand/logo-new-box.png';
 import certsUrl from '../assets/brand/certifications.png';
 
-// Petite caisse 3D de l'accueil, en tête des pages de présentation : rotation lente, rabats qui
-// s'ouvrent et se referment, glisser pour la tourner. Rendu en pause hors de l'écran.
+// Petite caisse 3D de l'accueil (même modèle, mêmes couleurs et lumière), en tête des pages de
+// présentation : balancement lent, glisser pour la tourner. Rendu en pause hors de l'écran.
 
 const loadImage = (src) =>
   new Promise((resolve) => {
@@ -24,27 +24,48 @@ export async function miniBox(canvas) {
     canvas.hidden = true;
     return;
   }
+  // mêmes réglages que la scène « caisse » de l'accueil (src/three/stage.js)
   renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
   renderer.toneMappingExposure = 1.05;
+  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.type = THREE.PCFShadowMap;
+  renderer.setClearColor(0x000000, 0);
 
   const scene = new THREE.Scene();
   const pmrem = new THREE.PMREMGenerator(renderer);
   scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+  scene.environmentIntensity = 0.55;
   scene.add(new THREE.HemisphereLight(0xfff3e0, 0x8a7560, 0.9));
-  const key = new THREE.DirectionalLight(0xfff1dc, 2.2);
-  key.position.set(4, 8, 6);
+  const key = new THREE.DirectionalLight(0xfff1dc, 2.4);
+  key.position.set(8, 16, 10);
+  key.castShadow = true;
+  key.shadow.mapSize.set(1024, 1024);
+  key.shadow.bias = -0.0004;
+  key.shadow.normalBias = 0.02;
+  key.shadow.radius = 5;
+  Object.assign(key.shadow.camera, { left: -12, right: 12, top: 16, bottom: -8, near: 1, far: 50 });
   scene.add(key);
+  const fill = new THREE.DirectionalLight(0xdfe8ff, 0.6);
+  fill.position.set(-10, 6, -4);
+  scene.add(fill);
+  const ground = new THREE.Mesh(new THREE.PlaneGeometry(80, 80), new THREE.ShadowMaterial({ color: 0x3a2716, opacity: 0.2 }));
+  ground.rotation.x = -Math.PI / 2;
+  ground.position.y = -0.005;
+  ground.receiveShadow = true;
+  scene.add(ground);
 
   const [brandLogo, certs] = await Promise.all([loadImage(logoUrl), loadImage(certsUrl)]);
   await document.fonts.ready;
+  // caisse de l'accueil : fermée, ruban adhésif posé
   const box = new CorrugatedBox(renderer).build({ brandLogo, certs });
-  box.params.tape = 0;
+  box.params.lid = 0;
+  box.params.tape = 1;
   box.update();
   scene.add(box.group);
 
-  const camera = new THREE.PerspectiveCamera(30, 1, 0.1, 100);
+  const camera = new THREE.PerspectiveCamera(35, 1, 0.01, 400);
   const target = box.center(new THREE.Vector3());
   const resize = () => {
     const w = canvas.clientWidth;
@@ -75,15 +96,11 @@ export async function miniBox(canvas) {
     requestAnimationFrame(frame);
     if (!visible) return;
     const t = reduced ? 0 : (now - t0) / 1000;
-    // ouverture lente des rabats : fermé → ouvert → fermé (cycle de 8 s)
-    const cyc = (t % 8) / 8;
-    box.params.lid = reduced ? 0.35 : Math.max(0, Math.sin(cyc * Math.PI * 2 - Math.PI / 2) * 0.5 + 0.5) * 0.85;
-    box.update();
-    box.group.rotation.y = -0.6 + t * 0.35 + spin;
-    box.group.position.y = Math.sin(t * 1.2) * 0.06;
+    // balancement de la caisse comme à l'ouverture de l'accueil (rotY −0,22, idle)
+    box.group.rotation.y = -0.22 + 0.28 * Math.sin(t * 0.45) + spin;
     const c = box.center(target);
-    camera.position.set(c.x + 9.6, c.y + 4.6, c.z + 9.6);
-    camera.lookAt(c.x, c.y - 0.1, c.z);
+    camera.position.set(c.x + 6.2 * 0.9, c.y + 5.4 * 0.9, c.z + 10.2 * 0.9);
+    camera.lookAt(0, c.y - 0.1, 0);
     renderer.render(scene, camera);
   };
   requestAnimationFrame(frame);
