@@ -33,8 +33,8 @@ npm run build     # site statique dans dist/
 npm run preview   # prévisualiser le build
 ```
 
-Le dossier `dist/` est 100 % statique (chemins relatifs) : il peut être copié tel quel sur l'hébergement
-actuel, par exemple dans `newbox.com.tn/experience/`.
+Le dossier `dist/` est 100 % statique : il remplace le site actuel à la racine de `newbox.com.tn`.
+Procédure complète et points à compléter : [`docs/DEPLOIEMENT.md`](docs/DEPLOIEMENT.md).
 
 ## Installer la version locale sur le Bureau
 

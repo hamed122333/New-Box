@@ -37,6 +37,7 @@ const loadImage = (src) =>
   });
 
 root.classList.add('js');
+document.querySelectorAll('[data-year]').forEach((el) => (el.textContent = new Date().getFullYear()));
 
 function fillPaperLabels() {
   const label = (p) => `${p.code} · ${p.name} ${p.gsm} g/m²`;

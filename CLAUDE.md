@@ -12,6 +12,7 @@ d'exécution par défaut).
 - Lancer (ouvre le navigateur) : `npm.cmd start` → http://localhost:5173
 - Serveur sans ouverture : `npm.cmd run dev` ; accessible sur le réseau local : `npm.cmd run dev:lan`
 - Build statique : `npm.cmd run build` (sortie `dist/`, chemins relatifs) ; `npm.cmd run preview`
+- Mise en production sur newbox.com.tn : `docs/DEPLOIEMENT.md` (fichiers d'hébergement, SEO, 404 et mentions légales dans `public/`)
 
 Prérequis : Node.js 20.19+ ou 22.12+ (Vite 8), Git.
 

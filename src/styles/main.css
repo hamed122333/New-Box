@@ -1679,6 +1679,19 @@ input[type='range'] {
   color: #8189b0;
 }
 
+.contact__legal a {
+  color: inherit;
+}
+
+.noscript {
+  position: relative;
+  z-index: 10;
+  margin: 0;
+  padding: 16px var(--gutter);
+  background: var(--orange);
+  color: var(--navy);
+}
+
 /* ---------- sans JavaScript / sans WebGL ---------- */
 
 html:not(.js) .chapter,
