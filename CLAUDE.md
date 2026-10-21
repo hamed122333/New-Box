@@ -64,3 +64,7 @@ Pas de suite de tests automatisés dans le dépôt. Vérification manuelle ou vi
   entrées Vite dans `vite.config.js`. Pas de Three.js sur ces pages. Aucun chiffre sans source : seuls les faits connus
   (2020, certifications, délais, gamme) sont affichés ; les engagements de service (réponse 48 h, stock de sécurité,
   contrat-cadre, rythme des rapports) sont à valider par la direction New Box.
+- Graphiques SVG animés (courbes, fourchettes) : `src/premium/charts.js`. Veille papier, papetiers et contexte tunisien :
+  `src/data/market.js` — chaque chiffre a une source datée dans `SOURCES` ; n'en ajouter aucun sans source.
+  Croissance des partenaires : `src/data/partners.js` — **valeurs fictives** (`DEMO = true` affiche « Données
+  d'illustration ») : les remplacer par les chiffres New Box puis passer `DEMO` à `false`.

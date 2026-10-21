@@ -26,6 +26,8 @@
       <nav class="p-nav" aria-label="Navigation principale">
         <a href="./">Accueil</a>
         <a href="./grands-comptes.html" aria-current="page">Grands comptes</a>
+        <a href="#matiere">Prix du papier</a>
+        <a href="#papetiers">Papetiers</a>
         <a href="./partenaires.html">Partenaires</a>
       </nav>
       <a class="btn btn--small" href="#consultation" data-magnet>Consulter New Box</a>
@@ -206,6 +208,63 @@
             <p>DI imprimée · DV vierge — forme de découpe Bobst sur mesure</p>
           </article>
         </div>
+      </section>
+
+      <!-- ============ VEILLE MATIÈRE ============ -->
+      <section class="sec" id="matiere">
+        <header class="sec__head">
+          <p class="eyebrow">Veille matière première · <span data-updated></span></p>
+          <h2 data-split>Le papier bouge. Nous le suivons pour vous.</h2>
+          <p class="lead" data-up>
+            Le papier représente l’essentiel du prix d’une caisse. Voici ce que nous observons sur les marchés mondiaux, avec
+            chaque source. C’est la base d’une révision de prix transparente dans votre contrat-cadre.
+          </p>
+        </header>
+        <div class="grid moves" data-moves data-up data-up-children></div>
+      </section>
+
+      <section class="sec sec--light" aria-labelledby="t-prix">
+        <div class="chart-grid chart-grid--stack">
+          <div class="chart-card" data-up>
+            <div class="chart-card__head">
+              <div>
+                <h3 id="t-prix">Hausses du kraftliner annoncées par SCA</h3>
+                <p>Cumul en €/t depuis janvier 2025 — référence du kraftliner européen</p>
+              </div>
+            </div>
+            <div data-chart-sca></div>
+            <p class="chart-note">Sources : communiqués SCA <a data-src="sca90"></a>, <a data-src="sca60"></a>, <a data-src="sca100"></a>.</p>
+          </div>
+          <div class="chart-card" data-up>
+            <div class="chart-card__head">
+              <div>
+                <h3>Niveaux de prix des papiers</h3>
+                <p>€/t, Europe face au prix moyen implicite tunisien</p>
+              </div>
+              <ul class="legend"><li><i style="--c: var(--c1)"></i>Europe</li><li><i style="--c: var(--c2)"></i>Tunisie</li></ul>
+            </div>
+            <div data-chart-levels></div>
+            <p class="chart-note" data-levels-note></p>
+          </div>
+        </div>
+      </section>
+
+      <section class="sec" aria-labelledby="t-tl">
+        <header class="sec__head">
+          <p class="eyebrow">Chronologie</p>
+          <h2 id="t-tl" data-split>Ce qui fait bouger les prix.</h2>
+        </header>
+        <ol class="tl" data-timeline></ol>
+      </section>
+
+      <section class="sec" id="papetiers" aria-labelledby="t-bench">
+        <header class="sec__head">
+          <p class="eyebrow">Benchmark des fournisseurs de bobines</p>
+          <h2 id="t-bench" data-split>Les papetiers qui font le marché.</h2>
+          <p class="lead" data-up>Du papetier voisin de Kairouan aux géants mondiaux : qui produit quoi, à quelle échelle, et ce que cela change pour votre approvisionnement.</p>
+        </header>
+        <div class="filter" role="group" aria-label="Filtrer par zone" data-filter></div>
+        <div class="bench" data-bench></div>
       </section>
 
       <!-- ============ FAQ ============ -->
