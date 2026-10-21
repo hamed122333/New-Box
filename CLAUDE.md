@@ -26,8 +26,8 @@ Pas de suite de tests automatisés dans le dépôt. Vérification manuelle ou vi
    morphing des cannelures jusqu'à BC (04), test ECT (05), flan qui se plie (06), palette (07).
 4. Configurateur : changer produit / dimensions / cannelure / papiers → le modèle 3D, le délai et le BCT se mettent à jour ;
    « Capture PNG » télécharge une image ; « Demander un devis » ouvre un e-mail pré-rempli.
-5. `grands-comptes.html` et `partenaires.html` : aucune erreur console, titres animés, étapes horizontales
-   épinglées (desktop), formulaires → e-mail pré-rempli, pas de défilement horizontal à 390 px.
+5. `grands-comptes.html` et `partenaires.html` : aucune erreur console, filtres et sélection du benchmark,
+   survol / flèches du graphique de croissance, formulaires → e-mail pré-rempli, pas de défilement horizontal à 390 px.
 6. La console expose `window.__newbox` (état du scroll, scène, configurateur) pour le débogage.
    `?capture` dans l'URL passe en horloge pilotée (`__newbox.step(dt)`) pour l'enregistrement vidéo.
 
@@ -59,12 +59,11 @@ Pas de suite de tests automatisés dans le dépôt. Vérification manuelle ou vi
 - Certifications (SGS FSSC 22000, ISO 9001, ISO 45001 ; FSC C191615) : `src/assets/brand/certifications.png`,
   imprimées sous le logo sur la face avant des caisses imprimées et affichées dans la section « Produits & délais »
 - Plan et feuille de route : `docs/PLAN.md`
-- Pages premium `grands-comptes.html` (clients industriels) et `partenaires.html` (partenaires financiers actuels) :
-  effets GSAP/SplitText/Lenis inspirés de react-bits en JS natif dans `src/premium/fx.js`, styles `src/styles/premium.css`,
-  entrées Vite dans `vite.config.js`. Pas de Three.js sur ces pages. Aucun chiffre sans source : seuls les faits connus
-  (2020, certifications, délais, gamme) sont affichés ; les engagements de service (réponse 48 h, stock de sécurité,
-  contrat-cadre, rythme des rapports) sont à valider par la direction New Box.
-- Graphiques SVG animés (courbes, fourchettes) : `src/premium/charts.js`. Veille papier, papetiers et contexte tunisien :
+- Tableaux de bord `grands-comptes.html` (acheteurs : benchmark des papetiers, prix du papier, programme) et
+  `partenaires.html` (partenaires financiers actuels : croissance, marché, engagements) : code `src/dash/`
+  (`common.js` utilitaires, `accounts.js`, `partners.js`), styles `src/styles/dashboard.css`, entrées Vite dans
+  `vite.config.js`. Pas de Three.js ni de GSAP sur ces pages. Engagements de service à valider par la direction.
+- Veille papier, papetiers et contexte tunisien :
   `src/data/market.js` — chaque chiffre a une source datée dans `SOURCES` ; n'en ajouter aucun sans source.
   Croissance des partenaires : `src/data/partners.js` — **valeurs fictives** (`DEMO = true` affiche « Données
   d'illustration ») : les remplacer par les chiffres New Box puis passer `DEMO` à `false`.
