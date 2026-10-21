@@ -62,7 +62,7 @@ Pas de suite de tests automatisés dans le dépôt. Vérification manuelle ou vi
 - Pages de présentation à la direction, univers de l'accueil (`body.present`) : `grands-comptes.html` (prix des bobines, benchmark des papetiers, garanties, à décider) et
   `partenaires.html` (partenaires financiers actuels : croissance, engagements, à décider, quoi partager à qui) : code `src/dash/`
   (`common.js` utilitaires, `accounts.js`, `partners.js`, `trend.js` courbe animée des prix des bobines), styles `src/styles/dashboard.css`, entrées Vite dans
-  `vite.config.js`. Pas de Three.js ni de GSAP sur ces pages. Engagements de service à valider par la direction.
+  `vite.config.js`. Pas de GSAP ; Three.js seulement pour la petite caisse 3D de l'en-tête (`minibox.js`, chargée à part). Engagements de service à valider par la direction.
 - Veille papier, papetiers et contexte tunisien :
   `src/data/market.js` — chaque chiffre a une source datée dans `SOURCES` ; n'en ajouter aucun sans source.
   Croissance des partenaires : `src/data/partners.js` — **valeurs fictives** (`DEMO = true` affiche « Données

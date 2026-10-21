@@ -118,3 +118,7 @@ new IntersectionObserver((e, io) => {
 
 reveal();
 
+
+// caisse 3D de l'accueil en tête de page (chargée après le reste)
+const boxCanvas = document.querySelector('[data-minibox]');
+if (boxCanvas) import('./minibox.js').then((m) => m.miniBox(boxCanvas));

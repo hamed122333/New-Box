@@ -1647,3 +1647,24 @@ body.present {
     display: none;
   }
 }
+
+.p-hero__box {
+  display: block;
+  width: 100%;
+  max-width: 440px;
+  aspect-ratio: 1 / 0.9;
+  justify-self: end;
+  cursor: grab;
+  touch-action: pan-y;
+}
+
+.p-hero__box:active {
+  cursor: grabbing;
+}
+
+@media (max-width: 900px) {
+  .p-hero__box {
+    max-width: 300px;
+    justify-self: center;
+  }
+}
