@@ -1,35 +1,12 @@
-import { $, h, fmt, srcLink, reveal, animate, mailtoForm, tip, hideTip } from './common.js';
+import { $, h, fmt, srcLink, reveal, animate } from './common.js';
 import { trendChart } from './trend.js';
-import { PRICE_TREND, SOURCES, UPDATED, PRICE_LEVELS, MOVES, TIMELINE, SUPPLIERS, SCOPES, TUNISIA_IMPLIED, EUR_TND } from '../data/market.js';
+import { PRICE_TREND, SOURCES, SUPPLIERS, SCOPES } from '../data/market.js';
 
 const COLORS = { local: '#f49c21', med: '#3550d0', world: '#0d1642' };
 const tonsText = (t) => (t >= 1e6 ? `${fmt(t / 1e6, 2).replace(/,?0+$/, '')} Mt` : `${fmt(t)} t`);
 const logPct = (t) => Math.max(1.5, ((Math.log10(t) - 4) / 3) * 100); // 10 000 t → 10 Mt
 
-$('[data-updated]').textContent = UPDATED;
 
-// ---------- indicateurs ----------
-const kraft = MOVES.find((m) => m.grade === 'Kraftliner' && m.market === 'Europe');
-const recy = MOVES.find((m) => m.grade.startsWith('Recyclé'));
-const tn = PRICE_LEVELS.find((p) => p.origin === 'tunisie');
-const kpis = [
-  { label: 'Kraftliner, Europe', value: kraft.value, meta: kraft.detail, delta: ['Hausse', 'up'], src: kraft.src },
-  { label: 'Papiers recyclés, Europe', value: recy.value, meta: recy.detail, delta: ['Hausse', 'up'], src: recy.src },
-  { label: 'Testliner + fluting, Tunisie', value: `≈ ${fmt(tn.lo)} €/t`, meta: 'prix moyen implicite 2025', delta: ['Local', 'neutral'], src: tn.src },
-  { label: 'Délai caisses américaines', value: '7–10 j', meta: 'plaques 5 j · découpes 12–15 j', delta: ['New Box', 'good'] },
-];
-$('[data-kpis]').append(
-  ...kpis.map((k) =>
-    h(
-      'article',
-      { class: 'card kpi span-3', 'data-in': true },
-      h('span', { class: 'kpi__label', text: k.label }),
-      h('b', { class: 'kpi__value', text: k.value }),
-      h('span', { class: 'kpi__meta' }, h('span', { class: `delta delta--${k.delta[1]}`, text: k.delta[0] }), h('span', { text: k.meta })),
-      k.src ? h('a', { href: SOURCES[k.src].url, target: '_blank', rel: 'noopener', style: 'font-size:11px;color:var(--ink-3)', text: SOURCES[k.src].label }) : null,
-    ),
-  ),
-);
 
 // ---------- prix des bobines : courbe animée ----------
 trendChart($('[data-trend]'), {
@@ -139,32 +116,5 @@ new IntersectionObserver((e, io) => {
   io.disconnect();
 }, { threshold: 0.2 }).observe($('#benchmark'));
 
-// ---------- niveaux de prix ----------
-const MAX = 1000;
-$('[data-levels]').append(
-  ...PRICE_LEVELS.map((p, i) => {
-    const txt = p.lo === p.hi ? `${fmt(p.lo)} €/t` : `${fmt(p.lo)}–${fmt(p.hi)}`;
-    const bar = h('i', { style: `left:0;width:${(p.hi / MAX) * 100}%;background:${p.origin === 'tunisie' ? '#f49c21' : '#3550d0'}` });
-    const row = h('div', { class: 'level', tabindex: '0', 'aria-label': `${p.grade}, ${p.where} : ${txt}` }, h('div', {}, h('b', { text: p.grade }), h('span', { text: p.where })), h('div', { class: 'level__track' }, bar), h('span', { class: 'num', text: txt }));
-    row.addEventListener('pointermove', (e) => tip(e.clientX, e.clientY, txt, SOURCES[p.src].label));
-    row.addEventListener('pointerleave', hideTip);
-    new IntersectionObserver((en, io) => {
-      if (!en[0].isIntersecting) return;
-      animate(bar, [{ transform: 'scaleX(0)' }, { transform: 'scaleX(1)' }], { duration: 700, delay: i * 60 });
-      io.disconnect();
-    }).observe(row);
-    return row;
-  }),
-);
-$('[data-levels-note]').textContent = `Tunisie : chiffre d’affaires ÷ production publiés par Sotipapier (≈ ${fmt(Math.round(TUNISIA_IMPLIED.tlflDT))} DT/t), converti à ${String(EUR_TND).replace('.', ',')} DT/€ (BCT). Survolez une ligne pour sa source.`;
-
-// ---------- chronologie ----------
-const KIND = { hausse: '#f49c21', annonce: '#f49c21', baisse: '#3550d0', offre: '#12805c' };
-$('[data-feed]').append(
-  ...[...TIMELINE].reverse().slice(0, 7).map((t) =>
-    h('li', {}, h('time', {}, h('span', { class: 'dot', style: `background:${KIND[t.kind]}` }), t.date), h('div', {}, h('p', { text: t.text }), srcLink(SOURCES[t.src], ''))),
-  ),
-);
-
 reveal();
-mailtoForm($('[data-form]'), (d) => `Consultation grands comptes — ${d.get('societe')}`);
+

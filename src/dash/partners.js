@@ -1,6 +1,5 @@
-import { $, h, svg, fmt, srcLink, reveal, animate, mailtoForm, reduced } from './common.js';
+import { $, h, svg, fmt, reveal, animate, reduced } from './common.js';
 import { DEMO, GROWTH } from '../data/partners.js';
-import { CONTEXT, SOURCES } from '../data/market.js';
 
 // Données de src/data/partners.js : DEMO = valeurs fictives (badge affiché).
 const { years, forecastFrom, firstFullYear, series } = GROWTH;
@@ -11,33 +10,6 @@ const last = fi - 1; // dernière année réalisée
 const i0 = years.indexOf(firstFullYear);
 const cagr = (v) => ((v[last] / v[i0]) ** (1 / (last - i0)) - 1) * 100;
 if (DEMO) $('[data-demo]').hidden = false;
-
-// ---------- indicateurs (avec mini-courbe) ----------
-function spark(values) {
-  const w = 120, hgt = 32, max = Math.max(...values);
-  const pts = values.slice(0, fi).map((v, i) => `${(i / (fi - 1)) * w},${hgt - 3 - (v / max) * (hgt - 6)}`);
-  const s = svg('svg', { class: 'spark', viewBox: `0 0 ${w} ${hgt}`, preserveAspectRatio: 'none', 'aria-hidden': 'true' });
-  s.append(svg('polyline', { points: pts.join(' '), fill: 'none', stroke: '#3550d0', 'stroke-width': 2, 'vector-effect': 'non-scaling-stroke' }));
-  return s;
-}
-const kpis = [
-  { label: `Chiffre d’affaires ${years[last]}`, value: fmt(ca.values[last], 1), unit: 'MDT', meta: `+${fmt((ca.values[last] / ca.values[last - 1] - 1) * 100)} % sur un an`, sp: ca.values },
-  { label: `Croissance annuelle moyenne`, value: `+${fmt(cagr(ca.values))}`, unit: '%', meta: `chiffre d’affaires ${firstFullYear}–${years[last]}`, sp: ca.values },
-  { label: `Volume vendu ${years[last]}`, value: fmt(vol.values[last]), unit: 't', meta: `+${fmt(cagr(vol.values))} %/an depuis ${firstFullYear}`, sp: vol.values },
-  { label: `Prévision ${forecastFrom}`, value: fmt(ca.values[fi], 1), unit: 'MDT', meta: `${fmt(vol.values[fi])} t prévues`, sp: ca.values },
-];
-$('[data-kpis]').append(
-  ...kpis.map((k) =>
-    h(
-      'article',
-      { class: 'card kpi span-3', 'data-in': true },
-      h('span', { class: 'kpi__label', text: k.label }),
-      h('b', { class: 'kpi__value' }, h('span', { 'data-count': k.value, text: k.value }), h('small', { text: k.unit })),
-      h('span', { class: 'kpi__meta' }, h('span', { class: 'delta delta--good', text: '▲' }), h('span', { text: k.meta })),
-      spark(k.sp),
-    ),
-  ),
-);
 
 // ---------- graphique combiné : colonnes (volume) + courbe (CA) ----------
 const chartEl = $('[data-chart]');
@@ -165,30 +137,7 @@ new IntersectionObserver((e, io) => {
   io.disconnect();
 }, { threshold: 0.3 }).observe(chartEl);
 
-// ---------- contexte de marché ----------
-$('[data-ctx]').append(...Object.values(CONTEXT).map((c) => h('div', {}, h('b', { text: c.value }), h('p', { text: c.label }), srcLink(SOURCES[c.src]))));
-
-// compteurs des indicateurs à l'entrée dans l'écran
-const kpiBox = $('[data-kpis]');
-new IntersectionObserver((e, io) => {
-  if (!e[0].isIntersecting || reduced) return io.disconnect();
-  kpiBox.querySelectorAll('[data-count]').forEach((el, j) => {
-    const raw = el.dataset.count;
-    const target = parseFloat(raw.replace(/[^\d,.-]/g, '').replace(/\s/g, '').replace(',', '.'));
-    const dec = raw.includes(',') ? raw.split(',')[1].length : 0;
-    const sign = raw.startsWith('+') ? '+' : '';
-    const t0 = performance.now() + j * 120;
-    const step = (t) => {
-      const k = Math.max(0, Math.min(1, (t - t0) / 1200));
-      el.textContent = sign + fmt(target * (1 - (1 - k) ** 3), dec);
-      if (k < 1) requestAnimationFrame(step);
-      else el.textContent = raw;
-    };
-    requestAnimationFrame(step);
-  });
-  io.disconnect();
-}, { threshold: 0.5 }).observe(kpiBox);
 $('[data-replay]')?.addEventListener('click', () => draw(true));
 
 reveal();
-mailtoForm($('[data-form]'), (d) => `Partenaires New Box — ${d.get('demande')} (${d.get('institution')})`);
+
