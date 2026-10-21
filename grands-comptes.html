@@ -263,8 +263,36 @@
           <h2 id="t-bench" data-split>Les papetiers qui font le marché.</h2>
           <p class="lead" data-up>Du papetier voisin de Kairouan aux géants mondiaux : qui produit quoi, à quelle échelle, et ce que cela change pour votre approvisionnement.</p>
         </header>
-        <div class="filter" role="group" aria-label="Filtrer par zone" data-filter></div>
-        <div class="bench" data-bench></div>
+        <div class="bench-bar">
+          <div class="filter" role="group" aria-label="Filtrer par zone" data-filter></div>
+          <button type="button" class="sort-btn" data-sort>Trier : par zone</button>
+        </div>
+        <div class="chart-card scale-card">
+          <div class="chart-card__head">
+            <div>
+              <h3>L’échelle de chacun, en tonnes publiées</h3>
+              <p>Échelle logarithmique : chaque graduation vaut 10 fois la précédente. La mesure publiée (capacité, production, livraisons) figure sous chaque nom.</p>
+            </div>
+            <ul class="legend"><li><i style="--c: #f49c21"></i>Tunisie</li><li><i style="--c: #3550d0"></i>Méditerranée</li><li><i style="--c: #0d1642"></i>Mondial</li></ul>
+          </div>
+          <div class="tons" data-tons></div>
+        </div>
+        <div class="bench-grid" data-bench></div>
+      </section>
+
+      <section class="sec sec--dark comment" aria-labelledby="t-comment">
+        <p class="comment__eyebrow"><span class="live"></span>Notre commentaire</p>
+        <h2 id="t-comment" data-split>Les géants fixent le prix. La proximité protège votre approvisionnement.</h2>
+        <div class="grid" data-up data-up-children>
+          <article class="card"><b class="comment__n">+250 €/t</b><h3>Le tempo vient du Nord</h3><p>SCA a annoncé +90, +60 puis +100 €/t sur le kraftliner européen depuis janvier 2025. Smurfit Westrock et International Paper donnent le même signal des deux côtés de l’Atlantique.</p></article>
+          <article class="card"><b class="comment__n">&gt; 2 Mt/an</b><h3>La Méditerranée s’équipe</h3><p>Modern Karton, Kipaş et Mondi Duino ont ajouté de la capacité recyclée en Turquie et en Italie : une source alternative, à quelques jours de mer.</p></article>
+          <article class="card"><b class="comment__n">0 change</b><h3>Le local en dinars</h3><p>Afripaper (Chebika, gouvernorat de Kairouan) et Sotipapier produisent testliner et fluting en Tunisie : délais courts, achats en dinars, sans risque de change.</p></article>
+        </div>
+        <div class="comment__foot">
+          <p>Pour vous, cela se traduit par un contrat-cadre dont la révision de prix suit ces sources publiques, avec un préavis convenu. Vous savez pourquoi le prix bouge, et de combien.</p>
+          <a class="btn" href="#consultation" data-magnet>Parler de votre contrat-cadre</a>
+        </div>
+        <p class="comment__note">Commentaire de New Box, à valider par la direction avant publication.</p>
       </section>
 
       <!-- ============ FAQ ============ -->

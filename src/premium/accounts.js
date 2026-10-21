@@ -68,34 +68,88 @@ $('[data-timeline]')?.append(
   }),
 );
 
-// benchmark papetiers
+// benchmark papetiers : barres de tonnage (échelle log) + fiches, animations rejouées à chaque filtre
 const bench = $('[data-bench]');
 const filter = $('[data-filter]');
-if (bench && filter) {
-  const rows = SUPPLIERS.map((sup) => {
-    const r = h('article', 'card bench__row');
-    r.dataset.scope = sup.scope;
-    const a = h('div');
-    a.append(h('h3', '', sup.name), h('p', 'where', sup.country), h('span', 'bench__scope', SCOPES[sup.scope]));
-    const b = h('div', 'bench__tags');
-    b.append(...sup.grades.map((g) => h('span', '', g)), h('span', '', `Fibre ${sup.fibre.toLowerCase()}`));
-    const c = h('div');
-    c.append(h('b', 'scale', sup.scale), h('p', '', sup.edge), srcLink(sup.src));
-    r.append(a, b, c);
-    return r;
-  });
-  bench.append(...rows);
+const tons = $('[data-tons]');
+if (bench && filter && tons) {
+  const COLORS = { local: '#f49c21', med: '#3550d0', world: '#0d1642' };
+  const fmtT = (t) => (t >= 1e6 ? `${(t / 1e6).toLocaleString('fr-FR', { maximumFractionDigits: 2 })} Mt` : `${t.toLocaleString('fr-FR')} t`);
+  const logW = (t) => Math.max(2, ((Math.log10(t) - 4) / 3) * 100); // 10 000 t → 10 Mt
+  let zone = 'all';
+  let bySize = false;
+
+  const render = () => {
+    let list = SUPPLIERS.filter((x) => zone === 'all' || x.scope === zone);
+    if (bySize) list = [...list].sort((a, b) => (b.tons || 0) - (a.tons || 0));
+    tons.replaceChildren();
+    list.filter((x) => x.tons).forEach((x, i) => {
+      const row = h('div', 'tons__row');
+      const lab = h('div', 'tons__label');
+      lab.append(h('b', '', x.name), h('span', '', x.metric));
+      const track = h('div', 'tons__track');
+      const bar = h('i', 'boom-bar');
+      bar.style.cssText = `width:${logW(x.tons)}%;background:${COLORS[x.scope]};animation-delay:${0.1 + i * 0.12}s`;
+      const val = h('em', 'boom', fmtT(x.tons));
+      val.style.cssText = `left:calc(${logW(x.tons)}% + 12px);animation-delay:${0.3 + i * 0.12}s`;
+      track.append(bar, val);
+      row.append(lab, track);
+      tons.append(row);
+    });
+    const axis = h('div', 'tons__row tons__row--axis');
+    const ticks = h('div', 'tons__axis');
+    ['10 000 t', '100 000 t', '1 Mt', '10 Mt'].forEach((t) => ticks.append(h('span', '', t)));
+    axis.append(h('span'), ticks);
+    tons.append(axis);
+
+    bench.replaceChildren();
+    list.forEach((sup, i) => {
+      const c = h('article', `card bench-card boom is-${sup.scope}`);
+      c.dataset.spotlight = '';
+      c.style.animationDelay = `${i * 0.08}s`;
+      const top = h('div', 'bench-card__top');
+      const id = h('div');
+      id.append(h('span', 'bench-card__zone', SCOPES[sup.scope]), h('h3', '', sup.name), h('p', 'where', sup.country));
+      top.append(id, h('span', 'bench-card__rank', String(SUPPLIERS.indexOf(sup) + 1).padStart(2, '0')));
+      const tags = h('div', 'bench__tags');
+      tags.append(...sup.grades.map((g) => h('span', '', g)), h('span', 'is-soft', `Fibre ${sup.fibre.toLowerCase()}`));
+      c.append(top, tags, h('b', 'scale', sup.scale), h('p', 'edge', sup.edge), srcLink(sup.src));
+      bench.append(c);
+    });
+  };
+
   const choices = [['all', 'Tous'], ...Object.entries(SCOPES)];
   for (const [key, label] of choices) {
     const btn = h('button', '', label);
     btn.type = 'button';
+    btn.append(h('small', '', String(key === 'all' ? SUPPLIERS.length : SUPPLIERS.filter((x) => x.scope === key).length)));
     btn.setAttribute('aria-pressed', key === 'all');
     btn.addEventListener('click', () => {
       filter.querySelectorAll('button').forEach((x) => x.setAttribute('aria-pressed', x === btn));
-      rows.forEach((r) => (r.hidden = key !== 'all' && r.dataset.scope !== key));
+      zone = key;
+      render();
     });
     filter.append(btn);
   }
+  const sortBtn = $('[data-sort]');
+  sortBtn.addEventListener('click', () => {
+    bySize = !bySize;
+    sortBtn.textContent = `Trier : ${bySize ? 'par taille' : 'par zone'}`;
+    render();
+  });
+  // première animation à l'entrée dans l'écran
+  const sec = $('#papetiers');
+  sec.classList.add('is-wait');
+  render();
+  new IntersectionObserver(
+    (e, io) => {
+      if (!e[0].isIntersecting) return;
+      sec.classList.remove('is-wait');
+      render();
+      io.disconnect();
+    },
+    { threshold: 0.15 },
+  ).observe(sec);
 }
 
 initPremium();

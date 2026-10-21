@@ -98,6 +98,8 @@ export const TIMELINE = [
 export const SUPPLIERS = [
   {
     name: 'Afripaper',
+    tons: 100000, // tonnage publié (voir scale)
+    metric: 'capacité annuelle',
     country: 'Tunisie · Chebika (Kairouan)',
     scope: 'local',
     grades: ['Testliner', 'Fluting'],
@@ -108,6 +110,8 @@ export const SUPPLIERS = [
   },
   {
     name: 'Sotipapier',
+    tons: 47969, // tonnage publié (voir scale)
+    metric: 'production 2025',
     country: 'Tunisie · cotée à la BVMT',
     scope: 'local',
     grades: ['Testliner', 'Fluting', 'Kraft sacs'],
@@ -118,6 +122,8 @@ export const SUPPLIERS = [
   },
   {
     name: 'Modern Karton (Eren)',
+    tons: 1450000, // tonnage publié (voir scale)
+    metric: 'capacité annuelle',
     country: 'Turquie',
     scope: 'med',
     grades: ['Testliner', 'Fluting'],
@@ -128,6 +134,8 @@ export const SUPPLIERS = [
   },
   {
     name: 'Kipaş Kağıt',
+    tons: 650000, // tonnage publié (voir scale)
+    metric: 'capacité ajoutée (PM3)',
     country: 'Turquie',
     scope: 'med',
     grades: ['Testliner', 'Fluting'],
@@ -138,6 +146,8 @@ export const SUPPLIERS = [
   },
   {
     name: 'Mondi',
+    tons: 2100000, // tonnage publié (voir scale)
+    metric: 'production 2025 (carton vierge)',
     country: 'Autriche · Royaume-Uni',
     scope: 'med',
     grades: ['Kraftliner', 'Testliner', 'Fluting'],
@@ -178,6 +188,8 @@ export const SUPPLIERS = [
   },
   {
     name: 'Klabin',
+    tons: 162000, // tonnage publié (voir scale)
+    metric: 'livraisons T1 2026 (un trimestre)',
     country: 'Brésil',
     scope: 'world',
     grades: ['Kraftliner'],
