@@ -31,6 +31,9 @@ export class ChapterUI {
     const r = inStory ? this.story.activeAt(time) : null;
     const id = r?.id ?? null;
     if (id !== this.active) {
+      // en quittant le test qualité, les compteurs reprennent leurs valeurs finales : le chapitre
+      // inactif reste lu par les lecteurs d'écran (ni « 0 » ni valeur intermédiaire)
+      if (this.active === 'qualite') this._updateCounters(1);
       this.active = id;
       document.querySelectorAll('#story .chapter').forEach((el) => el.classList.toggle('is-active', el.id === id));
       this.rail.forEach((el) => el.classList.toggle('is-active', el.dataset.target === id));
@@ -44,7 +47,9 @@ export class ChapterUI {
 
     if (id === 'cannelures' || id === 'anatomie') this._updateFlute(st.flute);
     if (id === 'qualite') this._updateCounters(st.ect);
-    if (id === 'fabrication' && r) this._updateSteps((time - r.start) / (r.end - r.start));
+    // un chapitre est actif de start − 0,35 à end − 0,35 (activeAt) : les 4 étapes se répartissent
+    // sur toute cette fenêtre, la dernière a donc autant de temps que les autres
+    if (id === 'fabrication' && r) this._updateSteps((time - r.start + 0.35) / (r.end - r.start));
   }
 
   _updateFlute(f) {

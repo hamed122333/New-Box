@@ -10,7 +10,9 @@ Le site est 100 % statique : `npm.cmd run build` produit `dist/`, à déposer à
    (fichier caché : activer l'affichage des fichiers cachés dans le client FTP).
 4. Vérifier : https://newbox.com.tn/ , une URL inexistante (page 404), `robots.txt`, `sitemap.xml`, `llms.txt`
    (résumé du site pour les agents IA, `public/llms.txt` : à tenir à jour avec les pages publiées, la gamme et
-   les délais de `src/data/products.js` ; retirer la mise en garde sur `partenaires.html` quand `DEMO` passe à `false`).
+   les délais de `src/data/products.js`). `grands-comptes.html` et `partenaires.html` sont des présentations de
+   travail pour la direction : `noindex`, absentes du sitemap et de `llms.txt` ; une fois validées (chiffres réels,
+   `DEMO` à `false`), retirer le `noindex` et les ajouter au sitemap et à `llms.txt`.
 5. Google Search Console : ajouter la propriété `newbox.com.tn` et soumettre `sitemap.xml`.
 
 `public/.htaccess` (Apache) force HTTPS sans `www`, active la compression, le cache long des fichiers

@@ -4,6 +4,9 @@ import '../styles/dashboard.css';
 
 // Utilitaires partagés des tableaux de bord (pas de Three.js ni de bibliothèque de graphiques).
 
+// le module s'exécute : le repli « sans JS » du script du <head> est désarmé
+window.__nbBoot?.();
+
 export const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
 document.documentElement.classList.add('js');
 document.querySelectorAll('[data-year]').forEach((el) => (el.textContent = new Date().getFullYear()));

@@ -4,10 +4,29 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <!-- .js avant le 1er affichage : les cartes [data-in] restent masquées jusqu'au fondu (pas de clignotement) -->
-    <script>document.documentElement.classList.add('js');addEventListener('error',function(e){var t=e.target;if(t&&t.tagName==='SCRIPT')document.documentElement.classList.remove('js')},true)</script>
+    <script>
+      // .js dès le 1er affichage (pas de saut de mise en page). Repli « sans JS » si le module d'entrée
+      // ne se charge pas ou ne s'exécute pas dans les 15 s ; le module appelle __nbBoot() pour désarmer.
+      (function (h) {
+        h.classList.add('js');
+        function fail(e) {
+          var t = e.target;
+          if (t && t.tagName === 'SCRIPT' && t.type === 'module') h.classList.remove('js');
+        }
+        addEventListener('error', fail, true);
+        var timer = setTimeout(function () { h.classList.remove('js'); }, 15000);
+        window.__nbBoot = function () {
+          removeEventListener('error', fail, true);
+          clearTimeout(timer);
+          h.classList.add('js');
+        };
+      })(document.documentElement);
+    </script>
     <title>Partenaires — New Box</title>
     <meta name="description" content="Espace partenaires New Box : ce que la confiance de nos partenaires financiers a construit à Kairouan, notre croissance et nos engagements de transparence." />
     <meta name="theme-color" content="#14259B" />
+    <!-- présentation de travail pour la direction : hors des moteurs de recherche tant qu'elle n'est pas validée -->
+    <meta name="robots" content="noindex" />
     <link rel="canonical" href="https://newbox.com.tn/partenaires.html" />
     <link rel="icon" href="/favicon-32.png" type="image/png" sizes="32x32" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />

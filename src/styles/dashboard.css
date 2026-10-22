@@ -15,8 +15,9 @@
   --orange: #f49c21;
   /* orange foncé pour le texte sur fond clair (≥ 5:1 sur papier, cartes et #fdf1dd) */
   --orange-ink: #9c5000;
-  /* orange au plus près de la charte pour les grands textes (≥ 24 px : 3:1 suffit, 3,1:1 sur le papier) */
-  --orange-display: #cc7000;
+  /* orange au plus près de la charte pour les grands textes (≥ 24 px : 3:1 suffit) : 3,55:1 sur le
+     papier, ≥ 3,2:1 sur les zones les plus foncées du dégradé de fond */
+  --orange-display: #bf6600;
   --orange-soft: #fdf1dd;
   --navy: #0d1642;
   --green: #12805c;
@@ -866,6 +867,11 @@ td small {
   font-size: 11px;
   font-weight: 600;
   fill: var(--ink);
+  /* halo de la couleur de la carte : l'étiquette reste lisible quand une autre courbe la croise */
+  paint-order: stroke;
+  stroke: var(--card);
+  stroke-width: 3px;
+  stroke-linejoin: round;
 }
 
 .legend {
@@ -1663,12 +1669,18 @@ body.present {
 
 .p-hero__box {
   display: block;
+  opacity: 0;
+  transition: opacity 0.6s ease;
   width: 100%;
   max-width: 440px;
   aspect-ratio: 1 / 0.9;
   justify-self: end;
   cursor: grab;
   touch-action: pan-y;
+}
+
+.p-hero__box.is-ready {
+  opacity: 1;
 }
 
 .p-hero__box:active {

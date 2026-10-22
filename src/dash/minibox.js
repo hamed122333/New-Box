@@ -81,7 +81,11 @@ export async function miniBox(canvas) {
     camera.aspect = w / h;
     camera.updateProjectionMatrix();
   };
-  new ResizeObserver(resize).observe(canvas);
+  let lastSpin = NaN; // dernière rotation dessinée (mouvement réduit : rendu seulement si elle change)
+  new ResizeObserver(() => {
+    resize();
+    lastSpin = NaN; // redessiner après un redimensionnement, même en mouvement réduit
+  }).observe(canvas);
   resize();
 
   // glisser pour tourner
@@ -97,10 +101,17 @@ export async function miniBox(canvas) {
   let visible = true;
   new IntersectionObserver((e) => (visible = e[0].isIntersecting)).observe(canvas);
 
+  // shaders compilés et textures envoyées avant d'afficher la caisse (fondu), sans bloquer la page
+  await Promise.race([renderer.compileAsync(scene, camera), new Promise((r) => setTimeout(r, 4000))]).catch(() => {});
+  canvas.classList.add('is-ready');
+
   const t0 = performance.now();
   const frame = (now) => {
     requestAnimationFrame(frame);
     if (!visible) return;
+    // mouvement réduit : la caisse est immobile, on ne redessine qu'au glisser
+    if (reduced && spin === lastSpin) return;
+    lastSpin = spin;
     const t = reduced ? 0 : (now - t0) / 1000;
     // balancement de la caisse comme à l'ouverture de l'accueil (rotY −0,22, idle)
     box.group.rotation.y = -0.22 + 0.28 * Math.sin(t * 0.45) + spin;

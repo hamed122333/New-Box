@@ -5,9 +5,9 @@ import { h, svg, fmt, reduced, tip, hideTip } from './common.js';
 // relevé, annonce en pointillés, réticule au survol.
 
 const ease = (t) => 1 - (1 - t) ** 3;
-// texte (compteurs, étiquettes) : l'orange de la charte n'atteint que 2:1 sur fond clair,
-// on l'écrit en orange foncé ; traits, aires et halos gardent la couleur de la série
-// orange de la charte en texte : foncé pour le petit texte (4,5:1), « display » pour les compteurs (≥ 24 px, 3:1)
+// texte en orange : l'orange de la charte n'atteint que 2:1 sur fond clair. Petit texte en orange
+// foncé (4,5:1), compteurs (≥ 24 px, 3:1) en orange « display » ; traits, aires et halos gardent
+// la couleur de la série
 const ink = (c, large = false) => (c.toLowerCase() === '#f49c21' ? (large ? 'var(--orange-display)' : 'var(--orange-ink)') : c);
 
 function countUp(el, to, { prefix = '+', suffix = ' €/t', duration = 1400, delay = 0 } = {}) {

@@ -27,6 +27,8 @@ import certsPngUrl from './assets/brand/certifications.png';
 
 
 const root = document.documentElement;
+// le module s'exécute : le repli « sans JS » du script du <head> est désarmé (voir index.html)
+window.__nbBoot?.();
 // ?capture : horloge pilotée de l'extérieur (enregistrement vidéo image par image)
 const capture = new URLSearchParams(location.search).has('capture');
 const reduced = capture || matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -87,7 +89,7 @@ function setupScroll() {
  * fenceSync sondé à chaque image ; sinon simple flush). Sans cela, tout le travail GPU de la
  * pré-compilation tombe sur la première image visible et la page se fige à l'apparition de la 3D.
  */
-async function gpuIdle(gl, max = 3000) {
+async function gpuIdle(gl, max = 10000) {
   gl.flush();
   if (!gl.fenceSync) return;
   const sync = gl.fenceSync(gl.SYNC_GPU_COMMANDS_COMPLETE, 0);
@@ -130,7 +132,6 @@ async function warmUp({ stage, board, stack, xp }) {
       stage.world = 'macro';
       stage.render();
     });
-    await gpuIdle(gl);
   } catch (err) {
     console.warn('Pré-compilation incomplète :', err);
   }
@@ -150,11 +151,16 @@ function hideLoader() {
 // Le configurateur est écrit dans le HTML : tant qu'il n'est pas branché (fin du chargement),
 // il reste inerte et signalé « occupé » pour que rien de ce qui y est saisi ne soit perdu.
 const cfgPanel = document.querySelector('#configurateur .config__panel');
-let configured = false;
+let cfgInstance = null; // une seule instance (3D ou repli sans 3D)
+let stage = null;
+let tick = null;
 const setConfigReady = (ok) => {
-  configured = ok;
   cfgPanel.inert = !ok;
-  cfgPanel.toggleAttribute('aria-busy', !ok);
+  if (ok) cfgPanel.removeAttribute('aria-busy');
+  else cfgPanel.setAttribute('aria-busy', 'true');
+};
+const configWithout3D = () => {
+  cfgInstance ??= new Configurator(document.querySelector('#configurateur'), { onSpec: () => {}, onCapture: async () => null });
 };
 setConfigReady(false);
 
@@ -174,14 +180,13 @@ async function init() {
     document.fonts.load('400 32px "Inter Variable"'),
   ]).catch(() => {});
 
-  let stage;
   try {
     stage = new Stage(canvas);
   } catch (err) {
     console.warn('WebGL indisponible :', err);
     root.classList.add('no-webgl');
     setupScroll();
-    new Configurator(document.querySelector('#configurateur'), { onSpec: () => {}, onCapture: async () => null });
+    configWithout3D();
     setConfigReady(true);
     hideLoader();
     return;
@@ -270,7 +275,7 @@ async function init() {
 
   // la palette n'est visible que dans le récit : on la recalcule en y revenant
   let stackDirty = false;
-  const cfg = new Configurator(cfgRoot, {
+  const cfg = (cfgInstance = new Configurator(cfgRoot, {
     onSpec: (patch, opts) => {
       box.build(patch, opts);
       stackDirty = true;
@@ -281,7 +286,7 @@ async function init() {
       invalidate();
       return blob;
     },
-  });
+  }));
   setConfigReady(true);
 
   // Quelle partie de la page est visible ?
@@ -350,9 +355,13 @@ async function init() {
     }
   };
 
+  // le GPU finit la pré-compilation sans bloquer le fil principal (héros et configurateur déjà
+  // utilisables) ; la 3D apparaît ensuite, à la 1re image
+  await gpuIdle(stage.renderer.getContext());
+
   let last = performance.now();
   let clock = 0;
-  gsap.ticker.add(() => {
+  gsap.ticker.add((tick = () => {
     const now = performance.now();
     const dt = Math.min(0.1, (now - last) / 1000);
     last = now;
@@ -361,7 +370,7 @@ async function init() {
       return;
     }
     frame(reduced ? 0 : dt, reduced ? 0 : now / 1000);
-  });
+  }));
 
   window.addEventListener('resize', () => ScrollTrigger.refresh());
   if (coarse) root.classList.add('is-touch');
@@ -389,9 +398,16 @@ async function init() {
 
 init().catch((err) => {
   console.error('Initialisation de la 3D interrompue :', err);
+  // mise en page sans 3D d'abord : quoi qu'il arrive ensuite, la page ne reste pas en chargement
   root.classList.add('no-webgl');
-  // estimations et devis restent disponibles sans la 3D (comme le chemin sans WebGL)
-  if (!configured) new Configurator(document.querySelector('#configurateur'), { onSpec: () => {}, onCapture: async () => null });
-  setConfigReady(true);
   hideLoader();
+  if (tick) gsap.ticker.remove(tick);
+  stage?.renderer.dispose();
+  // estimations et devis restent disponibles sans la 3D (comme le chemin sans WebGL)
+  try {
+    configWithout3D();
+    setConfigReady(true);
+  } catch (e) {
+    console.error('Configurateur indisponible :', e);
+  }
 });

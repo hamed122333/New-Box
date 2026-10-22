@@ -4,7 +4,24 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <!-- .js avant le 1er affichage : la mise en page « sans JS » n'apparaît jamais (pas de saut) -->
-    <script>document.documentElement.classList.add('js');addEventListener('error',function(e){var t=e.target;if(t&&t.tagName==='SCRIPT')document.documentElement.classList.remove('js')},true)</script>
+    <script>
+      // .js dès le 1er affichage (pas de saut de mise en page). Repli « sans JS » si le module d'entrée
+      // ne se charge pas ou ne s'exécute pas dans les 15 s ; le module appelle __nbBoot() pour désarmer.
+      (function (h) {
+        h.classList.add('js');
+        function fail(e) {
+          var t = e.target;
+          if (t && t.tagName === 'SCRIPT' && t.type === 'module') h.classList.remove('js');
+        }
+        addEventListener('error', fail, true);
+        var timer = setTimeout(function () { h.classList.remove('js'); }, 15000);
+        window.__nbBoot = function () {
+          removeEventListener('error', fail, true);
+          clearTimeout(timer);
+          h.classList.add('js');
+        };
+      })(document.documentElement);
+    </script>
     <!-- polices du héros et des textures 3D (sous-ensemble latin) : demandées dès l'analyse du HTML -->
     <link rel="preload" href="/node_modules/@fontsource-variable/inter/files/inter-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="preload" href="/node_modules/@fontsource-variable/space-grotesk/files/space-grotesk-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin />
@@ -211,11 +228,13 @@
               Compression sur chant (ECT), gerbage (BCT), éclatement, absorption d’eau (Cobb) : chaque référence est
               définie par des valeurs mesurables.
             </p>
+            <!-- valeurs finales de src/lib/calc.js (caisse BC 400 × 300 × 300, papiers du récit), lisibles sans JS
+                 et par les lecteurs d’écran ; ChapterUI les recalcule et les anime depuis 0 à l’entrée du chapitre -->
             <div class="counters">
-              <div class="counter"><span class="counter__value"><b data-counter="ect">0</b><i>kN/m</i></span><span class="counter__label">ECT · compression sur chant</span></div>
-              <div class="counter"><span class="counter__value"><b data-counter="bct">0</b><i>kgf</i></span><span class="counter__label">BCT · caisse 400 × 300 × 300</span></div>
-              <div class="counter"><span class="counter__value"><b data-counter="burst">0</b><i>kPa</i></span><span class="counter__label">Résistance à l’éclatement</span></div>
-              <div class="counter"><span class="counter__value"><b data-counter="cobb">0</b><i>g/m²</i></span><span class="counter__label">Cobb 60 s · absorption d’eau</span></div>
+              <div class="counter"><span class="counter__value"><b data-counter="ect">10,8</b><i>kN/m</i></span><span class="counter__label">ECT · compression sur chant</span></div>
+              <div class="counter"><span class="counter__value"><b data-counter="bct">638</b><i>kgf</i></span><span class="counter__label">BCT · caisse 400 × 300 × 300</span></div>
+              <div class="counter"><span class="counter__value"><b data-counter="burst">1 337</b><i>kPa</i></span><span class="counter__label">Résistance à l’éclatement</span></div>
+              <div class="counter"><span class="counter__value"><b data-counter="cobb">32</b><i>g/m²</i></span><span class="counter__label">Cobb 60 s · absorption d’eau</span></div>
             </div>
             <small class="note">Caisse double cannelure BC, papiers KL / FL / TL. Valeurs indicatives calculées (formule de McKee).</small>
           </div>
@@ -378,6 +397,10 @@
           <p class="config__nogl">La vue 3D nécessite WebGL. Les estimations restent disponibles.</p>
         </div>
 
+        <p class="config__nojs">
+          Le configurateur 3D nécessite JavaScript. Pour un devis, écrivez-nous :
+          <a href="mailto:info@newbox.com.tn">info@newbox.com.tn</a>.
+        </p>
         <form class="config__panel" onsubmit="return false" aria-labelledby="config-title">
           <header>
             <p class="eyebrow">Configurateur 3D</p>

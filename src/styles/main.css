@@ -153,7 +153,15 @@ html[data-mode='config'] #webgl:active {
    tout de suite, la 3D reste masquée. opacity 0 (et non 0,01) : un canevas visible serait
    composité à chaque rendu de warmUp et bloquerait le fil principal. À la 1re image, #hero
    reçoit .is-active dans la même tâche, avec le même état calculé : ni transition ni saut. */
+html.js:not([data-ready]) #hero {
+  position: relative;
+}
+
+/* en absolu dans #hero (même place qu'en fixe à scrollY = 0) : sur une ancre ou un rechargement en
+   milieu de page, le héros reste dans sa section au lieu de passer par-dessus le contenu */
 html.js:not([data-ready]) #hero .chapter__content {
+  position: absolute;
+  top: calc(50svh + var(--header-h) / 2);
   opacity: 1;
   pointer-events: auto;
   transform: translate3d(0, -50%, 0);
@@ -403,6 +411,10 @@ html[data-mode='config'] .rail {
   white-space: nowrap;
   font-size: 12px;
   color: var(--text);
+  /* pastille de voile : le libellé passe parfois sur l'échantillon 3D */
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--scrim);
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.25s, transform 0.25s var(--ease);
@@ -457,10 +469,13 @@ html[data-mode='config'] .rail {
   content: '';
   position: absolute;
   z-index: -1;
-  inset: -18% -8% -18% calc(-1 * var(--gutter) - 10vw);
-  /* voile resserré sur le texte (plein jusqu'à 45 %, peu de débord à droite) : le texte reste
-     lisible quand la caisse passe dessous, sans masquer l'échantillon 3D voisin */
-  background: radial-gradient(closest-side, var(--scrim) 45%, transparent 100%);
+  inset: -12% -96px -12% calc(-1 * var(--gutter));
+  /* voile limité à la colonne de texte : plein jusqu'au bout des lignes puis fondu (96 px à
+     droite, 14 % en haut et en bas). Le texte garde ≥ 4,5:1 même quand l'échantillon macro
+     passe dessous, et la 3D reste nette à droite de la colonne. */
+  background: linear-gradient(90deg, var(--scrim) calc(100% - 96px), transparent);
+  -webkit-mask-image: linear-gradient(transparent, #000 14%, #000 86%, transparent);
+  mask-image: linear-gradient(transparent, #000 14%, #000 86%, transparent);
   pointer-events: none;
   transition: background 0.4s;
 }
@@ -849,18 +864,13 @@ html:not([data-world='macro']) .chapter.is-active .chapter__content {
   color: var(--text-2);
 }
 
-.steps li:not(.is-active):not(.is-done) span {
-  font-size: 13.5px;
-}
-
 .steps li:not(.is-active):not(.is-done)::before {
   border-style: dashed;
-  opacity: 0.55;
+  border-color: color-mix(in srgb, currentColor 45%, transparent);
 }
 
 .steps li.is-done::before {
   content: '✓';
-  border-color: var(--accent);
   color: var(--text);
 }
 
@@ -1791,9 +1801,41 @@ html:not(.js) .chapter__content::before,
 }
 
 .no-webgl .flute-card,
-.no-webgl .counter {
+.no-webgl .counter,
+html:not(.js) .flute-card,
+html:not(.js) .counter {
   background: var(--dark-2);
   color: var(--paper);
+  /* textes internes (var(--text) / --text-2) lisibles sur le fond sombre */
+  --text: var(--paper);
+  --text-2: var(--muted-on-dark);
+}
+
+/* 3D interrompue (échec d'initialisation) : pas de dernière image de pré-compilation en fond */
+.no-webgl #webgl {
+  display: none;
+}
+
+/* sans JavaScript, le configurateur ne peut rien calculer : message et contact à la place */
+.config__nojs {
+  display: none;
+}
+
+html:not(.js) .config__viewer,
+html:not(.js) .config__panel {
+  display: none;
+}
+
+html:not(.js) .config__nojs {
+  display: block;
+  padding: 48px var(--gutter);
+  color: var(--ink-2);
+}
+
+/* configurateur pas encore branché (chargement de la 3D) */
+.config__panel[inert] {
+  opacity: 0.6;
+  cursor: progress;
 }
 
 /* ---------- responsive ---------- */
@@ -1905,6 +1947,10 @@ html:not(.js) .chapter__content::before,
   .chapter.is-active .chapter__content,
   html.js:not([data-ready]) #hero .chapter__content {
     transform: translate3d(0, 0, 0);
+  }
+
+  html.js:not([data-ready]) #hero .chapter__content {
+    top: auto;
   }
 
   /* chargement : bandeau au-dessus de la carte du héros (placée en bas d'écran) */
