@@ -3,6 +3,11 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- .js avant le 1er affichage : la mise en page « sans JS » n'apparaît jamais (pas de saut) -->
+    <script>document.documentElement.classList.add('js');addEventListener('error',function(e){var t=e.target;if(t&&t.tagName==='SCRIPT')document.documentElement.classList.remove('js')},true)</script>
+    <!-- polices du héros et des textures 3D (sous-ensemble latin) : demandées dès l'analyse du HTML -->
+    <link rel="preload" href="/node_modules/@fontsource-variable/inter/files/inter-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/node_modules/@fontsource-variable/space-grotesk/files/space-grotesk-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin />
     <title>New Box — Emballage en carton ondulé sur mesure · Expérience 3D</title>
     <meta
       name="description"
@@ -50,7 +55,8 @@
       </p>
     </noscript>
     <div class="loader" data-loader aria-hidden="true">
-      <img class="loader__logo" src="/src/assets/brand/logo-new-box.png" alt="" width="604" height="634" />
+      <!-- logos de page en 112 / 224 px ; le 604 px ne sert qu'aux textures 3D (src/main.js, src/dash/minibox.js) -->
+      <img class="loader__logo" src="/src/assets/brand/logo-new-box-112.png" srcset="/src/assets/brand/logo-new-box-112.png 1x, /src/assets/brand/logo-new-box-224.png 2x" alt="" width="112" height="118" />
       <span class="loader__bar"><span></span></span>
       <p>Préparation de la matière…</p>
     </div>
@@ -80,7 +86,7 @@
 
     <header class="site-header">
       <a class="brand" href="#hero">
-        <img class="brand__logo" src="/src/assets/brand/logo-new-box.png" alt="New Box Tunisia — accueil" width="604" height="634" />
+        <img class="brand__logo" src="/src/assets/brand/logo-new-box-112.png" srcset="/src/assets/brand/logo-new-box-112.png 112w, /src/assets/brand/logo-new-box-224.png 224w" sizes="(max-width: 820px) 40px, 48px" alt="New Box Tunisia — accueil" width="112" height="118" />
       </a>
       <nav class="site-nav" aria-label="Navigation principale">
         <a href="#anatomie">Matière</a>
@@ -109,7 +115,7 @@
     <main>
       <!-- ============ RÉCIT 3D (scrollytelling) ============ -->
       <div id="story">
-        <section class="chapter chapter--hero" id="hero" data-units="1">
+        <section class="chapter chapter--hero" id="hero" data-units="1" style="--units: 1">
           <div class="chapter__content">
             <p class="eyebrow">Fabricant de carton ondulé · Kairouan, Tunisie</p>
             <h1>L’emballage qui protège ce qui compte.</h1>
@@ -124,7 +130,7 @@
           </div>
         </section>
 
-        <section class="chapter" id="ouverture" data-units="1.2">
+        <section class="chapter" id="ouverture" data-units="1.2" style="--units: 1.2">
           <div class="chapter__content">
             <p class="eyebrow"><span class="num">01</span>Sur mesure</p>
             <h2>Une caisse pensée pour votre produit.</h2>
@@ -142,7 +148,7 @@
           </div>
         </section>
 
-        <section class="chapter" id="plongee" data-units="1">
+        <section class="chapter" id="plongee" data-units="1" style="--units: 1">
           <div class="chapter__content">
             <p class="eyebrow"><span class="num">02</span>Au cœur de la matière</p>
             <h2>Regardons de plus près.</h2>
@@ -153,7 +159,7 @@
           </div>
         </section>
 
-        <section class="chapter" id="anatomie" data-units="1.5">
+        <section class="chapter" id="anatomie" data-units="1.5" style="--units: 1.5">
           <div class="chapter__content">
             <p class="eyebrow"><span class="num">03</span>Anatomie</p>
             <h2>Trois papiers, une structure.</h2>
@@ -170,7 +176,7 @@
           </div>
         </section>
 
-        <section class="chapter" id="cannelures" data-units="2.4">
+        <section class="chapter" id="cannelures" data-units="2.4" style="--units: 2.4">
           <div class="chapter__content">
             <p class="eyebrow"><span class="num">04</span>Cannelures</p>
             <h2>Choisir la bonne onde.</h2>
@@ -197,7 +203,7 @@
           </div>
         </section>
 
-        <section class="chapter" id="qualite" data-units="1.5">
+        <section class="chapter" id="qualite" data-units="1.5" style="--units: 1.5">
           <div class="chapter__content">
             <p class="eyebrow"><span class="num">05</span>Qualité</p>
             <h2>La résistance se mesure.</h2>
@@ -215,7 +221,7 @@
           </div>
         </section>
 
-        <section class="chapter" id="fabrication" data-units="1.8">
+        <section class="chapter" id="fabrication" data-units="1.8" style="--units: 1.8">
           <div class="chapter__content">
             <p class="eyebrow"><span class="num">06</span>Fabrication</p>
             <h2>De la bobine à la caisse.</h2>
@@ -228,7 +234,7 @@
           </div>
         </section>
 
-        <section class="chapter" id="palette" data-units="1.5">
+        <section class="chapter" id="palette" data-units="1.5" style="--units: 1.5">
           <div class="chapter__content">
             <p class="eyebrow"><span class="num">07</span>Logistique</p>
             <h2>Livrées à plat, prêtes à monter.</h2>
@@ -239,7 +245,7 @@
           </div>
         </section>
 
-        <section class="chapter" id="engagement" data-units="2">
+        <section class="chapter" id="engagement" data-units="2" style="--units: 2">
           <div class="chapter__content">
             <p class="eyebrow"><span class="num">08</span>Engagement</p>
             <h2>Un matériau qui revient toujours.</h2>
@@ -341,7 +347,11 @@
           </div>
         </div>
         <div class="certs">
-          <img src="/src/assets/brand/certifications.png" alt="Certifications SGS : FSSC 22000, ISO 9001, ISO 45001 — FSC C191615" width="530" height="189" loading="lazy" />
+          <!-- même fichier WebP de 530 px que la texture 3D : un seul téléchargement ; PNG de secours -->
+          <picture>
+            <source type="image/webp" srcset="/src/assets/brand/certifications.webp" />
+            <img src="/src/assets/brand/certifications.png" alt="Certifications SGS : FSSC 22000, ISO 9001, ISO 45001 — FSC C191615" width="530" height="189" loading="lazy" decoding="async" />
+          </picture>
           <div>
             <h3>Certifications</h3>
             <p>
@@ -368,17 +378,28 @@
           <p class="config__nogl">La vue 3D nécessite WebGL. Les estimations restent disponibles.</p>
         </div>
 
-        <form class="config__panel" onsubmit="return false">
+        <form class="config__panel" onsubmit="return false" aria-labelledby="config-title">
           <header>
             <p class="eyebrow">Configurateur 3D</p>
-            <h2>Dessinez votre emballage.</h2>
+            <h2 id="config-title">Dessinez votre emballage.</h2>
             <p>Choisissez le produit, les dimensions, la cannelure et les papiers : le modèle 3D, les performances et le délai se mettent à jour en direct.</p>
           </header>
 
           <fieldset>
             <legend>Produit</legend>
-            <div class="prod" data-options="product" role="group" aria-label="Type de produit"></div>
-            <p class="lead-time"><span data-out="product-name"></span><b>Délai : <span data-out="lead"></span></b></p>
+            <!-- boutons écrits ici (et non injectés après le chargement 3D) : pas de saut à l'arrivée sur le
+                 configurateur ; à garder identiques à src/data/products.js (sinon régénérés, avec un avertissement) -->
+            <div class="prod" data-options="product" role="group" aria-label="Type de produit">
+              <button type="button" class="prod__btn" data-product="CI" aria-pressed="true" title="Caisse imprimée"><strong>CI</strong><span>Caisse imprimée</span></button>
+              <button type="button" class="prod__btn" data-product="CV" aria-pressed="false" title="Caisse vierge"><strong>CV</strong><span>Caisse vierge</span></button>
+              <button type="button" class="prod__btn" data-product="CID" aria-pressed="false" title="Caisse imprimée découpée"><strong>CID</strong><span>Imprimée découpée</span></button>
+              <button type="button" class="prod__btn" data-product="CVD" aria-pressed="false" title="Caisse vierge découpée"><strong>CVD</strong><span>Vierge découpée</span></button>
+              <button type="button" class="prod__btn" data-product="DI" aria-pressed="false" title="Découpe imprimée"><strong>DI</strong><span>Découpe imprimée</span></button>
+              <button type="button" class="prod__btn" data-product="DV" aria-pressed="false" title="Découpe vierge"><strong>DV</strong><span>Découpe vierge</span></button>
+              <button type="button" class="prod__btn" data-product="PL" aria-pressed="false" title="Plaque"><strong>PL</strong><span>Plaque</span></button>
+              <button type="button" class="prod__btn" data-product="PLR" aria-pressed="false" title="Plaque rainée"><strong>PLR</strong><span>Plaque rainée</span></button>
+            </div>
+            <p class="lead-time"><span data-out="product-name">CI — Caisse imprimée</span><b>Délai : <span data-out="lead">7 à 10 jours</span></b></p>
           </fieldset>
 
           <fieldset>
@@ -402,7 +423,15 @@
 
           <fieldset>
             <legend>Cannelure</legend>
-            <div class="seg" data-options="flute" role="group" aria-label="Type de cannelure"></div>
+            <!-- idem : à garder identiques à src/data/flutes.js (épaisseur en mm) -->
+            <div class="seg" data-options="flute" role="group" aria-label="Type de cannelure">
+              <button type="button" class="seg__btn" data-flute="F" aria-pressed="false"><strong>F</strong><span>1 mm</span></button>
+              <button type="button" class="seg__btn" data-flute="E" aria-pressed="false"><strong>E</strong><span>1,5 mm</span></button>
+              <button type="button" class="seg__btn" data-flute="B" aria-pressed="false"><strong>B</strong><span>3 mm</span></button>
+              <button type="button" class="seg__btn" data-flute="C" aria-pressed="true"><strong>C</strong><span>4 mm</span></button>
+              <button type="button" class="seg__btn" data-flute="EB" aria-pressed="false"><strong>EB</strong><span>4,5 mm</span></button>
+              <button type="button" class="seg__btn" data-flute="BC" aria-pressed="false"><strong>BC</strong><span>7 mm</span></button>
+            </div>
           </fieldset>
 
           <fieldset>
@@ -435,8 +464,10 @@
             <label class="toggle"><input type="checkbox" name="autorotate" /><span>Rotation automatique</span></label>
           </fieldset>
 
-          <section class="results" aria-live="polite">
+          <section class="results">
             <h3>Performances estimées</h3>
+            <!-- seule région live du panneau : une phrase courte après chaque réglage (configurator.js) -->
+            <p class="visually-hidden" aria-live="polite" data-out="announce"></p>
             <div class="gauge" data-gauge data-case-only aria-hidden="true"><span></span></div>
             <dl>
               <div class="results__main" data-case-only><dt>BCT (gerbage)</dt><dd data-out="bct"></dd></div>
@@ -444,7 +475,7 @@
               <div><dt>Éclatement</dt><dd data-out="burst"></dd></div>
               <div><dt>Grammage</dt><dd data-out="grammage"></dd></div>
               <div><dt data-out="weight-label">Poids de la caisse</dt><dd data-out="weight"></dd></div>
-              <div class="results__wide"><dt>Livraison sur palette</dt><dd data-out="pallet"></dd><small data-out="pallet-note"></small></div>
+              <div class="results__wide"><dt>Livraison sur palette</dt><dd data-out="pallet"></dd><dd class="results__note" data-out="pallet-note"></dd></div>
             </dl>
           </section>
 
@@ -466,35 +497,35 @@
           <p class="note">Estimations indicatives (formule de McKee, indices papier moyens). Les valeurs contractuelles sont établies par New Box.</p>
         </form>
       </section>
-
-      <!-- ============ CONTACT ============ -->
-      <footer class="contact" id="contact">
-        <div class="contact__cta">
-          <img class="contact__logo" src="/src/assets/brand/logo-new-box.png" alt="New Box Tunisia" width="604" height="634" loading="lazy" />
-          <p class="eyebrow">Contact</p>
-          <h2>Parlons de votre prochain emballage.</h2>
-          <a class="btn btn--light" href="mailto:info@newbox.com.tn">info@newbox.com.tn</a>
-        </div>
-        <div class="contact__info">
-          <div>
-            <h3>Usine</h3>
-            <p>Z.I Sbikha 2 — B.P 92<br />Kairouan, Tunisie</p>
-          </div>
-          <div>
-            <h3>Produits</h3>
-            <p>Plaques · Caisses américaines · Découpes imprimées · Croisillons · Calages sur mesure</p>
-          </div>
-          <div>
-            <h3>Web</h3>
-            <p><a href="https://newbox.com.tn/" rel="noopener">newbox.com.tn</a></p>
-          </div>
-        </div>
-        <p class="contact__legal">
-          © <span data-year>2026</span> New Box Tunisia · <a href="./grands-comptes.html">Grands comptes</a> ·
-          <a href="./partenaires.html">Partenaires</a> · <a href="./mentions-legales.html">Mentions légales</a>
-        </p>
-      </footer>
     </main>
+
+    <!-- ============ CONTACT (hors de <main> : landmark contentinfo) ============ -->
+    <footer class="contact" id="contact">
+      <div class="contact__cta">
+        <img class="contact__logo" src="/src/assets/brand/logo-new-box-112.png" srcset="/src/assets/brand/logo-new-box-112.png 1x, /src/assets/brand/logo-new-box-224.png 2x" alt="New Box Tunisia" width="96" height="101" loading="lazy" decoding="async" />
+        <p class="eyebrow">Contact</p>
+        <h2>Parlons de votre prochain emballage.</h2>
+        <a class="btn btn--light" href="mailto:info@newbox.com.tn">info@newbox.com.tn</a>
+      </div>
+      <div class="contact__info">
+        <div>
+          <h3>Usine</h3>
+          <p>Z.I Sbikha 2 — B.P 92<br />Kairouan, Tunisie</p>
+        </div>
+        <div>
+          <h3>Produits</h3>
+          <p>Plaques · Caisses américaines · Découpes imprimées · Croisillons · Calages sur mesure</p>
+        </div>
+        <div>
+          <h3>Web</h3>
+          <p><a href="https://newbox.com.tn/" rel="noopener">newbox.com.tn</a></p>
+        </div>
+      </div>
+      <p class="contact__legal">
+        © <span data-year>2026</span> New Box Tunisia · <a href="./grands-comptes.html">Grands comptes</a> ·
+        <a href="./partenaires.html">Partenaires</a> · <a href="./mentions-legales.html">Mentions légales</a>
+      </p>
+    </footer>
 
     <script type="module" src="/src/main.js"></script>
   </body>

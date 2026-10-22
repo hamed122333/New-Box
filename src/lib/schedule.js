@@ -6,3 +6,10 @@
 export function afterNextPaint(fn) {
   requestAnimationFrame(() => setTimeout(fn, 0));
 }
+
+/**
+ * Termine la tâche en cours et reprend dans une nouvelle : découpe un long calcul de
+ * chargement en étapes courtes (scheduler.yield si disponible, sinon setTimeout).
+ */
+export const yieldToMain = () =>
+  globalThis.scheduler?.yield ? globalThis.scheduler.yield() : new Promise((r) => setTimeout(r, 0));

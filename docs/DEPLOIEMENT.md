@@ -8,7 +8,9 @@ Le site est 100 % statique : `npm.cmd run build` produit `dist/`, à déposer à
 2. Sauvegarder l'ancien site (FTP / gestionnaire de fichiers de l'hébergeur).
 3. Copier **le contenu** de `dist/` à la racine web (`public_html/` sous cPanel), fichier `.htaccess` compris
    (fichier caché : activer l'affichage des fichiers cachés dans le client FTP).
-4. Vérifier : https://newbox.com.tn/ , une URL inexistante (page 404), `robots.txt`, `sitemap.xml`.
+4. Vérifier : https://newbox.com.tn/ , une URL inexistante (page 404), `robots.txt`, `sitemap.xml`, `llms.txt`
+   (résumé du site pour les agents IA, `public/llms.txt` : à tenir à jour avec les pages publiées, la gamme et
+   les délais de `src/data/products.js` ; retirer la mise en garde sur `partenaires.html` quand `DEMO` passe à `false`).
 5. Google Search Console : ajouter la propriété `newbox.com.tn` et soumettre `sitemap.xml`.
 
 `public/.htaccess` (Apache) force HTTPS sans `www`, active la compression, le cache long des fichiers
@@ -28,3 +30,6 @@ dans leur configuration propre.
 - Lighthouse (onglet Chrome DevTools) sur mobile : performance, accessibilité, SEO.
 - Test du partage : https://www.opengraph.xyz/ (image `og-newbox.jpg`, titre, description).
 - Sans WebGL / avec « réduire les animations » : le contenu et le devis restent accessibles.
+- En-têtes : `curl -I https://newbox.com.tn/assets/<fichier>.css` renvoie `immutable`, mais pas
+  `curl -I https://newbox.com.tn/apple-touch-icon.png` ; `curl -I https://newbox.com.tn/llms.txt` renvoie
+  `text/plain; charset=utf-8`.

@@ -2,7 +2,9 @@ import * as THREE from 'three';
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
 import { CorrugatedBox } from '../three/box.js';
 import logoUrl from '../assets/brand/logo-new-box.png';
-import certsUrl from '../assets/brand/certifications.png';
+// WebP (13 Ko) à pleine résolution pour la texture ; PNG de secours si le navigateur ne décode pas le WebP
+import certsUrl from '../assets/brand/certifications.webp';
+import certsPngUrl from '../assets/brand/certifications.png';
 
 // Petite caisse 3D de l'accueil (même modèle, mêmes couleurs et lumière), en tête des pages de
 // présentation : balancement lent, glisser pour la tourner. Rendu en pause hors de l'écran.
@@ -56,7 +58,11 @@ export async function miniBox(canvas) {
   ground.receiveShadow = true;
   scene.add(ground);
 
-  const [brandLogo, certs] = await Promise.all([loadImage(logoUrl), loadImage(certsUrl)]);
+  // loadImage rend null en cas d'échec (pas de rejet) : repli sur le PNG dans ce cas
+  const [brandLogo, certs] = await Promise.all([
+    loadImage(logoUrl),
+    loadImage(certsUrl).then((img) => img ?? loadImage(certsPngUrl)),
+  ]);
   await document.fonts.ready;
   // caisse de l'accueil : fermée, ruban adhésif posé
   const box = new CorrugatedBox(renderer).build({ brandLogo, certs });

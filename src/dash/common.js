@@ -15,6 +15,11 @@ export const fmt = (v, d = 0) => v.toLocaleString('fr-FR', { minimumFractionDigi
 export function h(tag, props = {}, ...kids) {
   const n = document.createElement(tag);
   for (const [k, v] of Object.entries(props)) {
+    // états ARIA (aria-pressed, aria-expanded…) : toujours "true" / "false", jamais vide ni absent
+    if (k.startsWith('aria-') && typeof v === 'boolean') {
+      n.setAttribute(k, String(v));
+      continue;
+    }
     if (v == null || v === false) continue;
     if (k === 'text') n.textContent = v;
     else if (k === 'class') n.className = v;
@@ -35,7 +40,8 @@ export function svg(tag, attrs = {}, text) {
 
 let tipEl;
 export function tip(x, y, value, label) {
-  tipEl ??= document.body.appendChild(h('div', { class: 'tip', role: 'status' }));
+  // info-bulle visuelle seulement : les mêmes valeurs sont dans l'aria-label du graphique
+  tipEl ??= document.body.appendChild(h('div', { class: 'tip', 'aria-hidden': true }));
   tipEl.replaceChildren(h('b', { text: value }), h('span', { text: label }));
   const w = tipEl.offsetWidth;
   tipEl.style.transform = `translate(${Math.min(x + 14, innerWidth - w - 8)}px, ${y - 52}px)`;

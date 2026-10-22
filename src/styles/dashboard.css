@@ -13,7 +13,10 @@
   --blue-2: #3550d0;
   --blue-soft: #eef0fb;
   --orange: #f49c21;
-  --orange-ink: #b35f00;
+  /* orange foncé pour le texte sur fond clair (≥ 5:1 sur papier, cartes et #fdf1dd) */
+  --orange-ink: #9c5000;
+  /* orange au plus près de la charte pour les grands textes (≥ 24 px : 3:1 suffit, 3,1:1 sur le papier) */
+  --orange-display: #cc7000;
   --orange-soft: #fdf1dd;
   --navy: #0d1642;
   --green: #12805c;
@@ -243,7 +246,8 @@ button {
   margin-bottom: 14px;
 }
 
-.card__head h2 {
+.card__head h2,
+.card__head h3 {
   font-size: 16px;
 }
 
@@ -360,7 +364,8 @@ button {
 }
 
 .seg button small {
-  margin-left: 4px;
+  /* l'espace qui précède le compteur (accounts.js) tient lieu de marge */
+  margin-left: 0;
   color: var(--ink-3);
 }
 
@@ -405,6 +410,10 @@ button {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 320px;
   gap: 20px;
+}
+
+.bench--growth {
+  grid-template-columns: minmax(0, 1fr) 260px;
 }
 
 .bars {
@@ -1354,7 +1363,8 @@ body.present {
   --line: #e3d9c8;
   --ink: #10163a;
   --ink-2: #4a5070;
-  --ink-3: #6f7389;
+  /* ≥ 4,5:1 sur le papier, les cartes, le bleu clair et le dégradé orange du fond */
+  --ink-3: #62667c;
   --kraft: #b8864f;
   font-size: 15px;
   background:
@@ -1375,7 +1385,8 @@ body.present {
   box-shadow: 0 1px 0 rgba(16, 22, 58, 0.04), 0 18px 40px -32px rgba(13, 22, 66, 0.35);
 }
 
-.present .card__head h2 {
+.present .card__head h2,
+.present .card__head h3 {
   font-size: 20px;
   color: var(--blue);
 }
@@ -1425,7 +1436,9 @@ body.present {
 
 .p-hero h1 em {
   font-style: normal;
-  color: var(--orange);
+  /* l'orange vif (1,9:1 sur le papier) reste au trait de .p-eyebrow, aux courbes et aux barres ;
+     titre de grande taille : orange proche de la charte à 3:1 */
+  color: var(--orange-display);
 }
 
 .p-hero p {

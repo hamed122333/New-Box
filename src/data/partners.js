@@ -2,7 +2,7 @@
 //
 // ⚠️ DONNÉES D'ILLUSTRATION — ces valeurs sont fictives (maquette). Remplacez-les par les chiffres
 // réels de New Box avant toute diffusion, puis passez DEMO à false pour retirer la mention
-// « Données d'illustration » affichée sur le graphique.
+// « Données d'illustration » affichée sur le graphique (et la mise en garde de public/llms.txt).
 export const DEMO = true;
 
 export const GROWTH = {

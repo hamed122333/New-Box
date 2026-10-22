@@ -53,7 +53,10 @@ function draw(play) {
   const B = nice(Math.max(...vol.values));
   const ya = (v) => pad.t + (1 - v / A.top) * (H - pad.t - pad.b);
   const yb = (v) => pad.t + (1 - v / B.top) * (H - pad.t - pad.b);
-  const s = svg('svg', { viewBox: `0 0 ${w} ${H}`, role: 'img', 'aria-label': `Chiffre d’affaires et volume de ${years[0]} à ${years.at(-1)}` });
+  // alternative textuelle : toutes les valeurs de GROWTH (suit le remplacement des données)
+  const values = years.map((y, i) => `${y}${i >= fi ? ' (prévision)' : ''} ${fmt(ca.values[i], 1)} MDT, ${fmt(vol.values[i])} t`).join(' ; ');
+  const label = `Chiffre d’affaires et volume de ${years[0]} à ${years.at(-1)}${DEMO ? ' (chiffres d’illustration)' : ''} : ${values}`;
+  const s = svg('svg', { viewBox: `0 0 ${w} ${H}`, role: 'img', 'aria-label': label });
   const defs = svg('defs');
   const ag = svg('linearGradient', { id: 'ca-grad', x1: 0, x2: 0, y1: 0, y2: 1 });
   ag.append(svg('stop', { offset: '0%', 'stop-color': '#14259b', 'stop-opacity': 0.16 }), svg('stop', { offset: '100%', 'stop-color': '#14259b', 'stop-opacity': 0 }));
@@ -119,6 +122,9 @@ function draw(play) {
 }
 
 chartEl.tabIndex = 0;
+// conteneur focalisable : rôle et nom, sinon élément générique anonyme dans l'arbre d'accessibilité
+chartEl.setAttribute('role', 'group');
+chartEl.setAttribute('aria-label', 'Croissance par année : flèches gauche et droite pour changer d’année');
 chartEl.addEventListener('keydown', (e) => {
   if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
   e.preventDefault();

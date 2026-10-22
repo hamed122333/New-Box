@@ -5,6 +5,9 @@ import { defineConfig } from 'vite';
 // (ex. https://newbox.com.tn/experience/) sans reconfiguration.
 export default defineConfig({
   base: './',
+  // site multipage sans routes clientes : pas de repli vers index.html, une URL inconnue
+  // (ex. /.well-known/…) renvoie 404 en dev et en preview, comme en production (.htaccess)
+  appType: 'mpa',
   // localhost uniquement (pas d'alerte du pare-feu Windows) ; `npm run dev:lan` pour tester sur mobile
   server: { port: 5173 },
   build: {

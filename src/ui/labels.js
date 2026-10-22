@@ -37,8 +37,11 @@ export class Labels {
       if (side !== it.current) it.el.classList.toggle('label--left', (it.current = side) === 'left');
       // apparition échelonnée
       const k = Math.min(1, Math.max(0, visibility * 1.6 - it.order * 0.15));
-      it.el.style.transform = `translate3d(${x.toFixed(1)}px, ${y.toFixed(1)}px, 0)`;
-      it.el.style.opacity = k.toFixed(3);
+      // pas d'écriture DOM identique à chaque image (styles invalidés)
+      const tr = `translate3d(${x.toFixed(1)}px, ${y.toFixed(1)}px, 0)`;
+      const op = k.toFixed(3);
+      if (tr !== it.tr) it.el.style.transform = it.tr = tr;
+      if (op !== it.op) it.el.style.opacity = it.op = op;
     }
   }
 }

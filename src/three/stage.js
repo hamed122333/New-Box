@@ -21,12 +21,10 @@ export class Stage {
     this.camera = new THREE.PerspectiveCamera(35, 1, 0.01, 400);
     this.shift = { x: 0, y: 0 };
 
-    const pmrem = new THREE.PMREMGenerator(this.renderer);
-    const env = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+    // éclairage d'ambiance (scene.environment) : voir initEnvironment()
 
     // ---- Monde « caisse »
     this.boxScene = new THREE.Scene();
-    this.boxScene.environment = env;
     this.boxScene.environmentIntensity = 0.55;
     const hemi = new THREE.HemisphereLight(0xfff3e0, 0x8a7560, 0.9);
     this.boxScene.add(hemi);
@@ -60,7 +58,6 @@ export class Stage {
 
     // ---- Monde « macro »
     this.macroScene = new THREE.Scene();
-    this.macroScene.environment = env;
     this.macroScene.environmentIntensity = 0.35;
     this.macroScene.add(new THREE.HemisphereLight(0xfff0dc, 0x1a120b, 0.7));
     const mKey = new THREE.DirectionalLight(0xffe7c4, 2.6);
@@ -76,6 +73,20 @@ export class Stage {
     this.world = 'box';
     this.resize();
     window.addEventListener('resize', () => this.resize());
+  }
+
+  /**
+   * Éclairage d'ambiance (PMREM de RoomEnvironment) : tâche à part, hors de l'évaluation du
+   * module. À appeler avant warmUp : les programmes compilés dépendent de scene.environment.
+   */
+  initEnvironment(size = 256) {
+    const pmrem = new THREE.PMREMGenerator(this.renderer);
+    const room = new RoomEnvironment();
+    const env = pmrem.fromScene(room, 0.04, 0.1, 100, { size }).texture;
+    pmrem.dispose();
+    room.dispose();
+    this.boxScene.environment = env;
+    this.macroScene.environment = env;
   }
 
   resize() {

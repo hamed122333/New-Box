@@ -22,6 +22,9 @@ export class ChapterUI {
     // Valeurs du test qualité : caisse imprimée double cannelure BC, KL / FL / TL, 400 × 300 × 300
     const q = estimate({ product: 'CI', L: 400, W: 300, H: 300, flute: 'BC', ...STORY_PAPERS, content: 10, condition: 'standard' });
     this.quality = { ect: q.ect, bct: q.bctKg, burst: q.burst, cobb: q.cobb };
+    // valeurs finales dès le départ : un chapitre inactif reste dans l'arbre d'accessibilité,
+    // il ne doit pas y annoncer « 0 » ; l'animation repart de 0 à l'entrée du chapitre
+    this._updateCounters(1);
   }
 
   update(time, st, inStory) {

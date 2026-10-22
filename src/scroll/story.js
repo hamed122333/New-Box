@@ -29,6 +29,8 @@ export const state = {
 /**
  * Construit la timeline maître. Les chapitres (.chapter[data-units]) sont des
  * espaceurs de hauteur `units × 100vh` : 1 unité de timeline = 1 écran de scroll.
+ * index.html recopie chaque valeur dans style="--units: …" pour que la page ait sa
+ * hauteur finale dès le 1er affichage (pas de saut au rechargement ni sur une ancre).
  */
 export function buildStory({ reduced }) {
   const chapters = [...document.querySelectorAll('#story .chapter')];
@@ -37,7 +39,9 @@ export function buildStory({ reduced }) {
   let t = 0;
   for (const el of chapters) {
     const u = parseFloat(el.dataset.units || '1');
-    el.style.setProperty('--units', u);
+    const css = parseFloat(el.style.getPropertyValue('--units'));
+    if (css !== u) console.warn(`Chapitre #${el.id} : style="--units: ${css}" ≠ data-units="${u}" (index.html)`);
+    el.style.setProperty('--units', u); // data-units fait foi : timeline et hauteur restent alignées
     S[el.id] = t;
     ranges.push({ id: el.id, el, start: t, end: t + u });
     t += u;

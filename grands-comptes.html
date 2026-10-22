@@ -3,6 +3,8 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- .js avant le 1er affichage : les cartes [data-in] restent masquées jusqu'au fondu (pas de clignotement) -->
+    <script>document.documentElement.classList.add('js');addEventListener('error',function(e){var t=e.target;if(t&&t.tagName==='SCRIPT')document.documentElement.classList.remove('js')},true)</script>
     <title>Grands comptes — New Box</title>
     <meta name="description" content="Espace grands comptes New Box : le marché du papier expliqué, les papetiers comparés et nos engagements pour les grands acheteurs." />
     <meta name="theme-color" content="#14259B" />
@@ -17,7 +19,7 @@
   </head>
   <body class="present">
     <header class="topbar">
-      <a class="topbar__brand" href="./"><img src="/src/assets/brand/logo-new-box.png" alt="" width="604" height="634" />New Box</a>
+      <a class="topbar__brand" href="./"><img src="/src/assets/brand/logo-new-box-112.png" srcset="/src/assets/brand/logo-new-box-112.png 112w, /src/assets/brand/logo-new-box-224.png 224w" sizes="32px" alt="" width="112" height="118" />New Box</a>
       <nav aria-label="Navigation principale"><a href="./">Accueil</a><a href="./grands-comptes.html" aria-current="page">Grands comptes</a><a href="./partenaires.html">Partenaires</a></nav>
       <a class="btn topbar__cta" href="#decider">À décider</a>
     </header>
@@ -102,7 +104,7 @@
         <p>Ce qui est prêt, ce qu’il faut valider, et ce que l’on peut montrer à qui.</p>
         <div class="grid" style="gap: 16px">
           <div class="card span-6" data-in>
-            <div class="card__head"><div><h2>Ce qui est sur la page</h2></div></div>
+            <div class="card__head"><div><h3>Ce qui est sur la page</h3></div></div>
             <ul class="decide">
               <li><div><b>Courbe des prix du papier</b><span>Sources publiques citées</span></div><span class="st st--ok">Prêt</span></li>
               <li><div><b>Benchmark des papetiers</b><span>10 papetiers, sources citées</span></div><span class="st st--ok">Prêt</span></li>
@@ -112,7 +114,7 @@
             </ul>
           </div>
           <div class="card span-6" data-in>
-            <div class="card__head"><div><h2>Ce que la direction doit nous donner</h2></div></div>
+            <div class="card__head"><div><h3>Ce que la direction doit nous donner</h3></div></div>
             <ul class="decide">
               <li><div><b>Volume minimum « grand compte »</b><span>À partir de quel volume annuel</span></div><span class="st st--need">À fournir</span></li>
               <li><div><b>Règle de révision de prix</b><span>Indice suivi et préavis</span></div><span class="st st--need">À fournir</span></li>

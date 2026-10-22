@@ -1,6 +1,7 @@
 import { SINGLE_FLUTES, DOUBLE_FLUTES, FLUTE_ORDER } from './flutes.js';
 
-// Gamme de l'usine (codes internes) et délais de fabrication indicatifs, en jours.
+// Gamme de l'usine (codes internes) et délais de fabrication indicatifs, en jours
+// (repris dans index.html « Produits & délais » et public/llms.txt : à tenir à jour ensemble).
 //  family   : 'caisse' (caisse américaine montée), 'decoupe' (article découpé Bobst), 'plaque'
 //  walls    : 1 = simple cannelure, 2 = double cannelure, 0 = au choix
 //  diecut   : caisse découpée (CID / CVD) → poignées découpées sur les petits côtés

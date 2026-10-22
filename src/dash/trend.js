@@ -5,6 +5,10 @@ import { h, svg, fmt, reduced, tip, hideTip } from './common.js';
 // relevé, annonce en pointillés, réticule au survol.
 
 const ease = (t) => 1 - (1 - t) ** 3;
+// texte (compteurs, étiquettes) : l'orange de la charte n'atteint que 2:1 sur fond clair,
+// on l'écrit en orange foncé ; traits, aires et halos gardent la couleur de la série
+// orange de la charte en texte : foncé pour le petit texte (4,5:1), « display » pour les compteurs (≥ 24 px, 3:1)
+const ink = (c, large = false) => (c.toLowerCase() === '#f49c21' ? (large ? 'var(--orange-display)' : 'var(--orange-ink)') : c);
 
 function countUp(el, to, { prefix = '+', suffix = ' €/t', duration = 1400, delay = 0 } = {}) {
   if (reduced) return (el.textContent = `${prefix}${fmt(to)}${suffix}`);
@@ -27,7 +31,7 @@ export function trendChart(root, { data, sources, legend, side, srcNote, replay 
   // panneau latéral : compteurs
   const counters = series.map((s) => {
     const last = s.points.at(-1);
-    const val = h('b', { class: 'trend__val', style: `color:${s.color}`, text: '+0 €/t' });
+    const val = h('b', { class: 'trend__val', style: `color:${ink(s.color, true)}`, text: '+0 €/t' });
     return { s, last, val, box: h('div', { class: 'trend__stat' }, h('span', { class: 'kpi__label', text: s.label }), val, h('span', { class: 'kpi__meta', text: `depuis janvier ${year}` })) };
   });
   side.replaceChildren(
@@ -75,7 +79,7 @@ export function trendChart(root, { data, sources, legend, side, srcNote, replay 
       se.points.forEach((p, i) => {
         const [x, y] = pts[i];
         const c = svg('circle', { cx: x, cy: y, r: 5, fill: '#fff', stroke: se.color, 'stroke-width': 2.5, class: 'tdot' });
-        const t = i ? svg('text', { x: x - (i === se.points.length - 1 ? 8 : 0), y: y - 12, 'text-anchor': i === se.points.length - 1 ? 'end' : 'middle', class: 'lbl tdot', style: `fill:${se.color}` }, `+${p.v}`) : null;
+        const t = i ? svg('text', { x: x - (i === se.points.length - 1 ? 8 : 0), y: y - 12, 'text-anchor': i === se.points.length - 1 ? 'end' : 'middle', class: 'lbl tdot', style: `fill:${ink(se.color)}` }, `+${p.v}`) : null;
         dots.push({ x, els: [c, t].filter(Boolean) });
       });
     });

@@ -2,3 +2,5 @@ User-agent: *
 Allow: /
 
 Sitemap: https://newbox.com.tn/sitemap.xml
+
+# Résumé du site pour les assistants IA : https://newbox.com.tn/llms.txt

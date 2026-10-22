@@ -41,6 +41,13 @@ Pas de suite de tests automatisés dans le dépôt. Vérification manuelle ou vi
   (`once()`, `userData.shared` = ne pas libérer). Canvas en `willReadFrequently` ; pas de
   `getImageData` sur le chemin d'une interaction.
 - Pas d'écriture DOM identique à chaque image dans la boucle de rendu (styles invalidés).
+- Rendu à la demande (`sceneChanged()` dans `src/main.js`) : la scène n'est redessinée que si la caméra ou
+  un objet bouge. Toute reconstruction (`box.build`, `stack.build`) ou changement de visibilité doit appeler
+  `invalidate()`.
+- Chargement découpé en étapes courtes (`yieldToMain()` de `src/lib/schedule.js`) : pas de nouvelle longue
+  tâche synchrone dans `init()` ; le configurateur reste `inert` jusqu'à son branchement (`setConfigReady`).
+- Mesurer Lighthouse sur le build (`npm.cmd run build` puis `npm.cmd run preview`), jamais sur le serveur de
+  dev (CSS injectée par JS, fichiers non minifiés : CLS et poids faussés).
 - Shaders pré-compilés pendant l'écran de chargement (`warmUp` dans `src/main.js`) : tout nouvel
   objet/matériau visible seulement plus tard dans le récit doit y être rendu visible.
 
@@ -55,7 +62,8 @@ Pas de suite de tests automatisés dans le dépôt. Vérification manuelle ou vi
 - Cannelures F, E, B, C (+ doubles EB, BC) : `src/data/flutes.js` ; qualités papier KL, KS, TL, TB, FL : `src/data/papers.js`
   (grammages et indices indicatifs, à valider par New Box) ; calculs ECT / McKee / palettisation à plat : `src/lib/calc.js`
 - Palette du récit : caisses livrées pliées-collées à plat, en paquets cerclés (`src/three/stack.js`)
-- Logo officiel : `src/assets/brand/logo-new-box.png` ; charte : bleu `#14259B`, orange `#F49C21`, bleu nuit `#0D1642`
+- Logo officiel : `src/assets/brand/logo-new-box.png` (variantes dérivées `logo-new-box-112.png` / `-224.png` pour
+  l'affichage, `certifications.webp` dérivé de `certifications.png` : à régénérer quand les originaux changent) ; charte : bleu `#14259B`, orange `#F49C21`, bleu nuit `#0D1642`
 - Certifications (SGS FSSC 22000, ISO 9001, ISO 45001 ; FSC C191615) : `src/assets/brand/certifications.png`,
   imprimées sous le logo sur la face avant des caisses imprimées et affichées dans la section « Produits & délais »
 - Plan et feuille de route : `docs/PLAN.md`

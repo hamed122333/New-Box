@@ -10,10 +10,13 @@
   --blue: #14259b;
   --blue-deep: #0e1b78;
   --orange: #f49c21;
+  /* orange foncé pour du texte sur fond clair (l'orange vif n'y atteint que 2:1) */
+  --orange-ink: #9c5000;
   --navy: #0d1642;
   --ink: #10163a;
   --ink-2: #4a5070;
-  --ink-3: #868ba3;
+  /* gris des petits libellés : ≥ 4,5:1 sur le papier, les panneaux et les cartes (WCAG AA) */
+  --ink-3: #5f6480;
   --kraft: #b8864f;
   --kraft-deep: #7a5230;
   --accent: var(--orange);
@@ -33,12 +36,12 @@
   --fade: 0;
   --text: var(--ink);
   --text-2: var(--ink-2);
-  --scrim: rgba(243, 238, 230, 0.82);
+  --scrim: rgba(243, 238, 230, 0.88);
   color-scheme: light;
 }
 
 html[data-world='macro'] {
-  --scrim: rgba(9, 14, 44, 0.82);
+  --scrim: rgba(9, 14, 44, 0.86);
   --heading: #f4ede3;
   --text: #f4ede3;
   --text-2: var(--muted-on-dark);
@@ -123,6 +126,7 @@ html[data-world='macro'] #bg {
   display: block;
   pointer-events: none;
   outline: none;
+  transition: opacity 0.6s var(--ease);
 }
 
 html[data-mode='config'] #webgl {
@@ -145,24 +149,44 @@ html[data-mode='config'] #webgl:active {
 
 /* ---------- chargement ---------- */
 
+/* Avant la fin de la pré-compilation (data-ready posé par hideLoader) : le héros est lisible
+   tout de suite, la 3D reste masquée. opacity 0 (et non 0,01) : un canevas visible serait
+   composité à chaque rendu de warmUp et bloquerait le fil principal. À la 1re image, #hero
+   reçoit .is-active dans la même tâche, avec le même état calculé : ni transition ni saut. */
+html.js:not([data-ready]) #hero .chapter__content {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translate3d(0, -50%, 0);
+}
+
+html.js:not([data-ready]) #webgl {
+  opacity: 0;
+}
+
+/* Indicateur non bloquant, dans la zone de la 3D : sous le récit (z-index 4) et l'en-tête */
 .loader {
   position: fixed;
-  inset: 0;
-  z-index: 100;
+  inset: var(--header-h) 0 0 48%;
+  z-index: 3;
+  pointer-events: none;
   display: grid;
   place-content: center;
   justify-items: center;
   gap: 18px;
-  background: var(--paper);
   color: var(--ink);
   font-size: 14px;
   letter-spacing: 0.02em;
-  transition: opacity 0.8s var(--ease), visibility 0.8s;
+  transition: opacity 0.4s var(--ease), visibility 0.4s;
 }
 
+/* masqué sans être retiré du DOM (pas de layout tardif) ; les animations s'arrêtent */
 .loader.is-done {
   opacity: 0;
   visibility: hidden;
+}
+
+.loader.is-done * {
+  animation-play-state: paused;
 }
 
 .loader__logo {
@@ -415,13 +439,16 @@ html[data-mode='config'] .rail {
   top: calc(50% + var(--header-h) / 2);
   width: min(460px, 38vw);
   color: var(--text);
+  /* Chapitres inactifs : transparents mais présents dans l'arbre d'accessibilité (pas de
+     visibility: hidden), pour que titres et textes du récit restent lisibles par les lecteurs
+     d'écran et les agents. pointer-events: none : ces couches fixes ne doivent capturer ni les
+     clics du configurateur ni le glisser de la caisse. */
   opacity: 0;
-  visibility: hidden;
+  pointer-events: none;
   transform: translate3d(0, calc(-50% + 28px), 0);
   transition:
     opacity 0.6s var(--ease),
     transform 0.8s var(--ease),
-    visibility 0s linear 0.6s,
     color 0.4s;
 }
 
@@ -430,21 +457,29 @@ html[data-mode='config'] .rail {
   content: '';
   position: absolute;
   z-index: -1;
-  inset: -22% -30% -22% calc(-1 * var(--gutter) - 10vw);
-  background: radial-gradient(closest-side, var(--scrim) 35%, transparent 100%);
+  inset: -18% -8% -18% calc(-1 * var(--gutter) - 10vw);
+  /* voile resserré sur le texte (plein jusqu'à 45 %, peu de débord à droite) : le texte reste
+     lisible quand la caisse passe dessous, sans masquer l'échantillon 3D voisin */
+  background: radial-gradient(closest-side, var(--scrim) 45%, transparent 100%);
   pointer-events: none;
   transition: background 0.4s;
 }
 
 .chapter.is-active .chapter__content {
   opacity: 1;
-  visibility: visible;
+  pointer-events: auto;
   transform: translate3d(0, -50%, 0);
   transition:
     opacity 0.7s var(--ease) 0.1s,
     transform 0.9s var(--ease) 0.1s,
-    visibility 0s,
     color 0.4s;
+}
+
+/* liens d'un chapitre invisible (boutons du héros) : hors de l'ordre de tabulation, retirés
+   après le fondu de sortie (mêmes transitions que .btn, plus visibility) */
+html.js[data-ready]:not(.no-webgl) .chapter:not(.is-active) .chapter__content a {
+  visibility: hidden;
+  transition: transform 0.2s var(--ease), background 0.2s, color 0.2s, border-color 0.2s, visibility 0s linear 0.6s;
 }
 
 /* Pendant le fondu entre les deux mondes, le texte « clair » s'efface avec le voile */
@@ -779,8 +814,7 @@ html:not([data-world='macro']) .chapter.is-active .chapter__content {
   padding: 14px 0 14px 50px;
   border-top: 1px solid var(--line);
   color: var(--text-2);
-  opacity: 0.55;
-  transition: opacity 0.4s, color 0.4s;
+  transition: color 0.4s;
 }
 
 .steps li::before {
@@ -809,12 +843,29 @@ html:not([data-world='macro']) .chapter.is-active .chapter__content {
   font-size: 14.5px;
 }
 
-.steps li.is-done {
-  opacity: 0.8;
+/* Progression lisible sans opacité sur le texte (qui garde ≥ 4,5:1) : étapes à venir en
+   couleur secondaire avec pastille et filet atténués, étapes faites avec pastille cochée. */
+.steps li:not(.is-active):not(.is-done) b {
+  color: var(--text-2);
 }
 
-.steps li.is-active {
-  opacity: 1;
+.steps li:not(.is-active):not(.is-done) span {
+  font-size: 13.5px;
+}
+
+.steps li:not(.is-active):not(.is-done)::before {
+  border-style: dashed;
+  opacity: 0.55;
+}
+
+.steps li.is-done::before {
+  content: '✓';
+  border-color: var(--accent);
+  color: var(--text);
+}
+
+.steps li.is-active b {
+  color: var(--heading);
 }
 
 .steps li.is-active::before {
@@ -1042,7 +1093,7 @@ html:not([data-world='macro']) .chapter.is-active .chapter__content {
 .lead-card__time span {
   font-size: 15px;
   font-weight: 600;
-  color: var(--orange);
+  color: var(--orange-ink);
 }
 
 .lead-card h3 {
@@ -1149,6 +1200,7 @@ html:not([data-world='macro']) .chapter.is-active .chapter__content {
 .certs img {
   display: block;
   width: 100%;
+  max-width: 420px; /* source de 530 px : pas d'agrandissement flou quand la carte passe sur une colonne */
   height: auto;
 }
 
@@ -1440,6 +1492,12 @@ input[type='range'] {
   border-color: var(--ink);
 }
 
+/* l'input fichier est masqué (1 × 1) : son focus clavier s'affiche sur le bouton-label */
+.upload:has(input:focus-visible) label.btn {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
 .upload__name {
   font-size: 13px;
   color: var(--ink-3);
@@ -1567,13 +1625,6 @@ input[type='range'] {
   grid-column: 1 / -1;
 }
 
-.results__wide small {
-  display: block;
-  margin-top: 2px;
-  font-size: 11.5px;
-  color: var(--muted-on-dark);
-}
-
 .results dt {
   font-size: 12px;
   color: var(--muted-on-dark);
@@ -1588,6 +1639,13 @@ input[type='range'] {
 .results__main dd {
   font-size: 32px;
   color: var(--orange);
+}
+
+/* second <dd> du groupe (dt + dd + dd : seul contenu admis dans un <div> de <dl>) */
+.results dd.results__note {
+  margin-top: 2px;
+  font: 400 11.5px/1.4 var(--f-body);
+  color: var(--muted-on-dark);
 }
 
 .stack-result {
@@ -1622,6 +1680,8 @@ input[type='range'] {
 
 .config .note {
   color: var(--ink-3);
+  /* sans l'opacité 0,85 de .note : elle ramènerait le contraste sous 4,5:1 */
+  opacity: 1;
 }
 
 /* ---------- contact ---------- */
@@ -1704,7 +1764,7 @@ html:not(.js) .chapter__content,
 .no-webgl .chapter__content {
   position: static;
   opacity: 1;
-  visibility: visible;
+  pointer-events: auto;
   transform: none;
   width: auto;
   max-width: 640px;
@@ -1842,8 +1902,15 @@ html:not(.js) .chapter__content::before,
     display: none;
   }
 
-  .chapter.is-active .chapter__content {
+  .chapter.is-active .chapter__content,
+  html.js:not([data-ready]) #hero .chapter__content {
     transform: translate3d(0, 0, 0);
+  }
+
+  /* chargement : bandeau au-dessus de la carte du héros (placée en bas d'écran) */
+  .loader {
+    inset: var(--header-h) 0 auto;
+    height: 38svh;
   }
 
   .chapter h1 {

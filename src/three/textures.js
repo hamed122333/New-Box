@@ -132,7 +132,8 @@ export function paintPaper(ctx, w, h, pal, seed = 7, opts = {}) {
     g.addColorStop(0, hexA(col, 0.10 + r() * 0.08));
     g.addColorStop(1, hexA(col, 0));
     ctx.fillStyle = g;
-    ctx.fillRect(0, 0, w, h);
+    // hors du rayon, le dégradé est transparent : inutile de peindre toute la feuille
+    ctx.fillRect(x - rad, y - rad, 2 * rad, 2 * rad);
   }
 
   // Ondulations fantômes des cannelures sous la couverture (verticales)
@@ -851,4 +852,46 @@ export function woodTexture(aniso) {
     ctx.fill();
   }
   return finishTexture(new THREE.CanvasTexture(c), aniso, { repeat: true });
+}
+
+// ---------------------------------------------------------------------------
+// Préparation pendant l'écran de chargement : une étape courte par texture.
+// ---------------------------------------------------------------------------
+
+/**
+ * Le Canvas 2D enregistre les tracés et ne les rastérise qu'au premier drawImage ou envoi
+ * WebGL : la lecture d'un pixel force ce travail dans l'étape courante. Chargement seulement
+ * (Canvas CPU, jamais sur le chemin d'une interaction).
+ */
+function rasterize(x) {
+  const c = x?.isTexture ? x.image : x;
+  c?.getContext?.('2d').getImageData(0, 0, 1, 1);
+  return x;
+}
+
+/**
+ * Textures en cache qui ne dépendent ni des polices ni des dimensions (papiers, relief,
+ * tranches, trame) : une fonction par texture, à exécuter chacune dans sa propre tâche
+ * pendant le chargement des polices. Mêmes clés que la caisse, l'échantillon et la palette.
+ */
+export function warmTextureSteps(aniso, { flute = 'C', palette = 'kraft' } = {}) {
+  return [
+    () => rasterize(paperSheet(palette)), // faces imprimées, plaque, caisses à plat
+    () => rasterize(paperTile(palette, aniso, { seed: 5, stripes: 20 })), // caisse : extérieur
+    () => rasterize(paperTile('kraftInner', aniso, { seed: 9 })), // caisse : intérieur
+    () => rasterize(bumpTile(aniso)),
+    () => rasterize(edgeTexture(flute, aniso)),
+    () => rasterize(layersTexture(flute, aniso)),
+    () => rasterize(halftoneTile()),
+    () => rasterize(paperTile('kraft', aniso, { seed: 31 })), // échantillon macro
+    () => rasterize(paperTile('kraftInner', aniso, { seed: 32 })),
+    () => rasterize(paperTile('kraftInner', aniso, { seed: 33 })),
+    () => rasterize(paperTile('fluting', aniso, { seed: 34 })),
+    () => rasterize(paperTile(palette, aniso, { seed: 77 })), // palette : dessous des paquets
+  ];
+}
+
+/** Logo prêt à imprimer (lecture de pixels du logo officiel) : à préparer pendant le chargement. */
+export function prepareLogo(img) {
+  if (img) rasterize(logoInk(img));
 }

@@ -91,7 +91,8 @@ function seg(container, items, current, onPick) {
           },
         },
         label,
-        count != null ? h('small', { text: count }) : null,
+        // espace réelle avant le compteur : nom accessible « Tous 10 » et non « Tous10 »
+        count != null ? [' ', h('small', { text: count })] : null,
       ),
     ),
   );

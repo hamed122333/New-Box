@@ -18,6 +18,23 @@ const INK_NAMES = { bleu: 'bleu New Box', noir: 'noir', rouge: 'rouge', vert: 'v
 
 const clamp = (v, [a, b]) => Math.round(Math.min(b, Math.max(a, v)));
 
+/** Clé d'un bouton d'option (code, infobulle, libellés), hors état aria-pressed / disabled. */
+const optionKey = (b) => [b.dataset.product ?? b.dataset.flute, b.title, ...[...b.children].map((c) => c.textContent.trim())].join('|');
+
+/**
+ * Les boutons produit et cannelure sont écrits dans index.html (aucun saut de mise en page quand
+ * le configurateur est construit, après le chargement 3D). Les données font foi : si le HTML a
+ * divergé de src/data, le groupe est régénéré et un avertissement le signale.
+ */
+function fillOptions(el, html, what) {
+  const tpl = document.createElement('template');
+  tpl.innerHTML = html;
+  const want = [...tpl.content.children].map(optionKey).join('\n');
+  if ([...el.children].map(optionKey).join('\n') === want) return;
+  if (el.children.length) console.warn(`Configurateur : boutons « ${what} » de index.html différents de src/data, régénérés.`);
+  el.replaceChildren(tpl.content);
+}
+
 /**
  * Configurateur façon « mockup 3D » : produit (codes usine et délais), dimensions, cannelure,
  * papiers, impression, ouverture / mise à plat, capture PNG et demande de devis pré-remplie.
@@ -43,18 +60,20 @@ export class Configurator {
 
   _renderOptions() {
     const $ = (s) => this.root.querySelector(s);
-    $('[data-options="product"]').innerHTML = PRODUCT_ORDER.map((code) => {
+    const products = PRODUCT_ORDER.map((code) => {
       const p = PRODUCTS[code];
       return `<button type="button" class="prod__btn" data-product="${code}" aria-pressed="false" title="${p.name}">
           <strong>${code}</strong><span>${p.short}</span>
         </button>`;
     }).join('');
-    $('[data-options="flute"]').innerHTML = FLUTE_ORDER.map(
+    const flutes = FLUTE_ORDER.map(
       (id) =>
         `<button type="button" class="seg__btn" data-flute="${id}" aria-pressed="false">
            <strong>${id}</strong><span>${FLUTES[id].thickness.toString().replace('.', ',')} mm</span>
          </button>`,
     ).join('');
+    fillOptions($('[data-options="product"]'), products, 'Produit');
+    fillOptions($('[data-options="flute"]'), flutes, 'Cannelure');
     const opt = (code) => `<option value="${code}">${code} — ${PAPERS[code].name} (${PAPERS[code].gsm} g/m²)</option>`;
     $('select[name="outer"]').innerHTML = OUTER_ORDER.map(opt).join('');
     $('select[name="inner"]').innerHTML = INNER_ORDER.map(opt).join('');
@@ -213,6 +232,7 @@ export class Configurator {
   _set(patch, mode = 'full') {
     Object.assign(this.spec, patch);
     this._refreshOutputs();
+    this._announceSoon();
     if (mode === 'calc') return;
     this._pending = { ...(this._pending || {}), ...patch };
     if (mode === 'full') this._pendingFull = true;
@@ -226,6 +246,21 @@ export class Configurator {
       this._pendingFull = false;
       this.onSpec(pending, { deferTextures: !full });
     });
+  }
+
+  /**
+   * Annonce aux lecteurs d'écran (région live unique, texte seul) une fois la rafale terminée :
+   * une phrase au relâchement d'un curseur, et non une annonce par pas de glissement.
+   */
+  _announceSoon() {
+    clearTimeout(this._announceTimer);
+    this._announceTimer = setTimeout(() => {
+      const el = this.root.querySelector('[data-out="announce"]');
+      const e = this.result;
+      if (!el || !e) return;
+      const text = `${e.isCase ? `BCT ${fmt(e.bctKg)} kgf, ` : ''}ECT ${fmt(e.ect, 1)} kN/m, délai ${e.lead}`;
+      if (el.textContent !== text) el.textContent = text;
+    }, 700);
   }
 
   reset() {
