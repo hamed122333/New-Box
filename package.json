@@ -9,7 +9,8 @@
     "dev:lan": "vite --host",
     "start": "vite --open",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "preview:lan": "vite preview --host"
   },
   "engines": {
     "node": ">=20.19"

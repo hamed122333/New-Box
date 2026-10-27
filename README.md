@@ -56,7 +56,8 @@ $env:NEWBOX_DIR = 'C:\Users\hamed\work\NewBox-3D'; irm https://raw.githubusercon
 ```
 
 Le script prépare aussi l'environnement : si Git ou Node.js manquent (ou si Node est trop ancien),
-il propose de les installer avec `winget`. Tester sur téléphone (même Wi-Fi) : `npm.cmd run dev:lan`.
+il propose de les installer avec `winget`. Tester sur téléphone (même Wi-Fi) : `npm.cmd run dev:lan` (développement) ou `npm.cmd run build` puis
+`npm.cmd run preview:lan` (version de production) ; ouvrir sur le téléphone l'adresse « Network » affichée.
 
 Équivalent manuel (sous PowerShell, utiliser `npm.cmd` : `npm` seul est bloqué quand l'exécution
 des scripts est désactivée, ce qui est le réglage par défaut de Windows) :
