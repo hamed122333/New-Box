@@ -26,8 +26,7 @@ Pas de suite de tests automatisés dans le dépôt. Vérification manuelle ou vi
    morphing des cannelures jusqu'à BC (04), test ECT (05), flan qui se plie (06), palette (07).
 4. Configurateur : changer produit / dimensions / cannelure / papiers → le modèle 3D, le délai et le BCT se mettent à jour ;
    « Capture PNG » télécharge une image ; « Demander un devis » ouvre un e-mail pré-rempli.
-5. `grands-comptes.html` et `partenaires.html` : aucune erreur console, courbes animées (bouton Rejouer), sélection du benchmark,
-   survol / flèches du graphique de croissance, pas de défilement horizontal à 390 px.
+5. Pas de défilement horizontal à 390 px ; sans JavaScript ou sans WebGL, le texte du récit reste lisible.
 6. La console expose `window.__newbox` (état du scroll, scène, configurateur) pour le débogage.
    `?capture` dans l'URL passe en horloge pilotée (`__newbox.step(dt)`) pour l'enregistrement vidéo.
 
@@ -67,11 +66,3 @@ Pas de suite de tests automatisés dans le dépôt. Vérification manuelle ou vi
 - Certifications (SGS FSSC 22000, ISO 9001, ISO 45001 ; FSC C191615) : `src/assets/brand/certifications.png`,
   imprimées sous le logo sur la face avant des caisses imprimées et affichées dans la section « Produits & délais »
 - Plan et feuille de route : `docs/PLAN.md`
-- Pages de présentation à la direction, univers de l'accueil (`body.present`) : `grands-comptes.html` (prix des bobines, benchmark des papetiers, garanties, à décider) et
-  `partenaires.html` (partenaires financiers actuels : croissance, engagements, à décider, quoi partager à qui) : code `src/dash/`
-  (`common.js` utilitaires, `accounts.js`, `partners.js`, `trend.js` courbe animée des prix des bobines), styles `src/styles/dashboard.css`, entrées Vite dans
-  `vite.config.js`. Pas de GSAP ; Three.js seulement pour la petite caisse 3D de l'en-tête (`minibox.js`, chargée à part). Engagements de service à valider par la direction.
-- Veille papier, papetiers et contexte tunisien :
-  `src/data/market.js` — chaque chiffre a une source datée dans `SOURCES` ; n'en ajouter aucun sans source.
-  Croissance des partenaires : `src/data/partners.js` — **valeurs fictives** (`DEMO = true` affiche « Données
-  d'illustration ») : les remplacer par les chiffres New Box puis passer `DEMO` à `false`.

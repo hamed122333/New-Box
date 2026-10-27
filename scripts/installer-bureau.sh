@@ -7,7 +7,7 @@
 set -euo pipefail
 
 REPO="https://github.com/hamed122333/New-Box.git"
-BRANCH="claude/charming-maxwell-jjq9yf"
+BRANCH="main"
 NAME="NewBox-3D"
 
 for cmd in git node npm; do

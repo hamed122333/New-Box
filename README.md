@@ -44,7 +44,7 @@ installent les dépendances et ouvrent le site dans le navigateur. Relancez-les 
 **Windows** — ouvrir PowerShell et coller cette seule ligne :
 
 ```powershell
-irm https://raw.githubusercontent.com/hamed122333/New-Box/claude/charming-maxwell-jjq9yf/scripts/installer-bureau.ps1 | iex
+irm https://raw.githubusercontent.com/hamed122333/New-Box/main/scripts/installer-bureau.ps1 | iex
 ```
 
 Ensuite, pour relancer le site : double-clic sur **`demarrer.bat`** dans le dossier `NewBox-3D` du Bureau.
@@ -52,7 +52,7 @@ Ensuite, pour relancer le site : double-clic sur **`demarrer.bat`** dans le doss
 **Dans un autre dossier** (ex. `C:\Users\hamed\work`) : définir `NEWBOX_DIR` avant la même commande :
 
 ```powershell
-$env:NEWBOX_DIR = 'C:\Users\hamed\work\NewBox-3D'; irm https://raw.githubusercontent.com/hamed122333/New-Box/claude/charming-maxwell-jjq9yf/scripts/installer-bureau.ps1 | iex
+$env:NEWBOX_DIR = 'C:\Users\hamed\work\NewBox-3D'; irm https://raw.githubusercontent.com/hamed122333/New-Box/main/scripts/installer-bureau.ps1 | iex
 ```
 
 Le script prépare aussi l'environnement : si Git ou Node.js manquent (ou si Node est trop ancien),
@@ -63,7 +63,7 @@ des scripts est désactivée, ce qui est le réglage par défaut de Windows) :
 
 ```powershell
 cd $([Environment]::GetFolderPath('Desktop'))
-git clone -b claude/charming-maxwell-jjq9yf https://github.com/hamed122333/New-Box.git NewBox-3D
+git clone -b main https://github.com/hamed122333/New-Box.git NewBox-3D
 cd NewBox-3D
 npm.cmd install
 npm.cmd start
@@ -72,7 +72,7 @@ npm.cmd start
 **macOS / Linux**
 
 ```bash
-bash <(curl -fsSL https://raw.githubusercontent.com/hamed122333/New-Box/claude/charming-maxwell-jjq9yf/scripts/installer-bureau.sh)
+bash <(curl -fsSL https://raw.githubusercontent.com/hamed122333/New-Box/main/scripts/installer-bureau.sh)
 ```
 
 ## Identité visuelle

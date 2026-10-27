@@ -2,10 +2,10 @@
 # New Box - installe (ou met a jour) la version locale du site et la lance
 #
 # Sur le Bureau (dossier NewBox-3D), en une ligne :
-#   irm https://raw.githubusercontent.com/hamed122333/New-Box/claude/charming-maxwell-jjq9yf/scripts/installer-bureau.ps1 | iex
+#   irm https://raw.githubusercontent.com/hamed122333/New-Box/main/scripts/installer-bureau.ps1 | iex
 #
 # Dans un autre dossier (ex. C:\Users\hamed\work\NewBox-3D) :
-#   $env:NEWBOX_DIR = 'C:\Users\hamed\work\NewBox-3D'; irm https://raw.githubusercontent.com/hamed122333/New-Box/claude/charming-maxwell-jjq9yf/scripts/installer-bureau.ps1 | iex
+#   $env:NEWBOX_DIR = 'C:\Users\hamed\work\NewBox-3D'; irm https://raw.githubusercontent.com/hamed122333/New-Box/main/scripts/installer-bureau.ps1 | iex
 #
 # Prepare aussi l'environnement : si Git ou Node.js manquent (ou si Node est trop ancien),
 # le script propose de les installer avec winget. NEWBOX_YES=1 accepte sans poser la question.
@@ -18,7 +18,7 @@
 $ErrorActionPreference = 'Stop'
 
 $Repo   = 'https://github.com/hamed122333/New-Box.git'
-$Branch = 'claude/charming-maxwell-jjq9yf'
+$Branch = 'main'
 $Name   = 'NewBox-3D'
 
 # Executables uniquement (npm.cmd plutot que npm.ps1)

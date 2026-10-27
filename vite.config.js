@@ -1,11 +1,10 @@
-import { resolve } from 'node:path';
 import { defineConfig } from 'vite';
 
 // base relative : le build fonctionne dans n'importe quel sous-dossier
 // (ex. https://newbox.com.tn/experience/) sans reconfiguration.
 export default defineConfig({
   base: './',
-  // site multipage sans routes clientes : pas de repli vers index.html, une URL inconnue
+  // pas de routes clientes : pas de repli vers index.html, une URL inconnue
   // (ex. /.well-known/…) renvoie 404 en dev et en preview, comme en production (.htaccess)
   appType: 'mpa',
   // localhost uniquement (pas d'alerte du pare-feu Windows) ; `npm run dev:lan` pour tester sur mobile
@@ -14,11 +13,6 @@ export default defineConfig({
     target: 'es2020',
     chunkSizeWarningLimit: 900,
     rollupOptions: {
-      input: {
-        index: resolve(import.meta.dirname, 'index.html'),
-        'grands-comptes': resolve(import.meta.dirname, 'grands-comptes.html'),
-        partenaires: resolve(import.meta.dirname, 'partenaires.html'),
-      },
       output: {
         manualChunks(id) {
           if (id.includes('node_modules/three')) return 'three';
