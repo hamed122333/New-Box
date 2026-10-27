@@ -1,7 +1,3 @@
-import '@fontsource-variable/inter';
-import '@fontsource-variable/space-grotesk';
-import './styles/main.css';
-
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import Lenis from 'lenis';

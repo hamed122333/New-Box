@@ -2,6 +2,11 @@
    New Box — expérience 3D
    ========================================================================= */
 
+/* Feuille liée dans le <head> de index.html (et non importée par main.js) : elle est appliquée
+   avant le 1er affichage, aussi en développement — pas de page sans style puis de saut (CLS). */
+@import '@fontsource-variable/inter';
+@import '@fontsource-variable/space-grotesk';
+
 :root {
   --paper: #f3eee6;
   --paper-2: #e8dfd1;
