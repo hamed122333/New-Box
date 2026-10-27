@@ -352,6 +352,9 @@ async function init() {
     if (first) {
       first = false;
       hideLoader();
+      // le canevas devient visible : on redessine à l'image suivante (même scène immobile,
+      // en mouvement réduit), le 1er rendu ayant été fait canevas masqué
+      invalidate();
     }
   };
 

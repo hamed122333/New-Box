@@ -150,8 +150,9 @@ html[data-mode='config'] #webgl:active {
 /* ---------- chargement ---------- */
 
 /* Avant la fin de la pré-compilation (data-ready posé par hideLoader) : le héros est lisible
-   tout de suite, la 3D reste masquée. opacity 0 (et non 0,01) : un canevas visible serait
-   composité à chaque rendu de warmUp et bloquerait le fil principal. À la 1re image, #hero
+   tout de suite, la 3D reste masquée. visibility: hidden (et pas seulement opacity 0) : un canevas
+   présent dans la composition serait relu à chaque image pendant que le GPU termine la
+   pré-compilation, ce qui bloquerait le fil principal. À la 1re image, #hero
    reçoit .is-active dans la même tâche, avec le même état calculé : ni transition ni saut. */
 html.js:not([data-ready]) #hero {
   position: relative;
@@ -169,6 +170,7 @@ html.js:not([data-ready]) #hero .chapter__content {
 
 html.js:not([data-ready]) #webgl {
   opacity: 0;
+  visibility: hidden;
 }
 
 /* Indicateur non bloquant, dans la zone de la 3D : sous le récit (z-index 4) et l'en-tête */
