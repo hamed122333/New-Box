@@ -1204,9 +1204,10 @@ html:not([data-world='macro']) .chapter.is-active .chapter__content {
 
 .certs {
   display: grid;
-  grid-template-columns: minmax(240px, 420px) 1fr;
+  /* bandeau des 6 logos sur toute la largeur de la carte, texte dessous */
+  grid-template-columns: 1fr;
   align-items: center;
-  gap: 32px;
+  gap: 20px;
   margin-top: 16px;
   padding: 24px 28px;
   border: 1px solid var(--line);
@@ -1217,7 +1218,7 @@ html:not([data-world='macro']) .chapter.is-active .chapter__content {
 .certs img {
   display: block;
   width: 100%;
-  max-width: 420px; /* source de 530 px : pas d'agrandissement flou quand la carte passe sur une colonne */
+  max-width: 960px; /* source de 1440 px : net jusqu'à 960 px en écran 1,5x */
   height: auto;
 }
 

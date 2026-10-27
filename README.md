@@ -83,7 +83,7 @@ bash <(curl -fsSL https://raw.githubusercontent.com/hamed122333/New-Box/main/scr
   réserves blanches laissant voir le kraft).
 - Couleurs de la charte : bleu `#14259B`, orange `#F49C21`, bleu nuit `#0D1642` (variables en tête de
   `src/styles/main.css`, constante `BRAND` dans `src/three/textures.js`).
-- Certifications SGS (FSSC 22000, ISO 9001, ISO 45001) et FSC C191615 : `src/assets/brand/certifications.png`,
+- Certifications SGS (ISO 9001, ISO 14001, ISO 45001, FSSC 22000), Halal et FSC C191615 : `src/assets/brand/certifications.png`,
   imprimées sous le logo sur les caisses et présentées dans la section « Produits & délais ».
 
 ## Structure

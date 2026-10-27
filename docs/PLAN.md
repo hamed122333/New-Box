@@ -94,7 +94,7 @@ Un seul canvas WebGL en arrière-plan, deux « mondes » (caisse à l'échelle /
 - Caisses découpées (CID / CVD) : représentées en 3D avec des poignées découpées sur les petits côtés
 - Qualités papier : couvertures KL, KS, TL, TB ; cannelure FL
 - Livraison : caisses pliées-collées **à plat**, en paquets cerclés sur palette Europe (estimation du nombre par palette)
-- Certifications imprimées sur les caisses : SGS FSSC 22000, ISO 9001, ISO 45001 ; FSC C191615
+- Certifications imprimées sur les caisses : SGS ISO 9001, ISO 14001, ISO 45001, FSSC 22000 ; Halal ; FSC C191615
 
 > Libellés à confirmer par New Box : signification exacte de **KS** et **TB**.
 

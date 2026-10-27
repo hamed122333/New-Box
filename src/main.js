@@ -17,7 +17,7 @@ import { Configurator } from './ui/configurator.js';
 import { PAPERS, STORY_PAPERS } from './data/papers.js';
 import { afterNextPaint, yieldToMain } from './lib/schedule.js';
 import logoUrl from './assets/brand/logo-new-box.png';
-// WebP (13 Ko) à pleine résolution pour la texture ; PNG de secours si le navigateur ne décode pas le WebP
+// WebP (53 Ko, 1440 px) pour la texture et la page ; PNG de secours si le navigateur ne décode pas le WebP
 import certsUrl from './assets/brand/certifications.webp';
 import certsPngUrl from './assets/brand/certifications.png';
 
@@ -167,7 +167,7 @@ async function init() {
   // Les textures sont dessinées avec les polices du site et le logo officiel : leur chargement
   // part tout de suite, avant la création du renderer.
   const logoPromise = loadImage(logoUrl).catch(() => null);
-  const certsPromise = loadImage(certsUrl) // SGS FSSC 22000 · ISO 9001 · ISO 45001, FSC
+  const certsPromise = loadImage(certsUrl) // SGS ISO 9001 · 14001 · 45001 · FSSC 22000, Halal, FSC
     .catch(() => loadImage(certsPngUrl))
     .catch(() => null);
   const fontsPromise = Promise.all([

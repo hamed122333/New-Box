@@ -350,7 +350,7 @@ export function printedPanel(kind, o, aniso) {
   // blanches du logo laissent apparaître le papier comme sur une vraie impression.
   if (kind === 'front' && !o.logo && o.brandLogo) {
     printBrandLogo(ctx, o, layout);
-    // Certifications (SGS FSSC 22000 · ISO 9001 · ISO 45001, FSC) imprimées sous le logo
+    // Certifications (SGS ISO 9001 · 14001 · 45001 · FSSC 22000, Halal, FSC) imprimées sous le logo
     if (layout.certs) printCerts(ctx, o, layout.certs);
   }
 
@@ -386,7 +386,8 @@ function frontLayout(W, H, o) {
   let hc = 0;
   if (o.certs && !o.logo) {
     const ar = o.certs.width / o.certs.height;
-    hc = Math.min((W * 0.5) / ar, (bottom - top) * 0.3);
+    // bandeau de logos : jusqu'à 62 % de la largeur de la face (6 logos restent lisibles)
+    hc = Math.min((W * 0.62) / ar, (bottom - top) * 0.3);
     certs = { w: hc * ar, h: hc };
   }
   let logo = null;

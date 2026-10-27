@@ -63,6 +63,7 @@ Pas de suite de tests automatisés dans le dépôt. Vérification manuelle ou vi
 - Palette du récit : caisses livrées pliées-collées à plat, en paquets cerclés (`src/three/stack.js`)
 - Logo officiel : `src/assets/brand/logo-new-box.png` (variantes dérivées `logo-new-box-112.png` / `-224.png` pour
   l'affichage, `certifications.webp` dérivé de `certifications.png` : à régénérer quand les originaux changent) ; charte : bleu `#14259B`, orange `#F49C21`, bleu nuit `#0D1642`
-- Certifications (SGS FSSC 22000, ISO 9001, ISO 45001 ; FSC C191615) : `src/assets/brand/certifications.png`,
+- Certifications (SGS ISO 9001, ISO 14001, ISO 45001, FSSC 22000 ; Halal Diwan Al-Iftaa / INNORPI ; FSC C191615) :
+  `src/assets/brand/certifications.png` (bandeau officiel des 6 logos),
   imprimées sous le logo sur la face avant des caisses imprimées et affichées dans la section « Produits & délais »
 - Plan et feuille de route : `docs/PLAN.md`
