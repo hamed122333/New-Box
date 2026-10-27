@@ -36,12 +36,12 @@
   --fade: 0;
   --text: var(--ink);
   --text-2: var(--ink-2);
-  --scrim: rgba(243, 238, 230, 0.88);
+  --scrim: rgba(243, 238, 230, 0.9);
   color-scheme: light;
 }
 
 html[data-world='macro'] {
-  --scrim: rgba(9, 14, 44, 0.86);
+  --scrim: rgba(9, 14, 44, 0.9);
   --heading: #f4ede3;
   --text: #f4ede3;
   --text-2: var(--muted-on-dark);
@@ -471,13 +471,13 @@ html[data-mode='config'] .rail {
   content: '';
   position: absolute;
   z-index: -1;
-  inset: -12% -96px -12% calc(-1 * var(--gutter));
+  inset: -14% -96px -14% calc(-1 * var(--gutter));
   /* voile limité à la colonne de texte : plein jusqu'au bout des lignes puis fondu (96 px à
-     droite, 14 % en haut et en bas). Le texte garde ≥ 4,5:1 même quand l'échantillon macro
-     passe dessous, et la 3D reste nette à droite de la colonne. */
+     droite ; en haut et en bas, fondu de 8 % entièrement hors du texte). Le texte garde
+     ≥ 4,5:1 même quand l'échantillon macro passe dessous, la 3D reste nette à droite. */
   background: linear-gradient(90deg, var(--scrim) calc(100% - 96px), transparent);
-  -webkit-mask-image: linear-gradient(transparent, #000 14%, #000 86%, transparent);
-  mask-image: linear-gradient(transparent, #000 14%, #000 86%, transparent);
+  -webkit-mask-image: linear-gradient(transparent, #000 8%, #000 92%, transparent);
+  mask-image: linear-gradient(transparent, #000 8%, #000 92%, transparent);
   pointer-events: none;
   transition: background 0.4s;
 }
